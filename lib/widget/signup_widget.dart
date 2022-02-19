@@ -1,16 +1,17 @@
-import 'package:drc/widget/navbar.dart';
 import 'package:flutter/material.dart';
 
-class LoginWidget extends StatefulWidget {
+class SignUpWidget extends StatefulWidget {
   @override
-  _LoginWidgetState createState() => _LoginWidgetState();
+  _SignUpWidgetState createState() => _SignUpWidgetState();
 }
 
-class _LoginWidgetState extends State<LoginWidget> {
+class _SignUpWidgetState extends State<SignUpWidget> {
   bool? _rememberMe = false;
 
+  FocusNode _fullname = FocusNode();
   FocusNode _emailfield = FocusNode();
   FocusNode _passwordfield = FocusNode();
+  FocusNode _confirmpasswordfield = FocusNode();
 
   @override
   void initState() {
@@ -34,7 +35,9 @@ class _LoginWidgetState extends State<LoginWidget> {
             children: <Widget>[
               SizedBox(
                   height: (_emailfield.hasPrimaryFocus ||
-                          _passwordfield.hasPrimaryFocus)
+                          _passwordfield.hasPrimaryFocus ||
+                          _fullname.hasPrimaryFocus ||
+                          _confirmpasswordfield.hasPrimaryFocus)
                       ? (MediaQuery.of(context).size.height * 0.00)
                       : (MediaQuery.of(context).size.height * 0.37)),
               Expanded(
@@ -54,10 +57,10 @@ class _LoginWidgetState extends State<LoginWidget> {
         ),
         Positioned(
           bottom: 370,
-          right: 167.5,
+          right: 130,
           child: Container(
             child: Text(
-              'Login',
+              'Sign Up',
               style: TextStyle(
                 fontSize: 35,
                 fontWeight: FontWeight.bold,
@@ -66,7 +69,41 @@ class _LoginWidgetState extends State<LoginWidget> {
           ),
         ),
         Positioned(
-          bottom: 325,
+          bottom: 340,
+          left: 50,
+          child: Container(
+            child: Text(
+              'Full Name',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 300,
+          left: 50,
+          child: Container(
+            width: (MediaQuery.of(context).size.width * 0.75),
+            height: 35,
+            child: TextFormField(
+              focusNode: _fullname,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(5.0),
+                  ),
+                ),
+              ),
+              onFieldSubmitted: (_) {
+                FocusScope.of(context).requestFocus(_emailfield);
+              },
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 275,
           left: 50,
           child: Container(
             child: Text(
@@ -79,11 +116,11 @@ class _LoginWidgetState extends State<LoginWidget> {
           ),
         ),
         Positioned(
-          bottom: 280,
+          bottom: 235,
           left: 50,
           child: Container(
             width: (MediaQuery.of(context).size.width * 0.75),
-            height: 40,
+            height: 35,
             child: TextFormField(
               focusNode: _emailfield,
               decoration: InputDecoration(
@@ -100,7 +137,7 @@ class _LoginWidgetState extends State<LoginWidget> {
           ),
         ),
         Positioned(
-          bottom: 250,
+          bottom: 210,
           left: 50,
           child: Container(
             child: Text(
@@ -113,13 +150,47 @@ class _LoginWidgetState extends State<LoginWidget> {
           ),
         ),
         Positioned(
-          bottom: 205,
+          bottom: 170,
           left: 50,
           child: Container(
             width: (MediaQuery.of(context).size.width * 0.75),
-            height: 40,
+            height: 35,
             child: TextFormField(
               focusNode: _passwordfield,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(5.0),
+                  ),
+                ),
+              ),
+              onFieldSubmitted: (_) {
+                FocusScope.of(context).requestFocus(_confirmpasswordfield);
+              },
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 145,
+          left: 50,
+          child: Container(
+            child: Text(
+              'Confirm Password',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 105,
+          left: 50,
+          child: Container(
+            width: (MediaQuery.of(context).size.width * 0.75),
+            height: 35,
+            child: TextFormField(
+              focusNode: _confirmpasswordfield,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(
@@ -132,7 +203,7 @@ class _LoginWidgetState extends State<LoginWidget> {
           ),
         ),
         Positioned(
-          bottom: 160,
+          bottom: 60,
           left: 50,
           child: Row(
             children: <Widget>[
@@ -146,21 +217,26 @@ class _LoginWidgetState extends State<LoginWidget> {
                   },
                 ),
               ),
-              Text('Remember Me'),
+              RichText(
+                text: TextSpan(
+                  text: "I agree to the ",
+                  style: TextStyle(color: Colors.black87),
+                  children: <TextSpan>[
+                    TextSpan(
+                        text: 'terms and conditions',
+                        style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
         Positioned(
-          bottom: 110,
+          bottom: 20,
           left: 80,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushReplacementNamed(NavBar.routeName);
-            },
-            child: Container(
-              child: Image.asset(
-                'assets/signup/Rectangle 6317.png',
-              ),
+          child: Container(
+            child: Image.asset(
+              'assets/signup/Rectangle 6317.png',
             ),
           ),
         )

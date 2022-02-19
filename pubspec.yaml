@@ -67,8 +67,11 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/signup/header.png
+    - assets/signup/pc-person 1.png
     - assets/signup/18410 1.png
+    - assets/signup/login wtih.png
+    - assets/signup/Rectangle 6317.png
+    - assets/signup/Already have an account_.png
   # - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

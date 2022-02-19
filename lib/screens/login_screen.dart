@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widget/login_widget.dart';
 
-class SignUpScreen extends StatelessWidget {
+class LoginScreen extends StatelessWidget {
+  static const routeName = '/login';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,20 +21,33 @@ class SignUpScreen extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 50,
-            right: 120,
+            top: 35,
+            right: 130,
             child: Container(
-              height: 290,
-              width: 150,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/signup/header.png'),
-                  fit: BoxFit.cover,
-                ),
+              child: Image.asset('assets/signup/pc-person 1.png',
+                  height: double.infinity, width: double.infinity),
+              height: 220,
+              width: 140,
+            ),
+          ),
+          LoginWidget(),
+          Positioned(
+            bottom: 125,
+            left: 185,
+            child: Text(
+              'Login',
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          ),
+          Positioned(
+            bottom: 80,
+            left: 86.7,
+            child: Container(
+              child: Image.asset(
+                'assets/signup/login wtih.png',
               ),
             ),
           ),
-          SignUpWidget(),
         ],
       ),
     );
