@@ -1,3 +1,4 @@
+import 'package:drc/screens/dashboard_screen.dart';
 import 'package:drc/screens/signup_screen.dart';
 import 'package:drc/widget/navbar.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
         routes: {
           LoginScreen.routeName: (ctx) => LoginScreen(),
           NavBar.routeName: (ctx) => NavBar(),
+          DashboardScreen.routeName: (ctx) => DashboardScreen(),
         });
   }
 }

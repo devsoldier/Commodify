@@ -12,23 +12,8 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  int _selectedPageIndex = 0;
-
-  // final _pageOptions = [
-  //   DashboardScreen(),
-  //   TradingScreen(),
-  //   TransactionScreen(),
-  //   WalletScreen(),
-  //   ProfileScreen(),
-  // ];
   late List<Map<String, dynamic>> _pages;
-  // = [
-  //   {'page': DashboardScreen(), 'title': 'Dashboard'},
-  //   {'page': TradingScreen(), 'title': 'Trading'},
-  //   {'page': TransactionScreen(), 'title': 'Transaction'},
-  //   {'page': WalletScreen(), 'title': 'Wallet'},
-  //   {'page': ProfileScreen(), 'title': 'Profile'},
-  // ];
+  int _selectedPageIndex = 0;
 
   @override
   void initState() {
@@ -59,7 +44,7 @@ class _NavBarState extends State<NavBar> {
           backgroundColor: Color.fromRGBO(10, 38, 83, 1.0),
         ),
         backgroundColor: Colors.white,
-        body: _pages[_selectedPageIndex]['pages'],
+        body: _pages[_selectedPageIndex]['page'],
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           items: [
