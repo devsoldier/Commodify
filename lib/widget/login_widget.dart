@@ -1,5 +1,7 @@
 import 'package:drc/widget/navbar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth.dart';
 
 class LoginWidget extends StatefulWidget {
   @override
@@ -8,9 +10,36 @@ class LoginWidget extends StatefulWidget {
 
 class _LoginWidgetState extends State<LoginWidget> {
   bool? _rememberMe = false;
+  bool? _isLoading = false;
+  final GlobalKey<FormState> _loginKey = GlobalKey();
 
   FocusNode _emailfield = FocusNode();
   FocusNode _passwordfield = FocusNode();
+
+  Map<String, String> _authData = {
+    "email": "",
+    "password": "",
+  };
+
+  Future<void> _submit() async {
+    if (!_loginKey.currentState!.validate()) {
+      // Invalid!
+      return;
+    }
+    _loginKey.currentState!.save();
+    setState(() {
+      _isLoading = true;
+    });
+    await Provider.of<Auth>(context, listen: false).signup(
+      _authData["name"]!,
+      _authData["email"]!,
+      _authData["password"]!,
+    );
+    setState(() {
+      _isLoading = false;
+    });
+    // print(_authData);
+  }
 
   @override
   void initState() {
@@ -79,27 +108,6 @@ class _LoginWidgetState extends State<LoginWidget> {
           ),
         ),
         Positioned(
-          bottom: 280,
-          left: 50,
-          child: Container(
-            width: (MediaQuery.of(context).size.width * 0.75),
-            height: 40,
-            child: TextFormField(
-              focusNode: _emailfield,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(5.0),
-                  ),
-                ),
-              ),
-              onFieldSubmitted: (_) {
-                FocusScope.of(context).requestFocus(_passwordfield);
-              },
-            ),
-          ),
-        ),
-        Positioned(
           bottom: 250,
           left: 50,
           child: Container(
@@ -112,23 +120,51 @@ class _LoginWidgetState extends State<LoginWidget> {
             ),
           ),
         ),
-        Positioned(
-          bottom: 205,
-          left: 50,
-          child: Container(
-            width: (MediaQuery.of(context).size.width * 0.75),
-            height: 40,
-            child: TextFormField(
-              focusNode: _passwordfield,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(5.0),
+        Form(
+          key: _loginKey,
+          child: Column(
+            children: <Widget>[
+              Positioned(
+                bottom: 280,
+                left: 50,
+                child: Container(
+                  width: (MediaQuery.of(context).size.width * 0.75),
+                  height: 40,
+                  child: TextFormField(
+                    focusNode: _emailfield,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5.0),
+                        ),
+                      ),
+                    ),
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(_passwordfield);
+                    },
                   ),
                 ),
               ),
-              onFieldSubmitted: (_) {},
-            ),
+              Positioned(
+                bottom: 205,
+                left: 50,
+                child: Container(
+                  width: (MediaQuery.of(context).size.width * 0.75),
+                  height: 40,
+                  child: TextFormField(
+                    focusNode: _passwordfield,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5.0),
+                        ),
+                      ),
+                    ),
+                    onFieldSubmitted: (_) {},
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         Positioned(
