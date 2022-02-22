@@ -32,7 +32,7 @@ class LoginScreen extends StatelessWidget {
           ),
           LoginWidget(),
           Positioned(
-            bottom: 125,
+            bottom: 122,
             left: 185,
             child: Text(
               'Login',

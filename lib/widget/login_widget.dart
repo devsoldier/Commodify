@@ -1,7 +1,8 @@
-import 'package:drc/widget/navbar.dart';
+// import 'package:drc/widget/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
+import '../model/http_exception.dart';
 
 class LoginWidget extends StatefulWidget {
   @override
@@ -10,16 +11,37 @@ class LoginWidget extends StatefulWidget {
 
 class _LoginWidgetState extends State<LoginWidget> {
   bool? _rememberMe = false;
-  bool? _isLoading = false;
+  bool _isLoading = false;
   final GlobalKey<FormState> _loginKey = GlobalKey();
 
   FocusNode _emailfield = FocusNode();
   FocusNode _passwordfield = FocusNode();
 
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   Map<String, String> _authData = {
     "email": "",
     "password": "",
   };
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occurred!'),
+        content: Text(message),
+        actions: <Widget>[
+          ElevatedButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
 
   Future<void> _submit() async {
     if (!_loginKey.currentState!.validate()) {
@@ -30,11 +52,30 @@ class _LoginWidgetState extends State<LoginWidget> {
     setState(() {
       _isLoading = true;
     });
-    await Provider.of<Auth>(context, listen: false).signup(
-      _authData["name"]!,
-      _authData["email"]!,
-      _authData["password"]!,
-    );
+    try {
+      await Provider.of<Auth>(context, listen: false).login(
+        _authData["email"]!,
+        _authData["password"]!,
+      );
+    } on HttpException catch (error) {
+      var errorMessage = 'Authentication failed';
+      if (error.toString().contains('EMAIL_EXISTS')) {
+        errorMessage = 'This email address is already in use.';
+      } else if (error.toString().contains('INVALID_EMAIL')) {
+        errorMessage = 'This is not a valid email address';
+      } else if (error.toString().contains('WEAK_PASSWORD')) {
+        errorMessage = 'This password is too weak.';
+      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
+        errorMessage = 'Could not find a user with that email.';
+      } else if (error.toString().contains('INVALID_PASSWORD')) {
+        errorMessage = 'Invalid password.';
+      }
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      const errorMessage =
+          'Could not authenticate you. Please try again later.';
+      _showErrorDialog(errorMessage);
+    }
     setState(() {
       _isLoading = false;
     });
@@ -120,18 +161,27 @@ class _LoginWidgetState extends State<LoginWidget> {
             ),
           ),
         ),
-        Form(
-          key: _loginKey,
-          child: Column(
-            children: <Widget>[
-              Positioned(
-                bottom: 280,
-                left: 50,
-                child: Container(
+        Positioned(
+          bottom: 105,
+          left: 50,
+          child: Form(
+            key: _loginKey,
+            child: Column(
+              children: <Widget>[
+                //EMAIL
+
+                Container(
                   width: (MediaQuery.of(context).size.width * 0.75),
                   height: 40,
                   child: TextFormField(
+                    keyboardType: TextInputType.emailAddress,
                     focusNode: _emailfield,
+                    validator: (value) {
+                      if (value!.isEmpty || !value.contains('@')) {
+                        return 'Invalid email!';
+                      }
+                      return null;
+                    },
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
@@ -139,20 +189,26 @@ class _LoginWidgetState extends State<LoginWidget> {
                         ),
                       ),
                     ),
-                    onFieldSubmitted: (_) {
+                    onSaved: (value) {
+                      _authData["email"] = value.toString();
                       FocusScope.of(context).requestFocus(_passwordfield);
                     },
                   ),
                 ),
-              ),
-              Positioned(
-                bottom: 205,
-                left: 50,
-                child: Container(
+                //PASSWORD
+                SizedBox(height: 33),
+                Container(
                   width: (MediaQuery.of(context).size.width * 0.75),
                   height: 40,
                   child: TextFormField(
+                    obscureText: true,
+                    controller: _passwordController,
                     focusNode: _passwordfield,
+                    validator: (value) {
+                      if (value!.isEmpty || value.length < 5) {
+                        return 'Password is too short!';
+                      }
+                    },
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
@@ -160,11 +216,25 @@ class _LoginWidgetState extends State<LoginWidget> {
                         ),
                       ),
                     ),
-                    onFieldSubmitted: (_) {},
+                    onSaved: (value) {
+                      _authData["password"] = value!;
+                    },
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 58),
+                if (_isLoading)
+                  CircularProgressIndicator()
+                else
+                  GestureDetector(
+                    onTap: _submit,
+                    child: Container(
+                      child: Image.asset(
+                        'assets/signup/Rectangle 6317.png',
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
         Positioned(
@@ -186,20 +256,6 @@ class _LoginWidgetState extends State<LoginWidget> {
             ],
           ),
         ),
-        Positioned(
-          bottom: 110,
-          left: 80,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushReplacementNamed(NavBar.routeName);
-            },
-            child: Container(
-              child: Image.asset(
-                'assets/signup/Rectangle 6317.png',
-              ),
-            ),
-          ),
-        )
       ],
     );
   }

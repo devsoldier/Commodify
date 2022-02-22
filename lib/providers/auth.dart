@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
+import '../model/http_exception.dart';
 
 class Auth with ChangeNotifier {
   late String _token;
@@ -14,13 +15,21 @@ class Auth with ChangeNotifier {
     resBody["email"] = email;
     resBody["password"] = password;
     String body = json.encode(resBody);
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: (body),
-    );
-    print(json.decode(response.body));
-    print(body);
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: (body),
+      );
+      final responseData = json.decode(response.body);
+      if (responseData['error'] != null) {
+        throw HttpException(responseData['error']['message']);
+      }
+      print(json.decode(response.body));
+      print(body);
+    } catch (error) {
+      throw error;
+    }
   }
 
   Future<void> login(String email, String password) async {
@@ -29,12 +38,20 @@ class Auth with ChangeNotifier {
     resBody["email"] = email;
     resBody["password"] = password;
     String body = json.encode(resBody);
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: (body),
-    );
-    print(json.decode(response.body));
-    print(body);
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: (body),
+      );
+      final responseData = json.decode(response.body);
+      if (responseData['error'] != null) {
+        throw HttpException(responseData['error']['message']);
+      }
+      print(json.decode(response.body));
+      print(body);
+    } catch (error) {
+      throw error;
+    }
   }
 }

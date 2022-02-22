@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
+import '../model/http_exception.dart';
 // import 'dart:convert';
 
 class SignUpWidget extends StatefulWidget {
@@ -10,7 +11,7 @@ class SignUpWidget extends StatefulWidget {
 
 class _SignUpWidgetState extends State<SignUpWidget> {
   bool? _rememberMe = false;
-  bool? _isLoading = false;
+  bool _isLoading = false;
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   FocusNode _fullname = FocusNode();
@@ -30,9 +31,23 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     "password": "",
   };
 
-  // List<Map<String, String>> _authData = [
-  //   {"name": "", "email": "", "password": ""}
-  // ];
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occurred!'),
+        content: Text(message),
+        actions: <Widget>[
+          ElevatedButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
@@ -43,11 +58,31 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     setState(() {
       _isLoading = true;
     });
-    await Provider.of<Auth>(context, listen: false).signup(
-      _authData["name"]!,
-      _authData["email"]!,
-      _authData["password"]!,
-    );
+    try {
+      await Provider.of<Auth>(context, listen: false).signup(
+        _authData["name"]!,
+        _authData["email"]!,
+        _authData["password"]!,
+      );
+    } on HttpException catch (error) {
+      var errorMessage = 'Authentication failed';
+      if (error.toString().contains('EMAIL_EXISTS')) {
+        errorMessage = 'This email address is already in use.';
+      } else if (error.toString().contains('INVALID_EMAIL')) {
+        errorMessage = 'This is not a valid email address';
+      } else if (error.toString().contains('WEAK_PASSWORD')) {
+        errorMessage = 'This password is too weak.';
+      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
+        errorMessage = 'Could not find a user with that email.';
+      } else if (error.toString().contains('INVALID_PASSWORD')) {
+        errorMessage = 'Invalid password.';
+      }
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      const errorMessage =
+          'Could not authenticate you. Please try again later.';
+      _showErrorDialog(errorMessage);
+    }
     setState(() {
       _isLoading = false;
     });
@@ -257,7 +292,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                       ),
                       onSaved: (value) {
                         _authData["email"] = value.toString();
-                        FocusScope.of(context).requestFocus(_emailfield);
+                        FocusScope.of(context).requestFocus(_passwordfield);
                       },
                     ),
                   ),
@@ -322,14 +357,17 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                   SizedBox(height: 38),
                   Row(
                     children: <Widget>[
-                      GestureDetector(
-                        onTap: _submit,
-                        child: Container(
-                          child: Image.asset(
-                            'assets/signup/Rectangle 6317.png',
+                      if (_isLoading)
+                        CircularProgressIndicator()
+                      else
+                        GestureDetector(
+                          onTap: _submit,
+                          child: Container(
+                            child: Image.asset(
+                              'assets/signup/Rectangle 6317.png',
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ],
