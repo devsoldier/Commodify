@@ -53,6 +53,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       _isLoading = true;
     });
     try {
+      // await Provider.of<Auth>(context, listen: false).isAuth();
       await Provider.of<Auth>(context, listen: false).login(
         _authData["email"]!,
         _authData["password"]!,
@@ -80,6 +81,14 @@ class _LoginWidgetState extends State<LoginWidget> {
       _isLoading = false;
     });
     // print(_authData);
+  }
+
+  Future<void> _verify() async {
+    await Provider.of<Auth>(context, listen: false).isAuth();
+  }
+
+  Future<void> runBoth() async {
+    _submit().then((_) => _verify());
   }
 
   @override
@@ -226,7 +235,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                   CircularProgressIndicator()
                 else
                   GestureDetector(
-                    onTap: _submit,
+                    onTap: runBoth,
                     child: Container(
                       child: Image.asset(
                         'assets/signup/Rectangle 6317.png',

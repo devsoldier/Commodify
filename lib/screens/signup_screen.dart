@@ -4,6 +4,7 @@ import '../widget/signup_widget.dart';
 import '../screens/login_screen.dart';
 
 class SignUpScreen extends StatelessWidget {
+  static const routeName = '/signup';
   @override
   Widget build(BuildContext context) {
     return Scaffold(

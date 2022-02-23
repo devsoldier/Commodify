@@ -1,7 +1,7 @@
 import 'package:drc/screens/dashboard_screen.dart';
 import 'package:drc/widget/navbar.dart';
 import 'package:flutter/material.dart';
-import './screens/graph.dart';
+// import './screens/graph.dart';
 import 'screens/login_screen.dart';
 import 'widget/navbar.dart';
 import 'package:provider/provider.dart';
@@ -19,18 +19,23 @@ class MyApp extends StatelessWidget {
           value: Auth(),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'CMD',
-        theme: ThemeData(
-          fontFamily: 'Roboto',
+      child: Consumer<Auth>(
+        builder: (ctx, auth, _) => MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'CMD',
+          theme: ThemeData(
+            fontFamily: 'Roboto',
+          ),
+          home: (auth.isAuthenticated == true)
+              ? DashboardScreen()
+              : SignUpScreen(),
+          routes: {
+            SignUpScreen.routeName: (ctx) => SignUpScreen(),
+            LoginScreen.routeName: (ctx) => LoginScreen(),
+            NavBar.routeName: (ctx) => NavBar(),
+            DashboardScreen.routeName: (ctx) => DashboardScreen(),
+          },
         ),
-        home: SignUpScreen(),
-        routes: {
-          LoginScreen.routeName: (ctx) => LoginScreen(),
-          NavBar.routeName: (ctx) => NavBar(),
-          DashboardScreen.routeName: (ctx) => DashboardScreen(),
-        },
       ),
     );
   }
