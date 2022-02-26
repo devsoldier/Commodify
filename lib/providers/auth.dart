@@ -6,9 +6,14 @@ import '../model/http_exception.dart';
 
 class Auth with ChangeNotifier {
   late String _token;
-  late DateTime _expiryDate;
-  late String _userId;
-  bool isAuthenticated = false;
+  // late DateTime _expiryDate;
+  // late String _userId;
+  bool? isAuthenticated;
+
+  bool? get isoyo {
+    print(isAuthenticated);
+    return isAuthenticated;
+  }
 
   Future<void> signup(String name, String email, String password) async {
     final url = Uri.parse('http://192.168.100.130:5000/auth/signup');
@@ -74,11 +79,11 @@ class Auth with ChangeNotifier {
     final response = await http.get(
       url,
       headers: {
-        "token":
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZDE2YzRjODItZWFjMS00MGY0LWEyOWYtN2E1ZTA1YmNkZDczIiwiaWF0IjoxNjQ1NTgzNDA1LCJleHAiOjE2NDU1ODcwMDV9.YjGs0Za0cWwM8YawRVCngA46rnugiZya38G_6GCIEEM'
+        "token": _token,
       },
     );
     isAuthenticated = json.decode(response.body);
-    print(isAuthenticated);
+    // print(isAuthenticated);
+    notifyListeners();
   }
 }

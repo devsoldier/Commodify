@@ -14,6 +14,7 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   late List<Map<String, dynamic>> _pages;
   int _selectedPageIndex = 0;
+  late String selectedInterval;
 
   @override
   void initState() {

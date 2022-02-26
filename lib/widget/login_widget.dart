@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 import '../model/http_exception.dart';
+import '../widget/navbar.dart';
 
 class LoginWidget extends StatefulWidget {
   @override
@@ -105,6 +106,7 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<Auth>(context);
     return Stack(
       children: <Widget>[
         Positioned(
@@ -178,7 +180,6 @@ class _LoginWidgetState extends State<LoginWidget> {
             child: Column(
               children: <Widget>[
                 //EMAIL
-
                 Container(
                   width: (MediaQuery.of(context).size.width * 0.75),
                   height: 40,
@@ -235,7 +236,20 @@ class _LoginWidgetState extends State<LoginWidget> {
                   CircularProgressIndicator()
                 else
                   GestureDetector(
-                    onTap: runBoth,
+                    onTap: () {
+                      setState(() async {
+                        await runBoth().then((_) => (auth.isAuthenticated!)
+                            ? Navigator.of(context)
+                                .pushReplacementNamed(NavBar.routeName)
+                            : 'nothing');
+                        /* await runBoth();
+                        Provider.of<Auth>(context, listen: false).isAuth();
+                        (auth.isAuthenticated!)
+                            ? Navigator.of(context).pushNamed(NavBar.routeName)
+                            : 'nothing'; */
+                      });
+                    },
+                    // runBoth,
                     child: Container(
                       child: Image.asset(
                         'assets/signup/Rectangle 6317.png',

@@ -1,3 +1,4 @@
+import 'package:drc/providers/interval.dart';
 import 'package:drc/screens/dashboard_screen.dart';
 import 'package:drc/widget/navbar.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import './providers/auth.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  late String selectedInterval;
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -18,6 +20,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: Auth(),
         ),
+        ChangeNotifierProvider.value(
+          value: TimeInterval(),
+        )
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
@@ -26,9 +31,11 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             fontFamily: 'Roboto',
           ),
-          home: (auth.isAuthenticated == true)
-              ? DashboardScreen()
-              : SignUpScreen(),
+          home: /* (auth.isoyo != null && auth.isoyo == true)
+              ? NavBar()
+              :  */
+              NavBar(),
+          // SignUpScreen(),
           routes: {
             SignUpScreen.routeName: (ctx) => SignUpScreen(),
             LoginScreen.routeName: (ctx) => LoginScreen(),
