@@ -39,13 +39,13 @@ class DashboardScreen extends StatelessWidget {
         ),
         Positioned(
           left: 7,
-          bottom: 0,
+          bottom: -10,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
             child: Container(
               color: Colors.white,
               width: MediaQuery.of(context).size.width * 0.96,
-              height: MediaQuery.of(context).size.height * 0.63,
+              height: MediaQuery.of(context).size.height * 0.645,
             ),
           ),
         ),

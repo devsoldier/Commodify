@@ -9,25 +9,22 @@ import '../providers/models.dart';
 import 'dart:async';
 // import '../widget/dashboard_widget.dart';
 
-class Graph extends StatefulWidget {
+class TradingWidget extends StatefulWidget {
   @override
-  _GraphState createState() => _GraphState();
+  _TradingWidgetState createState() => _TradingWidgetState();
 }
 
-class _GraphState extends State<Graph> {
+class _TradingWidgetState extends State<TradingWidget> {
   final List<Commodity> _chartData = [];
   late TrackballBehavior _trackballBehavior;
   late ZoomPanBehavior _zoomPanBehavior;
-  String _selectedInterval = '1 minute';
-  List intervals = [
-    '1 minute',
-    '2 minutes',
-    '3 minutes',
-    '4 minutes',
-    '5 minutes'
+  String _selectedCommodity = 'GOLD/USD';
+  List commodities = [
+    'GOLD/USD',
+    '??',
+    '???',
   ];
 
-  dynamic tickCount;
   bool stopLoop = true;
 
   final channel = IOWebSocketChannel.connect(
@@ -41,59 +38,15 @@ class _GraphState extends State<Graph> {
   }
 
   secTimer() {
-    if (_selectedInterval == '1 minute') {
-      print(_selectedInterval);
-      Timer.periodic(Duration(minutes: 1), (timer) {
-        if (_selectedInterval != '1 minute') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
-        });
+    Timer.periodic(Duration(minutes: 1), (timer) {
+      if (stopLoop == false) {
+        timer.cancel();
+        // channel2.sink.close();
+      }
+      setStateIfMounted(() {
+        getTickStream();
       });
-    } else if (_selectedInterval == '2 minutes') {
-      print(_selectedInterval);
-      Timer.periodic(Duration(minutes: 2), (timer) {
-        if (_selectedInterval != '2 minutes') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
-        });
-      });
-    } else if (_selectedInterval == '3 minutes') {
-      Timer.periodic(Duration(minutes: 3), (timer) {
-        if (_selectedInterval != '3 minutes') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
-        });
-      });
-    } else if (_selectedInterval == '4 minute') {
-      Timer.periodic(Duration(minutes: 4), (timer) {
-        if (_selectedInterval != '4 minute') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
-        });
-      });
-    } else if (_selectedInterval == '5 minute') {
-      Timer.periodic(Duration(minutes: 5), (timer) {
-        if (_selectedInterval != '5 minute') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
-        });
-      });
-    }
+    });
   }
 
   void getTickOnce() {
@@ -184,44 +137,13 @@ class _GraphState extends State<Graph> {
     return Stack(
       children: <Widget>[
         Positioned(
-          top: 202,
-          right: 35,
+          top: 10,
+          left: 0,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
+            // borderRadius: BorderRadius.circular(10.0),
             child: Container(
-              decoration: BoxDecoration(
-                  // border: Border.all(color: Colors.black54),
-                  borderRadius: BorderRadius.circular(12)),
-              width: MediaQuery.of(context).size.width * 0.25,
-              height: MediaQuery.of(context).size.height * 0.05,
-              child: DropdownButton(
-                isExpanded: true,
-                value: _selectedInterval,
-                onChanged: (newval) {
-                  setState(() {
-                    _selectedInterval = newval as String;
-                    secTimer();
-                  });
-                },
-                elevation: 16,
-                items: intervals.map((newval) {
-                  return DropdownMenuItem(
-                    value: newval,
-                    child: Text(newval),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 105,
-          left: 24,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.88,
-              height: MediaQuery.of(context).size.height * 0.3,
+              width: MediaQuery.of(context).size.width * 1.0,
+              height: MediaQuery.of(context).size.height * 0.4,
               color: Color.fromRGBO(15, 34, 66, 1),
               child: Column(
                 children: <Widget>[
@@ -256,6 +178,92 @@ class _GraphState extends State<Graph> {
                 ],
               ),
             ),
+          ),
+        ),
+        Positioned(
+          bottom: 200,
+          left: 30,
+          child: Column(
+            children: <Widget>[
+              Container(
+                height: 25,
+                // color: Colors.black,
+                child: Row(
+                  children: <Widget>[
+                    Text('BALANCE',
+                        style: TextStyle(
+                          color: Color.fromRGBO(0, 51, 116, 1),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    SizedBox(width: 25),
+                    Container(
+                      color: Color.fromRGBO(220, 243, 255, 1),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.monetization_on_outlined,
+                            color: Color.fromRGBO(0, 51, 116, 1),
+                          ),
+                          Text(
+                            '\$1000000000000000000',
+                            style: TextStyle(
+                              color: Color.fromRGBO(0, 51, 116, 1),
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Row(
+              //   children: <Widget>[
+              //     Container(
+              //       height: 25,
+              //       color: Colors.black,
+              //       child: Text('where am i'),
+              //     ),
+              //   ],
+              // ),
+            ],
+          ),
+        ),
+        Positioned(
+          bottom: 150,
+          left: 160,
+          child: Container(
+            color: Colors.amber,
+            height: 25,
+            width: 105,
+            child: DropdownButton(
+              isExpanded: true,
+              value: _selectedCommodity,
+              onChanged: (newval) {
+                setState(() {
+                  _selectedCommodity = newval as String;
+                  secTimer();
+                });
+              },
+              elevation: 16,
+              items: commodities.map((newval) {
+                return DropdownMenuItem(
+                  value: newval,
+                  child: Text(newval),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+        Positioned(
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[Container(child: Column())],
+              ),
+            ],
           ),
         ),
       ],

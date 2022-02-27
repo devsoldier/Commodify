@@ -14,12 +14,13 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     return Stack(
       children: <Widget>[
         Positioned(
-            top: 5,
-            left: 7,
-            child: Text(
-              'Welcome',
-              style: TextStyle(color: Colors.white),
-            )),
+          top: 5,
+          left: 7,
+          child: Text(
+            'Welcome',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
         Positioned(
           top: 28,
           left: 10,
@@ -32,8 +33,19 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   radius: 35,
                   lineWidth: 5.0,
                   percent: 1.0,
-                  center: new Text("100% Limit",
-                      style: TextStyle(color: Colors.white)),
+                  center: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "100%",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        "Limit%",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
                   progressColor: Color.fromRGBO(48, 175, 229, 1),
                 ),
                 Column(
@@ -78,8 +90,6 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
               child: Column(
-                // mainAxisAlignment: MainAxisAlignment.center,
-                // crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.only(top: 5),
@@ -206,7 +216,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
         ),
         Positioned(
           bottom: 12,
-          left: 25,
+          left: 22.5,
           child: Container(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
