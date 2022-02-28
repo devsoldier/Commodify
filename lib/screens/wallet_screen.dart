@@ -1,3 +1,4 @@
+import 'package:drc/widget/wallet_widget.dart';
 import 'package:flutter/material.dart';
 
 class WalletScreen extends StatelessWidget {
@@ -23,11 +24,15 @@ class WalletScreen extends StatelessWidget {
                 height: double.infinity, width: double.infinity),
           ),
         ),
-        Positioned(
-            child: Container(
-                child: TabBarView(
-          children: [],
-        )))
+
+        WalletWidget(),
+        // Positioned(
+        //   child: Container(
+        //     child: TabBarView(
+        //       children: [],
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

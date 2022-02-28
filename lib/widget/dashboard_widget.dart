@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
@@ -35,7 +37,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   percent: 1.0,
                   center: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
+                    children: const <Widget>[
                       Text(
                         "100%",
                         style: TextStyle(color: Colors.white),

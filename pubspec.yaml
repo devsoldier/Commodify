@@ -36,7 +36,7 @@ dependencies:
   syncfusion_flutter_charts: ^19.4.52
   jwt_decode: ^0.3.1
   percent_indicator: ^4.0.0
-
+  toggle_switch: ^1.4.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -76,6 +76,10 @@ flutter:
     - assets/navbar/Rectangle 6331.png
     - assets/navbar/green.png
     - assets/navbar/red.png
+    - assets/navbar/Oval 5 + Oval 5 Copy + Oval 5 Copy 3.png
+    - assets/navbar/Rectangle 6.png
+    - assets/navbar/Visa.png
+    - assets/navbar/save button.png
   # - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
