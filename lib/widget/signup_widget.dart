@@ -10,17 +10,19 @@ class SignUpWidget extends StatefulWidget {
 }
 
 class _SignUpWidgetState extends State<SignUpWidget> {
-  bool? _rememberMe = false;
+  bool? _tnc = false;
   bool _isLoading = false;
   final GlobalKey<FormState> _formKey = GlobalKey();
 
-  FocusNode _fullname = FocusNode();
+  FocusNode _fname = FocusNode();
+  FocusNode _lname = FocusNode();
   FocusNode _emailfield = FocusNode();
   FocusNode _passwordfield = FocusNode();
   FocusNode _confirmpasswordfield = FocusNode();
 
-  final TextEditingController _fullnameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
+  // final TextEditingController _fnameController = TextEditingController();
+  // final TextEditingController _lnameController = TextEditingController();
+  // final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmpasswordController =
       TextEditingController();
@@ -60,7 +62,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     });
     try {
       await Provider.of<Auth>(context, listen: false).signup(
-        _authData["name"]!,
+        _authData["first_name"]!,
+        _authData["last_name"]!,
         _authData["email"]!,
         _authData["password"]!,
       );
@@ -126,7 +129,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               SizedBox(
                   height: (_emailfield.hasPrimaryFocus ||
                           _passwordfield.hasPrimaryFocus ||
-                          _fullname.hasPrimaryFocus ||
+                          _fname.hasPrimaryFocus ||
+                          _lname.hasPrimaryFocus ||
                           _confirmpasswordfield.hasPrimaryFocus)
                       ? (MediaQuery.of(context).size.height * 0.00)
                       : (MediaQuery.of(context).size.height * 0.37)),
@@ -146,8 +150,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
           ),
         ),
         Positioned(
-          bottom: 370,
-          right: 130,
+          bottom: MediaQuery.of(context).size.height * 0.55,
+          right: MediaQuery.of(context).size.width * 0.31,
           child: Container(
             child: Text(
               'Sign Up',
@@ -159,118 +163,96 @@ class _SignUpWidgetState extends State<SignUpWidget> {
           ),
         ),
         Positioned(
-          bottom: 340,
-          left: 50,
-          child: Container(
-            child: Text(
-              'Full Name',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 275,
-          left: 50,
-          child: Container(
-            child: Text(
-              'Email',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 210,
-          left: 50,
-          child: Container(
-            child: Text(
-              'Password',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 145,
-          left: 50,
-          child: Container(
-            child: Text(
-              'Confirm Password',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 60,
-          left: 50,
-          child: Row(
-            children: <Widget>[
-              Container(
-                child: Checkbox(
-                  value: _rememberMe,
-                  onChanged: (value) {
-                    setState(() {
-                      _rememberMe = value;
-                    });
-                  },
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  text: "I agree to the ",
-                  style: TextStyle(color: Colors.black87),
-                  children: <TextSpan>[
-                    TextSpan(
-                        text: 'terms and conditions',
-                        style: TextStyle(color: Colors.red)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        Positioned(
-          bottom: 23,
-          left: 50,
+          bottom: MediaQuery.of(context).size.width * 0.07,
+          left: MediaQuery.of(context).size.width * 0.14,
           child: Form(
             key: _formKey,
             child: Container(
               margin: EdgeInsets.only(right: 60),
               // padding: EdgeInsets.only(right: 100),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   //FULL NAME
-                  Container(
-                    width: (MediaQuery.of(context).size.width * 0.75),
-                    height: 35,
-                    child: TextFormField(
-                      focusNode: _fullname,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5.0),
+                  Row(
+                    children: <Widget>[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            child: Text(
+                              'First Name',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                        ),
+                          Container(
+                            width: (MediaQuery.of(context).size.width * 0.350),
+                            height: 35,
+                            child: TextFormField(
+                              focusNode: _fname,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5.0),
+                                  ),
+                                ),
+                              ),
+                              onSaved: (value) {
+                                _authData["first_name"] = value.toString();
+                                FocusScope.of(context).requestFocus(_lname);
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      onSaved: (value) {
-                        _authData["name"] = value.toString();
-                        FocusScope.of(context).requestFocus(_emailfield);
-                      },
-                    ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.05),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            child: Text(
+                              'Last Name',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: (MediaQuery.of(context).size.width * 0.35),
+                            height: 35,
+                            child: TextFormField(
+                              focusNode: _lname,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5.0),
+                                  ),
+                                ),
+                              ),
+                              onSaved: (value) {
+                                _authData["last_name"] = value.toString();
+                                FocusScope.of(context)
+                                    .requestFocus(_emailfield);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   //EMAIL
-                  SizedBox(height: 30),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  Text(
+                    'Email',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   Container(
                     width: (MediaQuery.of(context).size.width * 0.75),
                     height: 35,
@@ -298,7 +280,14 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                   ),
 
                   //PASSWORD
-                  SizedBox(height: 30),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  Text(
+                    'Password',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   Container(
                     width: (MediaQuery.of(context).size.width * 0.75),
                     height: 35,
@@ -328,7 +317,14 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                   ),
 
                   //CONFIRM PASSWORD
-                  SizedBox(height: 30),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  Text(
+                    'Confirm Password',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   Container(
                     width: (MediaQuery.of(context).size.width * 0.75),
                     height: 35,
@@ -354,22 +350,51 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                       },
                     ),
                   ),
-                  SizedBox(height: 38),
                   Row(
                     children: <Widget>[
-                      if (_isLoading)
-                        CircularProgressIndicator()
+                      Container(
+                        child: Checkbox(
+                          value: _tnc,
+                          onChanged: (value) {
+                            setState(() {
+                              _tnc = value;
+                            });
+                          },
+                        ),
+                      ),
+                      RichText(
+                        text: TextSpan(
+                          text: "I agree to the ",
+                          style: TextStyle(color: Colors.black87),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: 'terms and conditions',
+                                style: TextStyle(color: Colors.red)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  // SizedBox(height: MediaQuery.of(context).size.height * 0.047),
+                  Row(
+                    children: <Widget>[
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.05),
+                      if (_tnc == false)
+                        Image.asset(
+                          'assets/signup/signup btn grey.png',
+                        )
                       else
                         GestureDetector(
                           onTap: _submit,
                           child: Container(
                             child: Image.asset(
-                              'assets/signup/Rectangle 6317.png',
+                              'assets/signup/signup btn.png',
                             ),
                           ),
                         ),
                     ],
                   ),
+                  // SizedBox(height: MediaQuery.of(context).size.height * 0.036),
                 ],
               ),
             ),

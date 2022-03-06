@@ -23,8 +23,8 @@ class SignUpScreen extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 35,
-            right: 130,
+            top: MediaQuery.of(context).size.height * 0.07,
+            right: MediaQuery.of(context).size.width * 0.3,
             child: Container(
               child: Image.asset('assets/signup/pc-person 1.png',
                   height: double.infinity, width: double.infinity),
@@ -61,17 +61,17 @@ class SignUpScreen extends StatelessWidget {
             ),
           ),
           SignUpWidget(),
+          // Positioned(
+          //   bottom: MediaQuery.of(context).size.height * 0.085,
+          //   left: MediaQuery.of(context).size.width * 0.42,
+          //   child: Text(
+          //     'Sign Up',
+          //     style: TextStyle(color: Colors.white, fontSize: 20),
+          //   ),
+          // ),
           Positioned(
-            bottom: 43,
-            left: 175,
-            child: Text(
-              'Sign Up',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          ),
-          Positioned(
-            bottom: 8,
-            left: 100,
+            bottom: MediaQuery.of(context).size.height * 0.017,
+            left: MediaQuery.of(context).size.width * 0.27,
             child: Row(
               children: <Widget>[
                 Image.asset(

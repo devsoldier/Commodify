@@ -32,14 +32,6 @@ class LoginScreen extends StatelessWidget {
           ),
           LoginWidget(),
           Positioned(
-            bottom: 122,
-            left: 185,
-            child: Text(
-              'Login',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          ),
-          Positioned(
             bottom: 80,
             left: 86.7,
             child: Container(

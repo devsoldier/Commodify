@@ -254,7 +254,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                   // runBoth,
                   child: Container(
                     child: Image.asset(
-                      'assets/signup/Rectangle 6317.png',
+                      'assets/signup/login button.png',
                     ),
                   ),
                 ),

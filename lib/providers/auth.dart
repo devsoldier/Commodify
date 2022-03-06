@@ -6,21 +6,15 @@ import '../model/http_exception.dart';
 
 class Auth with ChangeNotifier {
   late String _token;
-  // late DateTime _expiryDate;
-  // late String _userId;
   bool? isAuthenticated;
-  late double balance;
+  late dynamic balance;
 
-  // bool? get isoyo {
-  //   print(isAuthenticated);
-  //   return isAuthenticated;
-  // }
-
-  Future<void> signup(String name, String email, String password) async {
+  Future<void> signup(
+      String fname, String lname, String email, String password) async {
     final url = Uri.parse('http://157.245.57.54:5000/user/signup');
     var resBody = {};
-    resBody["first_name"] = name;
-    resBody["last_name"] = name;
+    resBody["first_name"] = fname;
+    resBody["last_name"] = lname;
     resBody["email"] = email;
     resBody["password"] = password;
     String body = json.encode(resBody);
@@ -34,6 +28,7 @@ class Auth with ChangeNotifier {
       if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
       }
+      print(responseData);
       _token = responseData['token'];
       notifyListeners();
       print(json.decode(response.body));
@@ -107,8 +102,8 @@ class Auth with ChangeNotifier {
       },
       body: Body,
     );
-    print(json.decode(response.body));
-    print(amount);
+    // print(json.decode(response.body));
+    // print(amount);
     notifyListeners();
   }
 
@@ -124,9 +119,9 @@ class Auth with ChangeNotifier {
       },
       body: Body,
     );
-    print(json.decode(response.body));
+    // print(json.decode(response.body));
     // print(_token);
-    print(amount);
+    // print(amount);
     notifyListeners();
   }
 
@@ -144,7 +139,7 @@ class Auth with ChangeNotifier {
     );
     print(json.decode(response.body));
     // print(_token);
-    print(amount);
+    // print(amount);
     notifyListeners();
   }
 
@@ -162,7 +157,7 @@ class Auth with ChangeNotifier {
     final responseData = json.decode(response.body);
     balance = responseData[0]['balance'];
     print(balance);
-    print(response);
+    print(responseData);
     notifyListeners();
   }
 }

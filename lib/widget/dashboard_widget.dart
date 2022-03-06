@@ -12,13 +12,13 @@ class DashboardWidget extends StatefulWidget {
 }
 
 class _DashboardWidgetState extends State<DashboardWidget> {
-  Future<void> getbalance() async {
-    await Provider.of<Auth>(context, listen: false).getbalance();
+  void getBAL() {
+    Provider.of<Auth>(context, listen: false).getbalance();
   }
 
   @override
   void initState() {
-    getbalance();
+    getBAL();
     super.initState();
   }
 
