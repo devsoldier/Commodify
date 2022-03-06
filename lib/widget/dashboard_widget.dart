@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
-
+import 'package:provider/provider.dart';
+import '../providers/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
@@ -11,6 +12,16 @@ class DashboardWidget extends StatefulWidget {
 }
 
 class _DashboardWidgetState extends State<DashboardWidget> {
+  Future<void> getbalance() async {
+    await Provider.of<Auth>(context, listen: false).getbalance();
+  }
+
+  @override
+  void initState() {
+    getbalance();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -18,9 +29,20 @@ class _DashboardWidgetState extends State<DashboardWidget> {
         Positioned(
           top: 5,
           left: 7,
-          child: Text(
-            'Welcome',
-            style: TextStyle(color: Colors.white),
+          child: Row(
+            children: <Widget>[
+              Text(
+                'Welcome back,',
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                ' Tom!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
         Positioned(
@@ -31,24 +53,11 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                CircularPercentIndicator(
-                  radius: 35,
-                  lineWidth: 5.0,
-                  percent: 1.0,
-                  center: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      Text(
-                        "100%",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        "Limit%",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  progressColor: Color.fromRGBO(48, 175, 229, 1),
+                Container(
+                  // color: Colors.black,
+                  height: 75,
+                  width: 75,
+                  child: Image.asset('assets/navbar/Vector.png'),
                 ),
                 Column(
                   children: <Widget>[
@@ -75,8 +84,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
           ),
         ),
         Positioned(
-          top: 120,
-          left: 13,
+          top: MediaQuery.of(context).size.height * 0.18,
+          left: MediaQuery.of(context).size.width * 0.034,
           child: Container(
             alignment: Alignment.center,
             decoration: BoxDecoration(
@@ -84,7 +93,6 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               boxShadow: [
                 BoxShadow(
                   color: Colors.black26,
-                  spreadRadius: 1,
                   blurRadius: 5,
                 ),
               ],
@@ -240,7 +248,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                               children: [
                                 Container(
                                     child: Image.asset(
-                                        'assets/navbar/Rectangle 6331.png'))
+                                        'assets/navbar/gold asset.png'))
                               ],
                             ),
                             Column(

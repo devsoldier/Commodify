@@ -23,6 +23,33 @@ class TransactionScreen extends StatelessWidget {
                 height: double.infinity, width: double.infinity),
           ),
         ),
+        Positioned(
+          top: 12,
+          left: 17,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22.0),
+            child: Container(
+              color: Colors.white,
+              width: MediaQuery.of(context).size.width * 0.915,
+              height: MediaQuery.of(context).size.height,
+            ),
+          ),
+        ),
+        Positioned(
+          top: 20,
+          left: 40,
+          child: Column(
+            children: <Widget>[
+              Text(
+                'History Lists',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

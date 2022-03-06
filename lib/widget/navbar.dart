@@ -63,7 +63,7 @@ class _NavBarState extends State<NavBar> {
                 icon: Icon(Icons.supervisor_account, size: 30),
                 label: 'Profile'),
           ],
-          selectedItemColor: Colors.white,
+          selectedItemColor: Color.fromRGBO(0, 178, 255, 1),
           unselectedItemColor: Colors.black,
           currentIndex: _selectedPageIndex,
           backgroundColor: Color.fromRGBO(9, 51, 116, 1.0),

@@ -7,6 +7,7 @@ import 'dart:convert';
 import '../providers/models.dart';
 // import '../providers/interval.dart';
 import 'dart:async';
+import 'dart:math';
 // import '../widget/dashboard_widget.dart';
 
 class Graph extends StatefulWidget {
@@ -105,6 +106,9 @@ class _GraphState extends State<Graph> {
     channel2.sink.add(
         '{  "ticks_history": "R_50",  "adjust_start_time": 1,  "count": 1,"end": "latest","start": 1,"style": "candles"}');
   }
+  // void getTickStream() {
+  //   channel2.sink.add('{  "ticks": "R_50",  "subscribe": 1}');
+  // }
 
   void initialValue() {
     channel.stream.listen((data) {
@@ -157,6 +161,35 @@ class _GraphState extends State<Graph> {
       });
     });
   }
+  // void handShake() {
+  //   channel2.stream.listen((data) {
+  //     final extractedData = jsonDecode(data);
+  //     List<dynamic> timeConverted = [];
+  //     List<dynamic> loadedData = [];
+  //     setStateIfMounted(() {
+  //       for (int i = 0; i < extractedData.length - 3; i++) {
+  //         timeConverted.insert(
+  //             0,
+  //             DateTime.fromMillisecondsSinceEpoch(
+  //                 extractedData['tick']['epoch'] * 1000));
+  //         loadedData.add(extractedData['tick']['quote']);
+  //         _chartData.add(Commodity(
+  //             close: loadedData[loadedData.length - 1],
+  //             epoch: timeConverted[i],
+  //             high: loadedData.cast<num>().reduce(max),
+  //             low: loadedData.cast<num>().reduce(min),
+  //             open: loadedData[0]));
+  //         // print('close:${_chartData[i].close}');
+  //         // print('epoch:${_chartData[i].epoch}');
+  //         // print('high:${_chartData[i].high}');
+  //         // print('low:${_chartData[i].low}');
+  //         // print('open:${_chartData[i].open}');
+  //         // print('length:${_chartData.length}');
+  //         // print('---------------------------');
+  //       }
+  //     });
+  //   });
+  // }
 
   @override
   void initState() {
@@ -184,8 +217,42 @@ class _GraphState extends State<Graph> {
     return Stack(
       children: <Widget>[
         Positioned(
-          top: 202,
-          right: 35,
+          bottom: MediaQuery.of(context).size.height * 0.136,
+          left: 13,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  spreadRadius: 3,
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(top: 5, left: 15),
+                    child: (Text('Market Overview',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(9, 51, 116, 1)))),
+                    height: (MediaQuery.of(context).size.height * 0.35),
+                    width: (MediaQuery.of(context).size.width * 0.93),
+                    color: Color.fromRGBO(249, 247, 247, 1),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: MediaQuery.of(context).size.height * 0.440,
+          right: MediaQuery.of(context).size.width * 0.06,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
             child: Container(
@@ -194,29 +261,31 @@ class _GraphState extends State<Graph> {
                   borderRadius: BorderRadius.circular(12)),
               width: MediaQuery.of(context).size.width * 0.25,
               height: MediaQuery.of(context).size.height * 0.05,
-              child: DropdownButton(
-                isExpanded: true,
-                value: _selectedInterval,
-                onChanged: (newval) {
-                  setState(() {
-                    _selectedInterval = newval as String;
-                    secTimer();
-                  });
-                },
-                elevation: 16,
-                items: intervals.map((newval) {
-                  return DropdownMenuItem(
-                    value: newval,
-                    child: Text(newval),
-                  );
-                }).toList(),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton(
+                  isExpanded: true,
+                  value: _selectedInterval,
+                  onChanged: (newval) {
+                    setState(() {
+                      _selectedInterval = newval as String;
+                      // secTimer();
+                    });
+                  },
+                  elevation: 16,
+                  items: intervals.map((newval) {
+                    return DropdownMenuItem(
+                      value: newval,
+                      child: Text(newval),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ),
         ),
         Positioned(
-          bottom: 105,
-          left: 24,
+          bottom: MediaQuery.of(context).size.height * 0.145,
+          left: MediaQuery.of(context).size.width * 0.06,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
             child: Container(

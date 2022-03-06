@@ -24,18 +24,6 @@ class TradingScreen extends StatelessWidget {
                 height: double.infinity, width: double.infinity),
           ),
         ),
-        Positioned(
-          left: 7,
-          bottom: -20,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(25.0),
-            child: Container(
-              color: Colors.white,
-              width: MediaQuery.of(context).size.width * 0.96,
-              height: MediaQuery.of(context).size.height * 0.41,
-            ),
-          ),
-        ),
         TradingWidget(),
       ],
     );

@@ -1,4 +1,5 @@
 // import 'package:drc/widget/navbar.dart';
+import 'package:drc/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
@@ -25,6 +26,10 @@ class _LoginWidgetState extends State<LoginWidget> {
     "email": "",
     "password": "",
   };
+
+  void setStateIfMounted(f) {
+    if (mounted) setState(f);
+  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -78,7 +83,7 @@ class _LoginWidgetState extends State<LoginWidget> {
           'Could not authenticate you. Please try again later.';
       _showErrorDialog(errorMessage);
     }
-    setState(() {
+    setStateIfMounted(() {
       _isLoading = false;
     });
     // print(_authData);
@@ -90,6 +95,10 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   Future<void> runBoth() async {
     _submit().then((_) => _verify());
+  }
+
+  Future<void> _getbal() async {
+    await Provider.of<Auth>(context, listen: false).getbalance();
   }
 
   @override
@@ -232,30 +241,23 @@ class _LoginWidgetState extends State<LoginWidget> {
                   ),
                 ),
                 SizedBox(height: 58),
-                if (_isLoading)
-                  CircularProgressIndicator()
-                else
-                  GestureDetector(
-                    onTap: () {
-                      setState(() async {
-                        await runBoth().then((_) => (auth.isAuthenticated!)
-                            ? Navigator.of(context)
-                                .pushReplacementNamed(NavBar.routeName)
-                            : 'nothing');
-                        /* await runBoth();
-                        Provider.of<Auth>(context, listen: false).isAuth();
-                        (auth.isAuthenticated!)
-                            ? Navigator.of(context).pushNamed(NavBar.routeName)
-                            : 'nothing'; */
-                      });
-                    },
-                    // runBoth,
-                    child: Container(
-                      child: Image.asset(
-                        'assets/signup/Rectangle 6317.png',
-                      ),
+                // if (_isLoading)
+                //   CircularProgressIndicator()
+                // else
+                GestureDetector(
+                  onTap: () async {
+                    await runBoth().then((_) => (auth.isAuthenticated == true)
+                        ? Navigator.of(context)
+                            .pushReplacementNamed(NavBar.routeName)
+                        : SignUpScreen());
+                  },
+                  // runBoth,
+                  child: Container(
+                    child: Image.asset(
+                      'assets/signup/Rectangle 6317.png',
                     ),
                   ),
+                ),
               ],
             ),
           ),

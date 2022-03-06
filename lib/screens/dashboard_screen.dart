@@ -49,40 +49,6 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
         ),
-        Positioned(
-          bottom: 100,
-          left: 13,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  spreadRadius: 3,
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(top: 5, left: 15),
-                    child: (Text('Market Overview',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromRGBO(9, 51, 116, 1)))),
-                    height: (MediaQuery.of(context).size.height * 0.35),
-                    width: (MediaQuery.of(context).size.width * 0.93),
-                    color: Color.fromRGBO(249, 247, 247, 1),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
         Graph(),
         DashboardWidget(),
       ],
