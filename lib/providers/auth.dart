@@ -3,11 +3,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'dart:convert';
 import '../model/http_exception.dart';
+import './models.dart';
 
 class Auth with ChangeNotifier {
   late String _token;
   bool? isAuthenticated;
   late dynamic balance;
+  List<TransactionHistory> history = [];
+  List<TransactionHistory> historybuy = [];
+  List<TransactionHistory> historysell = [];
+  List<TransactionHistory> historylatestdate = [];
+  List<TransactionHistory> historyoldestdate = [];
+  List<TransactionHistory> historybuylatestdate = [];
+  List<TransactionHistory> historyselllatestdate = [];
+  List<UserDetail> user = [];
 
   Future<void> signup(
       String fname, String lname, String email, String password) async {
@@ -102,8 +111,8 @@ class Auth with ChangeNotifier {
       },
       body: Body,
     );
-    // print(json.decode(response.body));
-    // print(amount);
+    print(json.decode(response.body));
+    print(amount);
     notifyListeners();
   }
 
@@ -119,9 +128,9 @@ class Auth with ChangeNotifier {
       },
       body: Body,
     );
-    // print(json.decode(response.body));
+    print(json.decode(response.body));
     // print(_token);
-    // print(amount);
+    print(amount);
     notifyListeners();
   }
 
@@ -156,8 +165,100 @@ class Auth with ChangeNotifier {
     );
     final responseData = json.decode(response.body);
     balance = responseData[0]['balance'];
-    print(balance);
+    // print(balance);
+    // print(responseData);
+    notifyListeners();
+  }
+
+  Future<void> gethistory() async {
+    history.clear();
+    final url = Uri.parse('http://157.245.57.54:5000/display/transaction');
+    // var resBody = amount;
+    // var Body = json.encode({"withdraw_amount": resBody});
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        // "token": _token,
+        "token":
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMmQzZGU1MzMtN2M1NS00Y2ZmLWE0ZGMtYWE2NTM2M2M1ZDQ0IiwiaWF0IjoxNjQ2NzA2MzQxLCJleHAiOjE2NDY3OTI3NDF9.aZMKdwcg7v-JJhaBcVpFAIvMAKxyNNebnCMiU-9O3Ko"
+      },
+    );
+    final responseData = json.decode(response.body);
+    List<dynamic> timeConverted = [];
+
+    for (int i = 0; i < responseData.length; i++) {
+      timeConverted.add(DateTime.fromMillisecondsSinceEpoch(
+          responseData[i]['timestamp'] * 1000));
+
+      history.add(
+        TransactionHistory(
+            user_id: responseData[i]["user_id"],
+            epoch: timeConverted[i],
+            tx_amount: responseData[i]["tx_amount"],
+            tx_type: responseData[i]["tx_type"],
+            tx_asset: responseData[i]["tx_asset"],
+            tx_id: responseData[i]["tx_id"]),
+      );
+      historyoldestdate = history;
+      historyoldestdate.sort((a, b) => a.epoch.compareTo(b.epoch));
+      historylatestdate = history.reversed.toList();
+    }
+
+    historybuy = history
+        .where((x) => x.tx_type.toLowerCase().contains("buy".toLowerCase()))
+        .toList();
+    historysell = history
+        .where((x) => x.tx_type.toLowerCase().contains("sell".toLowerCase()))
+        .toList();
+    historybuylatestdate = historylatestdate
+        .where((x) => x.tx_type.toLowerCase().contains("buy".toLowerCase()))
+        .toList();
+    historyselllatestdate = historylatestdate
+        .where((x) => x.tx_type.toLowerCase().contains("buy".toLowerCase()))
+        .toList();
+
+    print('old to new: ${historyoldestdate}');
+    print('---------------------------------------');
+    print('new to old : ${historylatestdate}');
+    print('---------------------------------------');
+    // print('normal:${history[0]}');
+    // print('buy: ${historybuy.length}');
+    // print('sell: ${historysell.length}');
+    // print('all: ${history.length}');
+    // print('sortnew: ${historylatestdate.length}');
+    // print('sortold:${historyoldestdate.length}');
+
+    notifyListeners();
+  }
+
+  Future<void> getuser() async {
+    final url = Uri.parse('http://157.245.57.54:5000/display/user');
+    // var resBody = amount;
+    // var Body = json.encode({"withdraw_amount": resBody});
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "token": _token,
+      },
+    );
+    final responseData = json.decode(response.body);
+
+    for (int i = 0; i < responseData.length; i++) {
+      user.add(
+        UserDetail(
+          user_id: responseData[i]["user_id"],
+          user_email: responseData[i]["user_email"],
+          first_name: responseData[i]["first_name"],
+          last_name: responseData[i]["last_name"],
+        ),
+      );
+    }
+
     print(responseData);
+
+    print(user);
     notifyListeners();
   }
 }

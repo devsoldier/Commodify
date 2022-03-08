@@ -16,14 +16,22 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     Provider.of<Auth>(context, listen: false).getbalance();
   }
 
+  void getTransHistory() {
+    Provider.of<Auth>(context, listen: false).gethistory();
+  }
+
+  void getName() {}
+
   @override
   void initState() {
     getBAL();
+    getTransHistory();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    // final balancedata = Provider.of<Auth>(context);
     return Stack(
       children: <Widget>[
         Positioned(
@@ -69,12 +77,14 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     ),
                     SizedBox(height: 10),
                     Container(
-                      child: Text(
-                        'miskin',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 28),
+                      child: Consumer<Auth>(
+                        builder: (_, balancedata, __) => Text(
+                          '\$${(balancedata.balance).toStringAsFixed(2)}',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 28),
+                        ),
                       ),
                     ),
                   ],

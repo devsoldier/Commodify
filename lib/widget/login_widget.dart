@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 import '../model/http_exception.dart';
 import '../widget/navbar.dart';
+import 'dart:async';
 
 class LoginWidget extends StatefulWidget {
   @override
@@ -99,6 +100,12 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   Future<void> _getbal() async {
     await Provider.of<Auth>(context, listen: false).getbalance();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
   }
 
   @override
@@ -246,10 +253,20 @@ class _LoginWidgetState extends State<LoginWidget> {
                 // else
                 GestureDetector(
                   onTap: () async {
-                    await runBoth().then((_) => (auth.isAuthenticated == true)
-                        ? Navigator.of(context)
-                            .pushReplacementNamed(NavBar.routeName)
-                        : SignUpScreen());
+                    await runBoth().then((_) {
+                      if (auth.isAuthenticated == false) {
+                        return;
+                      }
+                      if (auth.isAuthenticated == true) {
+                        setState(() {
+                          _getbal().then((_) => Navigator.of(context)
+                              .pushReplacementNamed(NavBar.routeName));
+                        });
+                        // _getbal();
+                        // Navigator.of(context)
+                        //     .pushReplacementNamed(NavBar.routeName);
+                      }
+                    });
                   },
                   // runBoth,
                   child: Container(

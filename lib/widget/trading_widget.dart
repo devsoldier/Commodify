@@ -136,6 +136,18 @@ class _TradingWidgetState extends State<TradingWidget> {
     await Provider.of<Auth>(context, listen: false).sell(_buysellData);
   }
 
+  Future<void> getBal() async {
+    await Provider.of<Auth>(context, listen: false).getbalance();
+  }
+
+  Future<void> runbothpurchase() async {
+    purchase().then((_) => getBal());
+  }
+
+  Future<void> runbothsell() async {
+    sell().then((_) => getBal());
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -295,7 +307,6 @@ class _TradingWidgetState extends State<TradingWidget> {
                   children: <Widget>[
                     Container(
                       height: 25,
-                      // color: Colors.black,
                       child: Row(
                         children: <Widget>[
                           Text('BALANCE',
@@ -327,15 +338,6 @@ class _TradingWidgetState extends State<TradingWidget> {
                         ],
                       ),
                     ),
-                    // Row(
-                    //   children: <Widget>[
-                    //     Container(
-                    //       height: 25,
-                    //       color: Colors.black,
-                    //       child: Text('where am i'),
-                    //     ),
-                    //   ],
-                    // ),
                   ],
                 ),
               ),
@@ -351,7 +353,6 @@ class _TradingWidgetState extends State<TradingWidget> {
                         color: Colors.black26,
                         offset: Offset(0.0, 4.0), //(x,y)
                         blurRadius: 5.0,
-                        // spreadRadius: 1,
                       ),
                     ],
                   ),
@@ -411,7 +412,6 @@ class _TradingWidgetState extends State<TradingWidget> {
                         color: Colors.black26,
                         offset: Offset(0.0, 4.0), //(x,y)
                         blurRadius: 5.0,
-                        // spreadRadius: 1,
                       ),
                     ],
                   ),
@@ -452,7 +452,11 @@ class _TradingWidgetState extends State<TradingWidget> {
                 left: 53,
                 bottom: 50,
                 child: Container(
-                  child: Image.asset('assets/navbar/Rectangle 6332.png'),
+                  width: MediaQuery.of(context).size.width * 0.73,
+                  child: FittedBox(
+                    child: Image.asset('assets/navbar/Rectangle 6332.png'),
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
               Positioned(
@@ -463,18 +467,12 @@ class _TradingWidgetState extends State<TradingWidget> {
                   child: Column(
                     children: [
                       Container(
-                        // color: Colors.black,
                         height: 40,
                         width: MediaQuery.of(context).size.width * 0.73,
                         child: TextFormField(
                             keyboardType: TextInputType.number,
                             focusNode: _buysellfield,
                             decoration: InputDecoration(
-                              /* border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(5.0),
-                                ),
-                              ), */
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
                               enabledBorder: InputBorder.none,
@@ -491,14 +489,22 @@ class _TradingWidgetState extends State<TradingWidget> {
                         child: Row(
                           children: <Widget>[
                             GestureDetector(
-                              onTap: purchase,
+                              onTap: () {
+                                setState(() {
+                                  runbothpurchase();
+                                });
+                              },
                               child: Image.asset(
                                 'assets/navbar/buybtn.png',
                               ),
                             ),
                             SizedBox(width: 25),
                             GestureDetector(
-                              onTap: sell,
+                              onTap: () {
+                                setState(() {
+                                  runbothsell();
+                                });
+                              },
                               child: Image.asset(
                                 'assets/navbar/sellbtn.png',
                               ),

@@ -1,4 +1,6 @@
+import 'package:drc/widget/transaction_widget.dart';
 import 'package:flutter/material.dart';
+import '../widget/transaction_widget2.dart';
 
 class TransactionScreen extends StatelessWidget {
   static const routeName = '/transaction';
@@ -40,16 +42,31 @@ class TransactionScreen extends StatelessWidget {
           left: 40,
           child: Column(
             children: <Widget>[
-              Text(
-                'History Lists',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+              Column(
+                children: [
+                  // Container(
+                  //   child: Text(
+                  //     'History Lists',
+                  //     style: TextStyle(
+                  //       fontWeight: FontWeight.bold,
+                  //       fontSize: 16,
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
+              Container(
+                // width: MediaQuery.of(context).size.width * 0.8,
+                // height: MediaQuery.of(context).size.width * 0.7,
+                child: TransactionWidget(),
               ),
             ],
           ),
         ),
+        // Positioned(
+        //   child: TransactionWidget(),
+        // ),
+        // TransactionWidget(),
       ],
     );
   }

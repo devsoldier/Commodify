@@ -44,54 +44,59 @@ class _GraphState extends State<Graph> {
   secTimer() {
     if (_selectedInterval == '1 minute') {
       print(_selectedInterval);
-      Timer.periodic(Duration(minutes: 1), (timer) {
-        if (_selectedInterval != '1 minute') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
+      setState(() {
+        Timer.periodic(Duration(minutes: 1), (timer) {
+          if (_selectedInterval != '1 minute') {
+            timer.cancel();
+          }
+          setStateIfMounted(() {
+            getTickStream();
+          });
         });
       });
     } else if (_selectedInterval == '2 minutes') {
       print(_selectedInterval);
-      Timer.periodic(Duration(minutes: 2), (timer) {
-        if (_selectedInterval != '2 minutes') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
+      setState(() {
+        Timer.periodic(Duration(minutes: 2), (timer) {
+          if (_selectedInterval != '2 minutes') {
+            timer.cancel();
+          }
+          setStateIfMounted(() {
+            getTickStream();
+          });
         });
       });
     } else if (_selectedInterval == '3 minutes') {
-      Timer.periodic(Duration(minutes: 3), (timer) {
-        if (_selectedInterval != '3 minutes') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
+      setState(() {
+        Timer.periodic(Duration(minutes: 3), (timer) {
+          if (_selectedInterval != '3 minutes') {
+            timer.cancel();
+          }
+          setStateIfMounted(() {
+            getTickStream();
+          });
         });
       });
     } else if (_selectedInterval == '4 minute') {
-      Timer.periodic(Duration(minutes: 4), (timer) {
-        if (_selectedInterval != '4 minute') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
+      setState(() {
+        Timer.periodic(Duration(minutes: 4), (timer) {
+          if (_selectedInterval != '4 minute') {
+            timer.cancel();
+          }
+          setStateIfMounted(() {
+            getTickStream();
+          });
         });
       });
     } else if (_selectedInterval == '5 minute') {
-      Timer.periodic(Duration(minutes: 5), (timer) {
-        if (_selectedInterval != '5 minute') {
-          timer.cancel();
-          // channel2.sink.close();
-        }
-        setStateIfMounted(() {
-          getTickStream();
+      setState(() {
+        Timer.periodic(Duration(minutes: 5), (timer) {
+          if (_selectedInterval != '5 minute') {
+            timer.cancel();
+          }
+          setStateIfMounted(() {
+            getTickStream();
+          });
         });
       });
     }
@@ -145,8 +150,7 @@ class _GraphState extends State<Graph> {
           timeConverted.add(DateTime.fromMillisecondsSinceEpoch(
               extractedData['candles'][i]['epoch'] * 1000));
           // _chartData.removeAt(1);
-          _chartData.insert(
-            0,
+          _chartData.add(
             Commodity(
               close: extractedData['candles'][i]['close'],
               epoch: timeConverted[i],
@@ -268,7 +272,7 @@ class _GraphState extends State<Graph> {
                   onChanged: (newval) {
                     setState(() {
                       _selectedInterval = newval as String;
-                      // secTimer();
+                      secTimer();
                     });
                   },
                   elevation: 16,

@@ -42,6 +42,18 @@ class _WalletWidgetState extends State<WalletWidget> {
     await Provider.of<Auth>(context, listen: false).iswithdraw(withdrawamount);
   }
 
+  Future<void> updatebalance() async {
+    await Provider.of<Auth>(context, listen: false).getbalance();
+  }
+
+  Future<void> topupbalance() async {
+    _topup().then((_) => updatebalance());
+  }
+
+  Future<void> withdrawbalance() async {
+    _withdraw().then((_) => updatebalance());
+  }
+
   _showWithdrawDialog() {
     showDialog(
       context: context,
@@ -89,7 +101,7 @@ class _WalletWidgetState extends State<WalletWidget> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      _withdraw();
+                      withdrawbalance();
                       Navigator.pop(context);
                     });
                   },
@@ -130,24 +142,6 @@ class _WalletWidgetState extends State<WalletWidget> {
                 alignment: Alignment.centerLeft,
                 child: Text('Amount'),
               ),
-              // Container(
-              //   color: Color.fromRGBO(229, 229, 229, 1),
-              //   height: 40,
-              //   width: 250,
-              //   child: TextField(
-              //     keyboardType: TextInputType.number,
-              //     decoration: InputDecoration(
-              //       hintText: 'Enter Amount',
-              //       border: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(
-              //           Radius.circular(5.0),
-              //         ),
-              //       ),
-              //     ),
-              //     onChanged: (value) {},
-              //     controller: _withdrawController,
-              //   ),
-              // ),
             ],
           ),
         ),
@@ -161,7 +155,7 @@ class _WalletWidgetState extends State<WalletWidget> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      _topup();
+                      topupbalance();
                       Navigator.pop(context);
                     });
                   },
@@ -171,13 +165,7 @@ class _WalletWidgetState extends State<WalletWidget> {
                 ),
                 SizedBox(width: 20),
                 GestureDetector(
-                  onTap: /* () {
-                    setState(() /* async */ {
-                      _topup();
-                      // await _topup().then((_) => Navigator.pop(context));
-                    });
-                  }, */
-                      () {
+                  onTap: () {
                     setState(() {
                       Navigator.pop(context);
                     });
@@ -222,7 +210,7 @@ class _WalletWidgetState extends State<WalletWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final balancedata = Provider.of<Auth>(context);
+    // final balancedata = Provider.of<Auth>(context);
     Widget Payment = Positioned(
       bottom: 10,
       left: 17,
@@ -527,11 +515,13 @@ class _WalletWidgetState extends State<WalletWidget> {
                     ),
                   ),
                   Container(
-                    child: Text(
-                      '\$${(balancedata.balance).toStringAsFixed(2)}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
+                    child: Consumer<Auth>(
+                      builder: (_, auth, __) => Text(
+                        '\$${(auth.balance).toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                        ),
                       ),
                     ),
                   ),
