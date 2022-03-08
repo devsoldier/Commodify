@@ -215,7 +215,7 @@ class Auth with ChangeNotifier {
         .where((x) => x.tx_type.toLowerCase().contains("buy".toLowerCase()))
         .toList();
     historyselllatestdate = historylatestdate
-        .where((x) => x.tx_type.toLowerCase().contains("buy".toLowerCase()))
+        .where((x) => x.tx_type.toLowerCase().contains("sell".toLowerCase()))
         .toList();
 
     print('old to new: ${historyoldestdate}');
