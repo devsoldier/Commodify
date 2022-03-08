@@ -218,16 +218,18 @@ class Auth with ChangeNotifier {
         .where((x) => x.tx_type.toLowerCase().contains("sell".toLowerCase()))
         .toList();
 
-    print('old to new: ${historyoldestdate}');
-    print('---------------------------------------');
-    print('new to old : ${historylatestdate}');
-    print('---------------------------------------');
+    // print('old to new: ${historyoldestdate}');
+    // print('---------------------------------------');
+    // print('new to old : ${historylatestdate}');
+    // print('---------------------------------------');
     // print('normal:${history[0]}');
     // print('buy: ${historybuy.length}');
     // print('sell: ${historysell.length}');
     // print('all: ${history.length}');
     // print('sortnew: ${historylatestdate.length}');
     // print('sortold:${historyoldestdate.length}');
+    // print('buy sortnew: ${historybuylatestdate.length}');
+    // print('sell sortold:${historyselllatestdate.length}');
 
     notifyListeners();
   }

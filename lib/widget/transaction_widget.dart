@@ -15,8 +15,6 @@ class _TransactionWidgetState extends State<TransactionWidget> {
     'all',
     'buy',
     'sell',
-    'sort old',
-    'sort new',
   ];
 
   String _selectedsort = 'sort old';
@@ -32,27 +30,53 @@ class _TransactionWidgetState extends State<TransactionWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Container(
-          width: 50,
-          height: 50,
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton(
-              isExpanded: true,
-              value: _selectedfilter,
-              onChanged: (newval) {
-                setState(() {
-                  _selectedfilter = newval as String;
-                });
-              },
-              elevation: 16,
-              items: filters.map((newval) {
-                return DropdownMenuItem(
-                  value: newval,
-                  child: Text(newval),
-                );
-              }).toList(),
+        Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton(
+                  isExpanded: true,
+                  value: _selectedfilter,
+                  onChanged: (newval) {
+                    setState(() {
+                      _selectedfilter = newval as String;
+                    });
+                  },
+                  elevation: 16,
+                  items: filters.map((newval) {
+                    return DropdownMenuItem(
+                      value: newval,
+                      child: Text(newval),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
-          ),
+            Container(
+              width: 50,
+              height: 50,
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton(
+                  isExpanded: true,
+                  value: _selectedsort,
+                  onChanged: (newval) {
+                    setState(() {
+                      _selectedsort = newval as String;
+                    });
+                  },
+                  elevation: 16,
+                  items: sortfilters.map((newval) {
+                    return DropdownMenuItem(
+                      value: newval,
+                      child: Text(newval),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ],
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.8,
@@ -62,18 +86,14 @@ class _TransactionWidgetState extends State<TransactionWidget> {
                 ? historydata.history.length
                 : (_selectedfilter == 'buy')
                     ? historydata.historybuy.length
-                    : (_selectedfilter == 'sell')
-                        ? historydata.historysell.length
-                        : (_selectedfilter == 'sort old')
-                            ? historydata.historyoldestdate.length
-                            : historydata.historylatestdate.length,
+                    : historydata.historysell.length,
             itemBuilder: (_, i) => Card(
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Column(
                   children: <Widget>[
-                    //ALL
-                    (_selectedfilter == 'all')
+                    //ALL and OLD
+                    (_selectedfilter == 'all' && _selectedsort == 'sort old')
                         ? ListTile(
                             leading: (historydata.history[i].tx_asset == "gold")
                                 ? Image.asset('assets/navbar/gold 1.png')
@@ -153,93 +173,121 @@ class _TransactionWidgetState extends State<TransactionWidget> {
                                     ],
                                   ),
                           )
-                        : (_selectedfilter == 'buy')
-                            ?
-                            //BUY
-                            ListTile(
-                                leading: (historydata.historybuy[i].tx_asset ==
+                        :
+                        //ALL and NEW
+                        (_selectedfilter == 'all' &&
+                                _selectedsort == 'sort new')
+                            ? ListTile(
+                                leading: (historydata
+                                            .historylatestdate[i].tx_asset ==
                                         "gold")
                                     ? Image.asset('assets/navbar/gold 1.png')
-                                    : null,
-                                title: /* (historydata.history[i].tx_type == 'buy')
-                                    ?  */
-                                    Center(
-                                  child: Text(
-                                      '-${historydata.historybuy[i].tx_amount}',
-                                      style: TextStyle(
-                                          color: Colors.red,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold)),
-                                ) /*  : null*/,
-                                subtitle:
-                                    /* (historydata.history[i].tx_type == 'buy')
-                                        ?  */
-                                    Center(child: Text('USD')) /* : null */,
-                                trailing: /* (historydata.history[i].tx_type ==
+                                    : Text('WIP'),
+                                title: (historydata
+                                            .historylatestdate[i].tx_type ==
                                         'buy')
-                                    ?  */
-                                    Column(
-                                  children: [
-                                    Container(
-                                      alignment: Alignment.center,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.15,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.05,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          color:
-                                              Color.fromRGBO(168, 255, 187, 1)),
-                                      child: Text(
-                                        'Buy',
-                                        style: TextStyle(
-                                            color: Colors.green,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                    ? Center(
+                                        child: Text(
+                                            '-${historydata.historylatestdate[i].tx_amount}',
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold)),
+                                      )
+                                    : Center(
+                                        child: Text(
+                                            '+${historydata.historylatestdate[i].tx_amount}',
+                                            style:
+                                                TextStyle(color: Colors.green)),
                                       ),
-                                    ),
-                                    Text(
-                                      '${DateFormat('dd MMM hh:mm ').format(historydata.historybuy[i].epoch)}',
-                                      style: TextStyle(color: Colors.black54),
-                                    ),
-                                  ],
-                                )
-                                /*  : null, */
-                                )
+                                subtitle: Center(child: Text('USD')),
+                                trailing: (historydata
+                                            .historylatestdate[i].tx_type ==
+                                        'buy')
+                                    ? Column(
+                                        children: [
+                                          Container(
+                                            alignment: Alignment.center,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.15,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.05,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                color: Color.fromRGBO(
+                                                    168, 255, 187, 1)),
+                                            child: Text(
+                                              'Buy',
+                                              style: TextStyle(
+                                                  color: Colors.green,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${DateFormat('dd MMM hh:mm ').format(historydata.historylatestdate[i].epoch)}',
+                                            style: TextStyle(
+                                                color: Colors.black54),
+                                          ),
+                                        ],
+                                      )
+                                    : Column(
+                                        children: [
+                                          Container(
+                                            alignment: Alignment.center,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.15,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.05,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                color: Color.fromRGBO(
+                                                    240, 186, 182, 1)),
+                                            child: Text(
+                                              'Sell',
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${DateFormat('dd/MMM hh:mm ').format(historydata.historylatestdate[i].epoch)}',
+                                            style: TextStyle(
+                                                color: Colors.black54),
+                                          ),
+                                        ],
+                                      ),
+                              )
                             :
-                            //SELL
-                            (_selectedfilter == "sell")
+                            //BUY and OLD
+                            (_selectedfilter == 'buy' &&
+                                    _selectedsort == 'sort old')
                                 ? ListTile(
-                                    leading: (historydata
-                                                .historysell[i].tx_asset ==
-                                            "gold" /* &&
-                                        historydata.history[i].tx_type ==
-                                            'sell' */
-                                        )
-                                        ? /* ?  */ Image.asset(
+                                    leading: (historydata.historybuy[i].tx_asset == "gold")
+                                        ? Image.asset(
                                             'assets/navbar/gold 1.png')
                                         : null,
-                                    title: /* (historydata.history[i].tx_type ==
-                                        'sell')
-                                    ?  */
-                                        Center(
+                                    title: Center(
                                       child: Text(
-                                          '+${historydata.historysell[i].tx_amount}',
+                                          '-${historydata.historybuy[i].tx_amount}',
                                           style: TextStyle(
-                                              color: Colors.green,
+                                              color: Colors.red,
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold)),
-                                    ) /* : null */,
-                                    subtitle:
-                                        /* (historydata.history[i].tx_type == 'sell')
-                                        ?  */
-                                        Center(child: Text('USD')) /* : null */,
-                                    trailing: /*  (historydata.history[i].tx_type ==
-                                        'sell')
-                                    ?  */
-                                        Column(
+                                    ),
+                                    subtitle: Center(child: Text('USD')),
+                                    trailing: Column(
                                       children: [
                                         Container(
                                           alignment: Alignment.center,
@@ -255,237 +303,455 @@ class _TransactionWidgetState extends State<TransactionWidget> {
                                               borderRadius:
                                                   BorderRadius.circular(15),
                                               color: Color.fromRGBO(
-                                                  240, 186, 182, 1)),
+                                                  168, 255, 187, 1)),
                                           child: Text(
-                                            'sell',
+                                            'Buy',
                                             style: TextStyle(
-                                                color: Colors.red,
+                                                color: Colors.green,
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold),
                                           ),
                                         ),
                                         Text(
-                                          '${DateFormat('dd MMM hh:mm ').format(historydata.historysell[i].epoch)}',
+                                          '${DateFormat('dd MMM hh:mm ').format(historydata.historybuy[i].epoch)}',
                                           style:
                                               TextStyle(color: Colors.black54),
                                         ),
                                       ],
-                                    )
-                                    /*  : null, */
-                                    )
-                                :
-                                //SORT OLD
-                                (_selectedfilter == "sort old")
+                                    ))
+                                //BUY and NEW
+                                : (_selectedfilter == 'buy' &&
+                                        _selectedsort == 'sort new')
                                     ? ListTile(
                                         leading: (historydata
-                                                    .historyoldestdate[i]
+                                                    .historybuylatestdate[i]
                                                     .tx_asset ==
                                                 "gold")
                                             ? Image.asset(
                                                 'assets/navbar/gold 1.png')
-                                            : Text('WIP'),
-                                        title: (historydata.historyoldestdate[i]
-                                                    .tx_type ==
-                                                'buy')
-                                            ? Center(
-                                                child: Text(
-                                                    '-${historydata.historyoldestdate[i].tx_amount}',
-                                                    style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                              )
-                                            : Center(
-                                                child: Text(
-                                                    '+${historydata.historyoldestdate[i].tx_amount}',
-                                                    style: TextStyle(
-                                                        color: Colors.green)),
-                                              ),
+                                            : null,
+                                        title: Center(
+                                          child: Text(
+                                              '-${historydata.historybuylatestdate[i].tx_amount}',
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold)),
+                                        ),
                                         subtitle: Center(child: Text('USD')),
-                                        trailing: (historydata
-                                                    .historyoldestdate[i]
-                                                    .tx_type ==
-                                                'buy')
-                                            ? Column(
-                                                children: [
-                                                  Container(
-                                                    alignment: Alignment.center,
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.15,
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.05,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        color: Color.fromRGBO(
-                                                            168, 255, 187, 1)),
-                                                    child: Text(
-                                                      'Buy',
-                                                      style: TextStyle(
-                                                          color: Colors.green,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '${DateFormat('dd MMM hh:mm ').format(historydata.historyoldestdate[i].epoch)}',
-                                                    style: TextStyle(
-                                                        color: Colors.black54),
-                                                  ),
-                                                ],
-                                              )
-                                            : Column(
-                                                children: [
-                                                  Container(
-                                                    alignment: Alignment.center,
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.15,
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.05,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        color: Color.fromRGBO(
-                                                            240, 186, 182, 1)),
-                                                    child: Text(
-                                                      'Sell',
-                                                      style: TextStyle(
-                                                          color: Colors.red,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '${DateFormat('dd/MMM hh:mm ').format(historydata.historyoldestdate[i].epoch)}',
-                                                    style: TextStyle(
-                                                        color: Colors.black54),
-                                                  ),
-                                                ],
+                                        trailing: Column(
+                                          children: [
+                                            Container(
+                                              alignment: Alignment.center,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.15,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.05,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  color: Color.fromRGBO(
+                                                      168, 255, 187, 1)),
+                                              child: Text(
+                                                'Buy',
+                                                style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
-                                      )
+                                            ),
+                                            Text(
+                                              '${DateFormat('dd MMM hh:mm ').format(historydata.historybuylatestdate[i].epoch)}',
+                                              style: TextStyle(
+                                                  color: Colors.black54),
+                                            ),
+                                          ],
+                                        ))
                                     :
-                                    //SORT NEW
-                                    ListTile(
-                                        leading: (historydata
-                                                    .historylatestdate[i]
-                                                    .tx_asset ==
-                                                "gold")
-                                            ? Image.asset(
-                                                'assets/navbar/gold 1.png')
-                                            : Text('WIP'),
-                                        title: (historydata.historylatestdate[i]
-                                                    .tx_type ==
-                                                'buy')
-                                            ? Center(
-                                                child: Text(
-                                                    '-${historydata.historylatestdate[i].tx_amount}',
+
+                                    //SELL and OLD
+                                    (_selectedfilter == "sell" &&
+                                            _selectedsort == 'sort old')
+                                        ? ListTile(
+                                            leading: (historydata.historysell[i].tx_asset == "gold")
+                                                ? Image.asset(
+                                                    'assets/navbar/gold 1.png')
+                                                : null,
+                                            title: Center(
+                                              child: Text(
+                                                  '+${historydata.historysell[i].tx_amount}',
+                                                  style: TextStyle(
+                                                      color: Colors.green,
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                            ),
+                                            subtitle:
+                                                Center(child: Text('USD')),
+                                            trailing: Column(
+                                              children: [
+                                                Container(
+                                                  alignment: Alignment.center,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.15,
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.05,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                      color: Color.fromRGBO(
+                                                          240, 186, 182, 1)),
+                                                  child: Text(
+                                                    'sell',
                                                     style: TextStyle(
                                                         color: Colors.red,
-                                                        fontSize: 18,
+                                                        fontSize: 16,
                                                         fontWeight:
-                                                            FontWeight.bold)),
-                                              )
-                                            : Center(
-                                                child: Text(
-                                                    '+${historydata.historylatestdate[i].tx_amount}',
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${DateFormat('dd MMM hh:mm ').format(historydata.historysell[i].epoch)}',
+                                                  style: TextStyle(
+                                                      color: Colors.black54),
+                                                ),
+                                              ],
+                                            ))
+                                        : //SELL and New
+                                        /*  (_selectedfilter == "sell" &&
+                                                _selectedsort == 'sort new') */
+                                        /* ? */ ListTile(
+                                            leading: (historydata
+                                                        .historyselllatestdate[i]
+                                                        .tx_asset ==
+                                                    "gold")
+                                                ? Image.asset('assets/navbar/gold 1.png')
+                                                : null,
+                                            title: Center(
+                                              child: Text(
+                                                  '+${historydata.historyselllatestdate[i].tx_amount}',
+                                                  style: TextStyle(
+                                                      color: Colors.green,
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                            ),
+                                            subtitle: Center(child: Text('USD')),
+                                            trailing: Column(
+                                              children: [
+                                                Container(
+                                                  alignment: Alignment.center,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.15,
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.05,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                      color: Color.fromRGBO(
+                                                          240, 186, 182, 1)),
+                                                  child: Text(
+                                                    'sell',
                                                     style: TextStyle(
-                                                        color: Colors.green)),
-                                              ),
-                                        subtitle: Center(child: Text('USD')),
-                                        trailing: (historydata
-                                                    .historylatestdate[i]
-                                                    .tx_type ==
-                                                'buy')
-                                            ? Column(
-                                                children: [
-                                                  Container(
-                                                    alignment: Alignment.center,
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.15,
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.05,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        color: Color.fromRGBO(
-                                                            168, 255, 187, 1)),
-                                                    child: Text(
-                                                      'Buy',
-                                                      style: TextStyle(
-                                                          color: Colors.green,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
+                                                        color: Colors.red,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
                                                   ),
-                                                  Text(
-                                                    '${DateFormat('dd MMM hh:mm ').format(historydata.historylatestdate[i].epoch)}',
-                                                    style: TextStyle(
-                                                        color: Colors.black54),
-                                                  ),
-                                                ],
-                                              )
-                                            : Column(
-                                                children: [
-                                                  Container(
-                                                    alignment: Alignment.center,
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.15,
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.05,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        color: Color.fromRGBO(
-                                                            240, 186, 182, 1)),
-                                                    child: Text(
-                                                      'Sell',
-                                                      style: TextStyle(
-                                                          color: Colors.red,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '${DateFormat('dd/MMM hh:mm ').format(historydata.historylatestdate[i].epoch)}',
-                                                    style: TextStyle(
-                                                        color: Colors.black54),
-                                                  ),
-                                                ],
-                                              ),
-                                      )
+                                                ),
+                                                Text(
+                                                  '${DateFormat('dd MMM hh:mm ').format(historydata.historyselllatestdate[i].epoch)}',
+                                                  style: TextStyle(
+                                                      color: Colors.black54),
+                                                ),
+                                              ],
+                                            ))
+
+                    //SORT OLD
+                    // (_selectedfilter == "sort old")
+                    //     ? ListTile(
+                    //         leading: (historydata
+                    //                     .historyoldestdate[
+                    //                         i]
+                    //                     .tx_asset ==
+                    //                 "gold")
+                    //             ? Image.asset(
+                    //                 'assets/navbar/gold 1.png')
+                    //             : Text('WIP'),
+                    //         title: (historydata
+                    //                     .historyoldestdate[
+                    //                         i]
+                    //                     .tx_type ==
+                    //                 'buy')
+                    //             ? Center(
+                    //                 child: Text(
+                    //                     '-${historydata.historyoldestdate[i].tx_amount}',
+                    //                     style: TextStyle(
+                    //                         color: Colors
+                    //                             .red,
+                    //                         fontSize:
+                    //                             18,
+                    //                         fontWeight:
+                    //                             FontWeight
+                    //                                 .bold)),
+                    //               )
+                    //             : Center(
+                    //                 child: Text(
+                    //                     '+${historydata.historyoldestdate[i].tx_amount}',
+                    //                     style: TextStyle(
+                    //                         color: Colors
+                    //                             .green)),
+                    //               ),
+                    //         subtitle: Center(
+                    //             child: Text('USD')),
+                    //         trailing: (historydata
+                    //                     .historyoldestdate[
+                    //                         i]
+                    //                     .tx_type ==
+                    //                 'buy')
+                    //             ? Column(
+                    //                 children: [
+                    //                   Container(
+                    //                     alignment:
+                    //                         Alignment
+                    //                             .center,
+                    //                     width: MediaQuery.of(
+                    //                                 context)
+                    //                             .size
+                    //                             .width *
+                    //                         0.15,
+                    //                     height: MediaQuery.of(
+                    //                                 context)
+                    //                             .size
+                    //                             .height *
+                    //                         0.05,
+                    //                     decoration: BoxDecoration(
+                    //                         borderRadius:
+                    //                             BorderRadius.circular(
+                    //                                 15),
+                    //                         color: Color
+                    //                             .fromRGBO(
+                    //                                 168,
+                    //                                 255,
+                    //                                 187,
+                    //                                 1)),
+                    //                     child: Text(
+                    //                       'Buy',
+                    //                       style: TextStyle(
+                    //                           color: Colors
+                    //                               .green,
+                    //                           fontSize:
+                    //                               16,
+                    //                           fontWeight:
+                    //                               FontWeight
+                    //                                   .bold),
+                    //                     ),
+                    //                   ),
+                    //                   Text(
+                    //                     '${DateFormat('dd MMM hh:mm ').format(historydata.historyoldestdate[i].epoch)}',
+                    //                     style: TextStyle(
+                    //                         color: Colors
+                    //                             .black54),
+                    //                   ),
+                    //                 ],
+                    //               )
+                    //             : Column(
+                    //                 children: [
+                    //                   Container(
+                    //                     alignment:
+                    //                         Alignment
+                    //                             .center,
+                    //                     width: MediaQuery.of(
+                    //                                 context)
+                    //                             .size
+                    //                             .width *
+                    //                         0.15,
+                    //                     height: MediaQuery.of(
+                    //                                 context)
+                    //                             .size
+                    //                             .height *
+                    //                         0.05,
+                    //                     decoration: BoxDecoration(
+                    //                         borderRadius:
+                    //                             BorderRadius.circular(
+                    //                                 15),
+                    //                         color: Color
+                    //                             .fromRGBO(
+                    //                                 240,
+                    //                                 186,
+                    //                                 182,
+                    //                                 1)),
+                    //                     child: Text(
+                    //                       'Sell',
+                    //                       style: TextStyle(
+                    //                           color: Colors
+                    //                               .red,
+                    //                           fontSize:
+                    //                               16,
+                    //                           fontWeight:
+                    //                               FontWeight
+                    //                                   .bold),
+                    //                     ),
+                    //                   ),
+                    //                   Text(
+                    //                     '${DateFormat('dd/MMM hh:mm ').format(historydata.historyoldestdate[i].epoch)}',
+                    //                     style: TextStyle(
+                    //                         color: Colors
+                    //                             .black54),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //       )
+                    //     :
+                    //SORT NEW
+                    // ListTile(
+                    //     leading: (historydata
+                    //                 .historylatestdate[
+                    //                     i]
+                    //                 .tx_asset ==
+                    //             "gold")
+                    //         ? Image.asset(
+                    //             'assets/navbar/gold 1.png')
+                    //         : Text('WIP'),
+                    //     title: (historydata
+                    //                 .historylatestdate[
+                    //                     i]
+                    //                 .tx_type ==
+                    //             'buy')
+                    //         ? Center(
+                    //             child: Text(
+                    //                 '-${historydata.historylatestdate[i].tx_amount}',
+                    //                 style: TextStyle(
+                    //                     color: Colors
+                    //                         .red,
+                    //                     fontSize:
+                    //                         18,
+                    //                     fontWeight:
+                    //                         FontWeight
+                    //                             .bold)),
+                    //           )
+                    //         : Center(
+                    //             child: Text(
+                    //                 '+${historydata.historylatestdate[i].tx_amount}',
+                    //                 style: TextStyle(
+                    //                     color: Colors
+                    //                         .green)),
+                    //           ),
+                    //     subtitle: Center(
+                    //         child: Text('USD')),
+                    //     trailing: (historydata
+                    //                 .historylatestdate[
+                    //                     i]
+                    //                 .tx_type ==
+                    //             'buy')
+                    //         ? Column(
+                    //             children: [
+                    //               Container(
+                    //                 alignment:
+                    //                     Alignment
+                    //                         .center,
+                    //                 width: MediaQuery.of(
+                    //                             context)
+                    //                         .size
+                    //                         .width *
+                    //                     0.15,
+                    //                 height: MediaQuery.of(
+                    //                             context)
+                    //                         .size
+                    //                         .height *
+                    //                     0.05,
+                    //                 decoration: BoxDecoration(
+                    //                     borderRadius:
+                    //                         BorderRadius.circular(
+                    //                             15),
+                    //                     color: Color
+                    //                         .fromRGBO(
+                    //                             168,
+                    //                             255,
+                    //                             187,
+                    //                             1)),
+                    //                 child: Text(
+                    //                   'Buy',
+                    //                   style: TextStyle(
+                    //                       color: Colors
+                    //                           .green,
+                    //                       fontSize:
+                    //                           16,
+                    //                       fontWeight:
+                    //                           FontWeight
+                    //                               .bold),
+                    //                 ),
+                    //               ),
+                    //               Text(
+                    //                 '${DateFormat('dd MMM hh:mm ').format(historydata.historylatestdate[i].epoch)}',
+                    //                 style: TextStyle(
+                    //                     color: Colors
+                    //                         .black54),
+                    //               ),
+                    //             ],
+                    //           )
+                    //         : Column(
+                    //             children: [
+                    //               Container(
+                    //                 alignment:
+                    //                     Alignment
+                    //                         .center,
+                    //                 width: MediaQuery.of(
+                    //                             context)
+                    //                         .size
+                    //                         .width *
+                    //                     0.15,
+                    //                 height: MediaQuery.of(
+                    //                             context)
+                    //                         .size
+                    //                         .height *
+                    //                     0.05,
+                    //                 decoration: BoxDecoration(
+                    //                     borderRadius:
+                    //                         BorderRadius.circular(
+                    //                             15),
+                    //                     color: Color
+                    //                         .fromRGBO(
+                    //                             240,
+                    //                             186,
+                    //                             182,
+                    //                             1)),
+                    //                 child: Text(
+                    //                   'Sell',
+                    //                   style: TextStyle(
+                    //                       color: Colors
+                    //                           .red,
+                    //                       fontSize:
+                    //                           16,
+                    //                       fontWeight:
+                    //                           FontWeight
+                    //                               .bold),
+                    //                 ),
+                    //               ),
+                    //               Text(
+                    //                 '${DateFormat('dd/MMM hh:mm ').format(historydata.historylatestdate[i].epoch)}',
+                    //                 style: TextStyle(
+                    //                     color: Colors
+                    //                         .black54),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //   )
                   ],
                 ),
               ),
