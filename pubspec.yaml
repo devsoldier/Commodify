@@ -37,6 +37,7 @@ dependencies:
   jwt_decode: ^0.3.1
   percent_indicator: ^4.0.0
   toggle_switch: ^1.4.0
+  flutter_keyboard_visibility: ^5.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -96,6 +97,16 @@ flutter:
     - assets/navbar/sellbtn.png
     - assets/navbar/Vector.png
     - assets/navbar/Rectangle 6332.png
+    - assets/navbar/arrow_right_alt.png
+    - assets/navbar/arrow_right_red.png
+    - assets/navbar/v green.png
+    - assets/navbar/v red.png
+    - assets/navbar/phone.png
+    - assets/navbar/usersymbol.png
+    - assets/navbar/editbtn.png
+    - assets/navbar/savebtn.png
+    - assets/navbar/cancelbtn.png
+    - assets/navbar/logout.png
   # - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

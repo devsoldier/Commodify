@@ -16,7 +16,19 @@ class Auth with ChangeNotifier {
   List<TransactionHistory> historyoldestdate = [];
   List<TransactionHistory> historybuylatestdate = [];
   List<TransactionHistory> historyselllatestdate = [];
+  List<TransactionHistory> historyfiltered = [];
+
   List<UserDetail> user = [];
+  List<UserAsset> asset = [];
+
+  List<PaymentHistory> phistory = [];
+  List<PaymentHistory> phistorytopup = [];
+  List<PaymentHistory> phistorywithdraw = [];
+  List<PaymentHistory> phistorylatestdate = [];
+  List<PaymentHistory> phistoryoldestdate = [];
+  List<PaymentHistory> phistorytopuplatestdate = [];
+  List<PaymentHistory> phistorywithdrawlatestdate = [];
+  List<PaymentHistory> phistoryfiltered = [];
 
   Future<void> signup(
       String fname, String lname, String email, String password) async {
@@ -40,8 +52,8 @@ class Auth with ChangeNotifier {
       print(responseData);
       _token = responseData['token'];
       notifyListeners();
-      print(json.decode(response.body));
-      print(body);
+
+      // print(body);
     } catch (error) {
       throw error;
     }
@@ -97,10 +109,9 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> buy(double amount) async {
-    final url = Uri.parse('http://157.245.57.54:5000/buy/Xau');
-    // var resBody = {};
-    // resBody["amount"] = amount;
+  Future<void> buy(double amount, String product) async {
+    final url = Uri.parse('http://157.245.57.54:5000/buy/${product}');
+
     var resBody = amount;
     var Body = json.encode({"amount": resBody});
     final response = await http.put(
@@ -116,8 +127,8 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> sell(double amount) async {
-    final url = Uri.parse('http://157.245.57.54:5000/sell/Xau');
+  Future<void> sell(double amount, String product) async {
+    final url = Uri.parse('http://157.245.57.54:5000/sell/${product}');
     var resBody = amount;
     var Body = json.encode({"amount": resBody});
     final response = await http.put(
@@ -129,7 +140,7 @@ class Auth with ChangeNotifier {
       body: Body,
     );
     print(json.decode(response.body));
-    // print(_token);
+
     print(amount);
     notifyListeners();
   }
@@ -147,15 +158,13 @@ class Auth with ChangeNotifier {
       body: Body,
     );
     print(json.decode(response.body));
-    // print(_token);
-    // print(amount);
+
     notifyListeners();
   }
 
   Future<void> getbalance() async {
     final url = Uri.parse('http://157.245.57.54:5000/display/balance');
-    // var resBody = amount;
-    // var Body = json.encode({"withdraw_amount": resBody});
+
     final response = await http.get(
       url,
       headers: {
@@ -165,23 +174,20 @@ class Auth with ChangeNotifier {
     );
     final responseData = json.decode(response.body);
     balance = responseData[0]['balance'];
-    // print(balance);
-    // print(responseData);
+
     notifyListeners();
   }
 
-  Future<void> gethistory() async {
+  Future<void> gethistory(String filteroption, String sortoption) async {
     history.clear();
+    historyfiltered.clear();
     final url = Uri.parse('http://157.245.57.54:5000/display/transaction');
-    // var resBody = amount;
-    // var Body = json.encode({"withdraw_amount": resBody});
+
     final response = await http.get(
       url,
       headers: {
         "Content-Type": "application/json",
-        // "token": _token,
-        "token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMmQzZGU1MzMtN2M1NS00Y2ZmLWE0ZGMtYWE2NTM2M2M1ZDQ0IiwiaWF0IjoxNjQ2NzA2MzQxLCJleHAiOjE2NDY3OTI3NDF9.aZMKdwcg7v-JJhaBcVpFAIvMAKxyNNebnCMiU-9O3Ko"
+        "token": _token,
       },
     );
     final responseData = json.decode(response.body);
@@ -218,18 +224,29 @@ class Auth with ChangeNotifier {
         .where((x) => x.tx_type.toLowerCase().contains("sell".toLowerCase()))
         .toList();
 
-    // print('old to new: ${historyoldestdate}');
-    // print('---------------------------------------');
-    // print('new to old : ${historylatestdate}');
-    // print('---------------------------------------');
-    // print('normal:${history[0]}');
-    // print('buy: ${historybuy.length}');
-    // print('sell: ${historysell.length}');
-    // print('all: ${history.length}');
-    // print('sortnew: ${historylatestdate.length}');
-    // print('sortold:${historyoldestdate.length}');
-    // print('buy sortnew: ${historybuylatestdate.length}');
-    // print('sell sortold:${historyselllatestdate.length}');
+    if (filteroption == 'all') {
+      if (sortoption == 'sort old') {
+        historyfiltered = history;
+      } else {
+        historyfiltered = historylatestdate;
+      }
+    }
+
+    if (filteroption == 'buy') {
+      if (sortoption == 'sort old') {
+        historyfiltered = historybuy;
+      } else {
+        historyfiltered = historybuy.reversed.toList();
+      }
+    }
+
+    if (filteroption == 'sell') {
+      if (sortoption == 'sort old') {
+        historyfiltered = historysell;
+      } else {
+        historyfiltered = historysell.reversed.toList();
+      }
+    }
 
     notifyListeners();
   }
@@ -258,9 +275,116 @@ class Auth with ChangeNotifier {
       );
     }
 
-    print(responseData);
+    // print(responseData);
 
-    print(user);
+    // print(user);
+    notifyListeners();
+  }
+
+  Future<void> getpaymenthistory(String filteroption, String sortoption) async {
+    phistory.clear();
+    final url = Uri.parse('http://157.245.57.54:5000/display/payment');
+
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "token": _token,
+      },
+    );
+    final responseData = json.decode(response.body);
+    List<dynamic> timeConverted = [];
+
+    for (int i = 0; i < responseData.length; i++) {
+      timeConverted.add(DateTime.fromMillisecondsSinceEpoch(
+          responseData[i]['payment_timestamp'] * 1000));
+
+      phistory.add(
+        PaymentHistory(
+            user_id: responseData[i]["user_id"],
+            payment_type: responseData[i]["payment_type"],
+            payment_amount: responseData[i]["payment_amount"],
+            payment_status: responseData[i]["payment_status"],
+            payment_timestamp: timeConverted[i],
+            payment_id: responseData[i]["payment_id"]),
+      );
+      phistoryoldestdate = phistory;
+      phistoryoldestdate
+          .sort((a, b) => a.payment_timestamp.compareTo(b.payment_timestamp));
+      phistorylatestdate = phistory.reversed.toList();
+    }
+    phistorytopup = phistory
+        .where(
+            (x) => x.payment_type.toLowerCase().contains("Topup".toLowerCase()))
+        .toList();
+    phistorywithdraw = phistory
+        .where((x) =>
+            x.payment_type.toLowerCase().contains("Withdraw".toLowerCase()))
+        .toList();
+    phistorytopuplatestdate = phistorylatestdate
+        .where(
+            (x) => x.payment_type.toLowerCase().contains("Topup".toLowerCase()))
+        .toList();
+    phistorywithdrawlatestdate = phistorylatestdate
+        .where((x) =>
+            x.payment_type.toLowerCase().contains("Withdraw".toLowerCase()))
+        .toList();
+
+    if (filteroption == 'all') {
+      if (sortoption == 'sort old') {
+        phistoryfiltered = phistory;
+      } else {
+        phistoryfiltered = phistorylatestdate;
+      }
+    }
+
+    if (filteroption == 'topup') {
+      if (sortoption == 'sort old') {
+        phistoryfiltered = phistorytopup;
+      } else {
+        phistoryfiltered = phistorytopup.reversed.toList();
+      }
+    }
+
+    if (filteroption == 'withdraw') {
+      if (sortoption == 'sort old') {
+        phistoryfiltered = phistorywithdraw;
+      } else {
+        phistoryfiltered = phistorywithdraw.reversed.toList();
+      }
+    }
+    // print(phistoryfiltered);
+    // print(phistory);
+    notifyListeners();
+  }
+
+  Future<void> getasset() async {
+    // asset.clear();
+    final url = Uri.parse('http://157.245.57.54:5000/display/asset');
+    // var resBody = amount;
+    // var Body = json.encode({"withdraw_amount": resBody});
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "token": _token,
+      },
+    );
+    final responseData = json.decode(response.body);
+
+    for (int i = 0; i < responseData.length; i++) {
+      asset.insert(
+        0,
+        UserAsset(
+          user_id: responseData[i]["user_id"],
+          gold_amount: responseData[i]["gold_amount"],
+          platinum_amount: responseData[i]["platinum_amount"],
+          silver_amount: responseData[i]["silver_amount"],
+          palladium_amount: responseData[i]["palladium_amount"],
+        ),
+      );
+    }
+    print(asset);
     notifyListeners();
   }
 }

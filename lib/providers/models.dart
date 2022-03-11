@@ -49,3 +49,49 @@ class UserDetail {
   @override
   String toString() => '$user_id, $user_email,$first_name,$last_name';
 }
+
+// class PriceOnly {
+//   final num Quote;
+//   PriceOnly({required this.Quote});
+//   @override
+//   String toString() => '$Quote';
+// }
+
+class PaymentHistory {
+  final String user_id;
+  final String payment_type;
+  final dynamic payment_amount;
+  final String payment_status;
+  final DateTime payment_timestamp;
+  final String payment_id;
+  PaymentHistory({
+    required this.user_id,
+    required this.payment_type,
+    required this.payment_amount,
+    required this.payment_status,
+    required this.payment_timestamp,
+    required this.payment_id,
+  });
+  @override
+  String toString() =>
+      '$user_id, $payment_type,$payment_amount,$payment_status,$payment_timestamp,$payment_id';
+}
+
+class UserAsset {
+  final String user_id;
+  final dynamic gold_amount;
+  final dynamic platinum_amount;
+  final dynamic silver_amount;
+  final dynamic palladium_amount;
+
+  UserAsset(
+      {required this.user_id,
+      required this.gold_amount,
+      required this.platinum_amount,
+      required this.silver_amount,
+      required this.palladium_amount});
+
+  @override
+  String toString() =>
+      '$user_id,$gold_amount,$platinum_amount,$silver_amount,$palladium_amount';
+}

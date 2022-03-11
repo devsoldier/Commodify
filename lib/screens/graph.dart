@@ -7,7 +7,7 @@ import 'dart:convert';
 import '../providers/models.dart';
 // import '../providers/interval.dart';
 import 'dart:async';
-import 'dart:math';
+// import 'dart:math';
 // import '../widget/dashboard_widget.dart';
 
 class Graph extends StatefulWidget {
@@ -16,6 +16,10 @@ class Graph extends StatefulWidget {
 }
 
 class _GraphState extends State<Graph> {
+  bool isactiveGold = true;
+  bool isactivePalla = false;
+  bool isactivePlat = false;
+  bool isactiveSilver = false;
   final List<Commodity> _chartData = [];
   late TrackballBehavior _trackballBehavior;
   late ZoomPanBehavior _zoomPanBehavior;
@@ -28,6 +32,13 @@ class _GraphState extends State<Graph> {
     '5 minutes'
   ];
 
+  String commodity = 'frxXAUUSD';
+
+  List<dynamic> loadedPLAT = [];
+  List<dynamic> loadedPALLA = [];
+  List<dynamic> loadedGOLD = [];
+  List<dynamic> loadedSILVER = [];
+
   dynamic tickCount;
   bool stopLoop = true;
 
@@ -35,6 +46,9 @@ class _GraphState extends State<Graph> {
       Uri.parse('wss://ws.binaryws.com/websockets/v3?app_id=1089'));
 
   final channel2 = IOWebSocketChannel.connect(
+      Uri.parse('wss://ws.binaryws.com/websockets/v3?app_id=1089'));
+
+  final channel3 = IOWebSocketChannel.connect(
       Uri.parse('wss://ws.binaryws.com/websockets/v3?app_id=1089'));
 
   void setStateIfMounted(f) {
@@ -104,16 +118,29 @@ class _GraphState extends State<Graph> {
 
   void getTickOnce() {
     channel.sink.add(
-        '{  "ticks_history": "R_50",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+        '{  "ticks_history": "${commodity}",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
   }
 
   void getTickStream() {
     channel2.sink.add(
-        '{  "ticks_history": "R_50",  "adjust_start_time": 1,  "count": 1,"end": "latest","start": 1,"style": "candles"}');
+        '{  "ticks_history": "${commodity}",  "adjust_start_time": 1,  "count": 1,"end": "latest","start": 1,"style": "candles"}');
   }
-  // void getTickStream() {
-  //   channel2.sink.add('{  "ticks": "R_50",  "subscribe": 1}');
-  // }
+
+  void tickStreamPLAT() {
+    channel3.sink.add('{  "ticks": "frxXPTUSD",  "subscribe": 1}');
+  }
+
+  void tickStreamPALLA() {
+    channel3.sink.add('{  "ticks": "frxXPDUSD",  "subscribe": 1}');
+  }
+
+  void tickStreamGOLD() {
+    channel3.sink.add('{  "ticks": "frxXAUUSD",  "subscribe": 1}');
+  }
+
+  void tickStreamSILVER() {
+    channel3.sink.add('{  "ticks": "frxXAGUSD",  "subscribe": 1}');
+  }
 
   void initialValue() {
     channel.stream.listen((data) {
@@ -160,46 +187,91 @@ class _GraphState extends State<Graph> {
             ),
           );
           // print(_chartData);
-          print(timeConverted);
+          // print(timeConverted);
         }
       });
     });
   }
-  // void handShake() {
-  //   channel2.stream.listen((data) {
-  //     final extractedData = jsonDecode(data);
-  //     List<dynamic> timeConverted = [];
-  //     List<dynamic> loadedData = [];
-  //     setStateIfMounted(() {
-  //       for (int i = 0; i < extractedData.length - 3; i++) {
-  //         timeConverted.insert(
-  //             0,
-  //             DateTime.fromMillisecondsSinceEpoch(
-  //                 extractedData['tick']['epoch'] * 1000));
-  //         loadedData.add(extractedData['tick']['quote']);
-  //         _chartData.add(Commodity(
-  //             close: loadedData[loadedData.length - 1],
-  //             epoch: timeConverted[i],
-  //             high: loadedData.cast<num>().reduce(max),
-  //             low: loadedData.cast<num>().reduce(min),
-  //             open: loadedData[0]));
-  //         // print('close:${_chartData[i].close}');
-  //         // print('epoch:${_chartData[i].epoch}');
-  //         // print('high:${_chartData[i].high}');
-  //         // print('low:${_chartData[i].low}');
-  //         // print('open:${_chartData[i].open}');
-  //         // print('length:${_chartData.length}');
-  //         // print('---------------------------');
-  //       }
-  //     });
-  //   });
-  // }
+
+  getprice() {
+    channel3.stream.listen(
+      (data) {
+        final extractedData = jsonDecode(data);
+        if (extractedData["echo_req"]["ticks"] == "frxXPTUSD") {
+          setState(() {
+            for (int i = 0; i < extractedData.length - 3; i++) {
+              loadedPLAT.insert(
+                0,
+                extractedData['tick']['quote'],
+              );
+              if (loadedPLAT.length > 3) {
+                loadedPLAT.removeAt(2);
+              }
+              // print(loadedData[i].Quote);
+            }
+          });
+        }
+        if (extractedData["echo_req"]["ticks"] == "frxXPDUSD") {
+          setState(() {
+            for (int i = 0; i < extractedData.length - 3; i++) {
+              loadedPALLA.insert(
+                0,
+                extractedData['tick']['quote'],
+              );
+              if (loadedPALLA.length > 3) {
+                loadedPALLA.removeAt(2);
+              }
+              // print(loadedData[i].Quote);
+            }
+          });
+        }
+        if (extractedData["echo_req"]["ticks"] == "frxXAUUSD") {
+          setState(() {
+            for (int i = 0; i < extractedData.length - 3; i++) {
+              loadedGOLD.insert(
+                0,
+                extractedData['tick']['quote'],
+              );
+              if (loadedGOLD.length > 3) {
+                loadedGOLD.removeAt(2);
+              }
+              // print(loadedData[i].Quote);
+            }
+          });
+        }
+        if (extractedData["echo_req"]["ticks"] == "frxXAGUSD") {
+          setState(() {
+            for (int i = 0; i < extractedData.length - 3; i++) {
+              loadedSILVER.insert(
+                0,
+                extractedData['tick']['quote'],
+              );
+              if (loadedSILVER.length > 3) {
+                loadedSILVER.removeAt(2);
+              }
+              // print(loadedData[i].Quote);
+            }
+          });
+        }
+
+        // print(loadedGOLD);
+        // print(loadedPLAT);
+        // print(loadedPALLA);
+        // print(extractedData);
+      },
+    );
+  }
 
   @override
   void initState() {
     secTimer();
     getTickOnce();
     getTickStream();
+    tickStreamPLAT();
+    tickStreamPALLA();
+    tickStreamGOLD();
+    tickStreamSILVER();
+    getprice();
     handShake();
     initialValue();
     _zoomPanBehavior = ZoomPanBehavior(
@@ -327,6 +399,485 @@ class _GraphState extends State<Graph> {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+        ),
+        Center(
+          // bottom: 12,
+          // left: 22.5,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  // color: Colors.black,
+                  height: MediaQuery.of(context).size.height * 0.105,
+                  width: MediaQuery.of(context).size.width * 0.88,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        //GOLD
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              commodity = 'frxXAUUSD';
+                              getTickOnce();
+                              getTickStream();
+                              isactiveGold = true;
+                              isactivePalla = false;
+                              isactivePlat = false;
+                              isactiveSilver = false;
+                              _chartData.clear();
+                            });
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.38,
+                            height: MediaQuery.of(context).size.height * 0.09,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Container(
+                                //GOLD
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      child: Image.asset(
+                                          'assets/navbar/gold 1.png'),
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          child: Text(
+                                            'Gold/USD',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 10),
+                                          ),
+                                        ),
+                                        (loadedGOLD.length < 3)
+                                            ? SizedBox()
+                                            : (loadedGOLD[0] > loadedGOLD[1])
+                                                ? Row(
+                                                    children: [
+                                                      Container(
+                                                        child: Image.asset(
+                                                            'assets/navbar/arrow_right_alt.png',
+                                                            height: 35,
+                                                            width: 35),
+                                                      ),
+                                                      Container(
+                                                          child: Text(
+                                                              '\$${loadedGOLD[0].toStringAsFixed(2)}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .green)))
+                                                    ],
+                                                  )
+                                                : Row(
+                                                    children: [
+                                                      Container(
+                                                        child: Image.asset(
+                                                            'assets/navbar/arrow_right_red.png',
+                                                            height: 35,
+                                                            width: 35),
+                                                      ),
+                                                      Container(
+                                                          child: Text(
+                                                              '\$${loadedGOLD[0].toStringAsFixed(2)}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red)))
+                                                    ],
+                                                  )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+
+                                decoration: (isactiveGold == false)
+                                    ? BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment(0.8,
+                                              0.0), // 10% of the width, so there are ten blinds.
+                                          colors: <Color>[
+                                            Color.fromRGBO(67, 68, 70, 1),
+                                            Color.fromRGBO(9, 51, 116, 0.8),
+                                            Color.fromRGBO(3, 33, 45, 1),
+                                          ], // red to yellow
+                                        ),
+                                      )
+                                    : BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment(0.8,
+                                              0.0), // 10% of the width, so there are ten blinds.
+                                          colors: <Color>[
+                                            Color.fromRGBO(66, 142, 243, 1),
+                                            Color.fromRGBO(61, 190, 242, 1),
+                                            Color.fromRGBO(57, 136, 242, 1),
+                                          ], // red to yellow
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        //PALLA
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              commodity = 'frxXPDUSD';
+                              getTickOnce();
+                              getTickStream();
+                              isactiveGold = false;
+                              isactivePalla = true;
+                              isactivePlat = false;
+                              isactiveSilver = false;
+                              _chartData.clear();
+                            });
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.38,
+                            height: MediaQuery.of(context).size.height * 0.09,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      // height: 35,
+                                      // width: 30,
+                                      child: Image.asset(
+                                        'assets/navbar/silver.png',
+                                        width: 50,
+                                        height: 50,
+                                      ),
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          // height: 35,
+                                          // width: 30,
+                                          child: Text(
+                                            'Palladium/USD',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 10),
+                                          ),
+                                        ),
+                                        (loadedPALLA.length < 3)
+                                            ? SizedBox()
+                                            : (loadedPALLA[0] > loadedPALLA[1])
+                                                ? Row(
+                                                    children: [
+                                                      Container(
+                                                        child: Image.asset(
+                                                            'assets/navbar/arrow_right_alt.png',
+                                                            height: 35,
+                                                            width: 35),
+                                                      ),
+                                                      Container(
+                                                          child: Text(
+                                                              '\$${loadedPALLA[0].toStringAsFixed(2)}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .green)))
+                                                    ],
+                                                  )
+                                                : Row(
+                                                    children: [
+                                                      Container(
+                                                        child: Image.asset(
+                                                            'assets/navbar/arrow_right_red.png',
+                                                            height: 35,
+                                                            width: 35),
+                                                      ),
+                                                      Container(
+                                                          child: Text(
+                                                              '\$${loadedPALLA[0].toStringAsFixed(2)}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red)))
+                                                    ],
+                                                  )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                decoration: (isactivePalla == false)
+                                    ? BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment(0.8,
+                                              0.0), // 10% of the width, so there are ten blinds.
+                                          colors: <Color>[
+                                            Color.fromRGBO(67, 68, 70, 1),
+                                            Color.fromRGBO(9, 51, 116, 0.8),
+                                            Color.fromRGBO(3, 33, 45, 1),
+                                          ], // red to yellow
+                                        ),
+                                      )
+                                    : BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment(0.8,
+                                              0.0), // 10% of the width, so there are ten blinds.
+                                          colors: <Color>[
+                                            Color.fromRGBO(66, 142, 243, 1),
+                                            Color.fromRGBO(61, 190, 242, 1),
+                                            Color.fromRGBO(57, 136, 242, 1),
+                                          ], // red to yellow
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        //PLAT
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              commodity = 'frxXPTUSD';
+                              getTickOnce();
+                              getTickStream();
+                              isactiveGold = false;
+                              isactivePalla = false;
+                              isactivePlat = true;
+                              isactiveSilver = false;
+                              _chartData.clear();
+                            });
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.38,
+                            height: MediaQuery.of(context).size.height * 0.09,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      // height: 35,
+                                      // width: 30,
+                                      child: Image.asset(
+                                        'assets/navbar/platinum.png',
+                                        width: 50,
+                                        height: 50,
+                                      ),
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          // height: 35,
+                                          // width: 30,
+                                          child: Text(
+                                            'Platinum/USD',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 10),
+                                          ),
+                                        ),
+                                        (loadedPLAT.length < 3)
+                                            ? SizedBox()
+                                            : (loadedPLAT[0] > loadedPLAT[1])
+                                                ? Row(
+                                                    children: [
+                                                      Container(
+                                                        child: Image.asset(
+                                                            'assets/navbar/arrow_right_alt.png',
+                                                            height: 35,
+                                                            width: 35),
+                                                      ),
+                                                      Container(
+                                                          child: Text(
+                                                              '\$${loadedPLAT[0].toStringAsFixed(2)}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .green)))
+                                                    ],
+                                                  )
+                                                : Row(
+                                                    children: [
+                                                      Container(
+                                                        child: Image.asset(
+                                                            'assets/navbar/arrow_right_red.png',
+                                                            height: 35,
+                                                            width: 35),
+                                                      ),
+                                                      Container(
+                                                          child: Text(
+                                                              '\$${loadedPLAT[0].toStringAsFixed(2)}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red)))
+                                                    ],
+                                                  )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                decoration: (isactivePlat == false)
+                                    ? BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment(0.8,
+                                              0.0), // 10% of the width, so there are ten blinds.
+                                          colors: <Color>[
+                                            Color.fromRGBO(67, 68, 70, 1),
+                                            Color.fromRGBO(9, 51, 116, 0.8),
+                                            Color.fromRGBO(3, 33, 45, 1),
+                                          ], // red to yellow
+                                        ),
+                                      )
+                                    : BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment(0.8,
+                                              0.0), // 10% of the width, so there are ten blinds.
+                                          colors: <Color>[
+                                            Color.fromRGBO(66, 142, 243, 1),
+                                            Color.fromRGBO(61, 190, 242, 1),
+                                            Color.fromRGBO(57, 136, 242, 1),
+                                          ], // red to yellow
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        //SILVER
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              commodity = 'frxXAGUSD';
+                              getTickOnce();
+                              getTickStream();
+                              isactiveGold = false;
+                              isactivePalla = false;
+                              isactivePlat = false;
+                              isactiveSilver = true;
+                              _chartData.clear();
+                            });
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.38,
+                            height: MediaQuery.of(context).size.height * 0.09,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        // height: 35,
+                                        // width: 30,
+                                        child: Image.asset(
+                                          'assets/navbar/platinum.png',
+                                          width: 50,
+                                          height: 50,
+                                        ),
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            // height: 35,
+                                            // width: 30,
+                                            child: Text(
+                                              'Silver/USD',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 10),
+                                            ),
+                                          ),
+                                          (loadedSILVER.length < 3)
+                                              ? SizedBox()
+                                              : (loadedSILVER[0] >
+                                                      loadedSILVER[1])
+                                                  ? Row(
+                                                      children: [
+                                                        Container(
+                                                          child: Image.asset(
+                                                              'assets/navbar/arrow_right_alt.png',
+                                                              height: 35,
+                                                              width: 35),
+                                                        ),
+                                                        Container(
+                                                            child: Text(
+                                                                '\$${loadedSILVER[0].toStringAsFixed(2)}',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .green)))
+                                                      ],
+                                                    )
+                                                  : Row(
+                                                      children: [
+                                                        Container(
+                                                          child: Image.asset(
+                                                              'assets/navbar/arrow_right_red.png',
+                                                              height: 35,
+                                                              width: 35),
+                                                        ),
+                                                        Container(
+                                                            child: Text(
+                                                                '\$${loadedSILVER[0].toStringAsFixed(2)}',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .red)))
+                                                      ],
+                                                    )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  decoration: (isactiveSilver == false)
+                                      ? BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment(0.8,
+                                                0.0), // 10% of the width, so there are ten blinds.
+                                            colors: <Color>[
+                                              Color.fromRGBO(67, 68, 70, 1),
+                                              Color.fromRGBO(9, 51, 116, 0.8),
+                                              Color.fromRGBO(3, 33, 45, 1),
+                                            ], // red to yellow
+                                          ),
+                                        )
+                                      : BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment(0.8,
+                                                0.0), // 10% of the width, so there are ten blinds.
+                                            colors: <Color>[
+                                              Color.fromRGBO(66, 142, 243, 1),
+                                              Color.fromRGBO(61, 190, 242, 1),
+                                              Color.fromRGBO(57, 136, 242, 1),
+                                            ], // red to yellow
+                                          ),
+                                        )),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

@@ -1,6 +1,5 @@
 import 'package:drc/widget/transaction_widget.dart';
 import 'package:flutter/material.dart';
-import '../widget/transaction_widget2.dart';
 
 class TransactionScreen extends StatelessWidget {
   static const routeName = '/transaction';

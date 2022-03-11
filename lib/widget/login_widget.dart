@@ -102,6 +102,14 @@ class _LoginWidgetState extends State<LoginWidget> {
     await Provider.of<Auth>(context, listen: false).getbalance();
   }
 
+  Future<void> _getuser() async {
+    await Provider.of<Auth>(context, listen: false).getuser();
+  }
+
+  Future<void> runbalanduser() async {
+    _getbal().then((_) => _getuser());
+  }
+
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
@@ -259,7 +267,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                       }
                       if (auth.isAuthenticated == true) {
                         setState(() {
-                          _getbal().then((_) => Navigator.of(context)
+                          runbalanduser().then((_) => Navigator.of(context)
                               .pushReplacementNamed(NavBar.routeName));
                         });
                         // _getbal();

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 import '../model/http_exception.dart';
 // import 'dart:convert';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class SignUpWidget extends StatefulWidget {
   @override
@@ -12,6 +13,8 @@ class SignUpWidget extends StatefulWidget {
 class _SignUpWidgetState extends State<SignUpWidget> {
   bool? _tnc = false;
   bool _isLoading = false;
+  bool _keyboardVisible = false;
+  // bool isOpen;
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   FocusNode _fname = FocusNode();
@@ -106,6 +109,14 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   //   }
   // }
 
+  detectKeyboard() {
+    if (MediaQuery.of(context).viewInsets.bottom != 0) {
+      setState(() {
+        _keyboardVisible = true;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -131,7 +142,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           _passwordfield.hasPrimaryFocus ||
                           _fname.hasPrimaryFocus ||
                           _lname.hasPrimaryFocus ||
-                          _confirmpasswordfield.hasPrimaryFocus)
+                          _confirmpasswordfield
+                              .hasPrimaryFocus /* _keyboardVisible */)
                       ? (MediaQuery.of(context).size.height * 0.00)
                       : (MediaQuery.of(context).size.height * 0.37)),
               Expanded(

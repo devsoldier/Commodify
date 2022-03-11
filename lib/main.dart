@@ -42,9 +42,9 @@ class MyApp extends StatelessWidget {
           home: /* (auth.isAuthenticated != null && auth.isAuthenticated == true)
               ? NavBar()
               // : */
-              NavBar(),
-          // Clone(),
-          // SignUpScreen(),
+              // NavBar(),
+              // Clone(),
+              SignUpScreen(),
           routes: {
             SignUpScreen.routeName: (ctx) => SignUpScreen(),
             LoginScreen.routeName: (ctx) => LoginScreen(),

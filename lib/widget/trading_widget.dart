@@ -25,13 +25,16 @@ class _TradingWidgetState extends State<TradingWidget> {
   String _selectedCommodity = 'Gold/USD';
   List commodities = [
     'Gold/USD',
+    'Palladium/USD',
     'Platinum/USD',
-    'Silver/USD',
+    'Silver/USD'
   ];
+  String commodity = 'frxXAUUSD';
   final GlobalKey<FormState> _buysellkey = GlobalKey();
   FocusNode _buysellfield = FocusNode();
   final TextEditingController _buysellController = TextEditingController();
   late double _buysellData;
+  late String _selectedproduct;
 
   bool maximize = true;
   bool stopLoop = true;
@@ -48,11 +51,11 @@ class _TradingWidgetState extends State<TradingWidget> {
 
   void getTickOnce() {
     channel.sink.add(
-        '{  "ticks_history": "R_50",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+        '{  "ticks_history": "${commodity}",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
   }
 
   void getTickStream() {
-    channel2.sink.add('{  "ticks": "R_50",  "subscribe": 1}');
+    channel2.sink.add('{  "ticks": "${commodity}",  "subscribe": 1}');
   }
 
   void initialValue() {
@@ -79,31 +82,32 @@ class _TradingWidgetState extends State<TradingWidget> {
     });
   }
 
+  void _getasset() {
+    Provider.of<Auth>(context, listen: false).getasset();
+  }
+
   void handShake() {
     channel2.stream.listen((data) {
-      final extractedData = jsonDecode(data);
+      setState(() {
+        final extractedData = jsonDecode(data);
+        // print(extractedData);
 
-      setStateIfMounted(() {
-        for (int i = 0; i < extractedData.length - 3; i++) {
-          timeConverted.insert(
-              0,
-              DateTime.fromMillisecondsSinceEpoch(
-                  extractedData['tick']['epoch'] * 1000));
-          loadedData.insert(0, extractedData['tick']['quote']);
-
-          _chartData.add(Commodity(
-              close: loadedData[loadedData.length - 1],
+        List<dynamic> timeConverted = [];
+        for (int i = 0; i < extractedData['candles'].length; i++) {
+          timeConverted.add(DateTime.fromMillisecondsSinceEpoch(
+              extractedData['candles'][i]['epoch'] * 1000));
+          // _chartData.removeAt(1);
+          _chartData.add(
+            Commodity(
+              close: extractedData['candles'][i]['close'],
               epoch: timeConverted[i],
-              high: loadedData.cast<num>().reduce(max),
-              low: loadedData.cast<num>().reduce(min),
-              open: loadedData[0]));
-          // print('close:${_chartData[i].close}');
-          // print('epoch:${_chartData[i].epoch}');
-          // print('high:${_chartData[i].high}');
-          // print('low:${_chartData[i].low}');
-          // print('open:${_chartData[i].open}');
-          // print('length:${_chartData.length}');
-          // print('---------------------------');
+              high: extractedData['candles'][i]['high'],
+              low: extractedData['candles'][i]['low'],
+              open: extractedData['candles'][i]['open'],
+            ),
+          );
+          // print(_chartData);
+          print(timeConverted);
         }
       });
     });
@@ -113,6 +117,7 @@ class _TradingWidgetState extends State<TradingWidget> {
   void initState() {
     // secTimer();
     // getbalance();
+    _getasset();
     getTickOnce();
     getTickStream();
     handShake();
@@ -128,12 +133,14 @@ class _TradingWidgetState extends State<TradingWidget> {
 
   Future<void> purchase() async {
     _buysellkey.currentState!.save();
-    await Provider.of<Auth>(context, listen: false).buy(_buysellData);
+    await Provider.of<Auth>(context, listen: false)
+        .buy(_buysellData, _selectedproduct);
   }
 
   Future<void> sell() async {
     _buysellkey.currentState!.save();
-    await Provider.of<Auth>(context, listen: false).sell(_buysellData);
+    await Provider.of<Auth>(context, listen: false)
+        .sell(_buysellData, _selectedproduct);
   }
 
   Future<void> getBal() async {
@@ -142,10 +149,12 @@ class _TradingWidgetState extends State<TradingWidget> {
 
   Future<void> runbothpurchase() async {
     purchase().then((_) => getBal());
+    _getasset();
   }
 
   Future<void> runbothsell() async {
     sell().then((_) => getBal());
+    _getasset();
   }
 
   @override
@@ -161,10 +170,21 @@ class _TradingWidgetState extends State<TradingWidget> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Image.asset('assets/navbar/gold 1.png'),
-        Text('Gold/USD'),
-        SizedBox(width: 50)
+        Column(
+          children: [
+            Text(
+              'Gold/USD',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text('Balance ${balancedata.asset[0].gold_amount}')
+          ],
+        ),
+        SizedBox(width: 40)
       ],
     );
+
     Widget platinum = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -172,10 +192,21 @@ class _TradingWidgetState extends State<TradingWidget> {
             height: 50,
             width: 50,
             child: Image.asset('assets/navbar/platinum.png')),
-        Text('Platinum/USD'),
-        SizedBox(width: 50)
+        Column(
+          children: [
+            Text(
+              'Platinum/USD',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text('Balance ${balancedata.asset[0].platinum_amount}')
+          ],
+        ),
+        SizedBox(width: 40)
       ],
     );
+
     Widget silver = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -183,8 +214,35 @@ class _TradingWidgetState extends State<TradingWidget> {
             height: 50,
             width: 50,
             child: Image.asset('assets/navbar/silver.png')),
-        Text('Silver/USD'),
-        SizedBox(width: 50)
+        Column(
+          children: [
+            Text(
+              'Silver/USD',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text('Balance ${balancedata.asset[0].silver_amount}')
+          ],
+        ),
+        SizedBox(width: 40)
+      ],
+    );
+
+    Widget palladium = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+            height: 50,
+            width: 50,
+            child: Image.asset('assets/navbar/silver.png')),
+        Column(
+          children: [
+            Text('Palladium/USD'),
+            Text('Balance ${balancedata.asset[0].palladium_amount}')
+          ],
+        ),
+        SizedBox(width: 40)
       ],
     );
 
@@ -374,21 +432,54 @@ class _TradingWidgetState extends State<TradingWidget> {
                         onChanged: (newval) {
                           setState(() {
                             _selectedCommodity = newval as String;
+                            if (newval == 'Gold/USD') {
+                              setState(() {
+                                commodity = 'frxXAUUSD';
+                                getTickOnce();
+                                getTickStream();
+                                _chartData.clear();
+                              });
+                            }
+                            if (newval == 'Palladium/USD') {
+                              setState(() {
+                                commodity = 'frxXPDUSD';
+                                getTickOnce();
+                                getTickStream();
+                                _chartData.clear();
+                              });
+                            }
+                            if (newval == 'Platinum/USD') {
+                              setState(() {
+                                commodity = 'frxXPTUSD';
+                                getTickOnce();
+                                getTickStream();
+                                _chartData.clear();
+                              });
+                            }
+                            if (newval == 'Silver/USD') {
+                              setState(() {
+                                commodity = 'frxXAGUSD';
+                                getTickOnce();
+                                getTickStream();
+                                _chartData.clear();
+                              });
+                            }
                             // secTimer();
                           });
                         },
                         // elevation: 16,
                         items: commodities.map((newval) {
                           return DropdownMenuItem(
-                            value: newval,
-                            child: (newval == 'Gold/USD')
-                                ? gold
-                                : (newval == 'Platinum/USD')
-                                    ? platinum
-                                    : (newval == 'Silver/USD')
-                                        ? silver
-                                        : Text('haha'),
-                          );
+                              value: newval,
+                              child: (newval == 'Gold/USD')
+                                  ? gold
+                                  : (newval == 'Palladium/USD')
+                                      ? palladium
+                                      : (newval == 'Platinum/USD')
+                                          ? platinum
+                                          : (newval == 'Silver/USD')
+                                              ? silver
+                                              : Text('T_T'));
                         }).toList(),
                         icon: Icon(
                           Icons.arrow_drop_down,
@@ -428,18 +519,30 @@ class _TradingWidgetState extends State<TradingWidget> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text('Price Index'),
+                              Text(
+                                'Price Index',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromRGBO(9, 51, 116, 1),
+                                ),
+                              ),
                               SizedBox(width: 50),
                               (loadedData.length < 3)
-                                  ? Text('\$ -')
+                                  ? Container(
+                                      width: 15,
+                                      height: 15,
+                                      child: CircularProgressIndicator())
                                   : (loadedData[0] > loadedData[1])
                                       ? Text(
                                           '\$${loadedData[0]}',
                                           style: TextStyle(color: Colors.green),
                                         )
                                       : /* (loadedData[0] < loadedData[1]) */
-                                      /* ? */ Text('\$${loadedData[0]}',
-                                          style: TextStyle(color: Colors.red))
+                                      /* ? */ Text(
+                                          '\$${loadedData[0]}',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
                             ],
                           ),
                         ),
@@ -491,7 +594,23 @@ class _TradingWidgetState extends State<TradingWidget> {
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  runbothpurchase();
+                                  if (_selectedCommodity == 'Gold/USD') {
+                                    _selectedproduct = 'Xau';
+                                    runbothpurchase();
+                                  }
+                                  if (_selectedCommodity == 'Palladium/USD') {
+                                    _selectedproduct = 'Xpd';
+                                    runbothpurchase();
+                                  }
+                                  if (_selectedCommodity == 'Platinum/USD') {
+                                    _selectedproduct = 'Xpt';
+                                    runbothpurchase();
+                                  }
+                                  if (_selectedCommodity == 'Silver/USD') {
+                                    _selectedproduct = 'Xag';
+                                    runbothpurchase();
+                                  }
+                                  _getasset();
                                 });
                               },
                               child: Image.asset(

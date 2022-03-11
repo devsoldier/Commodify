@@ -1,8 +1,10 @@
-// ignore_for_file: prefer_const_constructors
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/percent_indicator.dart';
+import 'package:web_socket_channel/io.dart';
+import 'dart:convert';
+import 'dart:async';
+// import '../providers/models.dart';
 
 class DashboardWidget extends StatefulWidget {
   const DashboardWidget({Key? key}) : super(key: key);
@@ -12,26 +14,50 @@ class DashboardWidget extends StatefulWidget {
 }
 
 class _DashboardWidgetState extends State<DashboardWidget> {
+  bool _isLoading = true;
+
   void getBAL() {
     Provider.of<Auth>(context, listen: false).getbalance();
   }
 
-  void getTransHistory() {
-    Provider.of<Auth>(context, listen: false).gethistory();
+  void _getuser() {
+    Provider.of<Auth>(context, listen: false).getuser();
   }
 
-  void getName() {}
+  void _getasset() {
+    Provider.of<Auth>(context, listen: false).getasset();
+  }
+
+  final channel = IOWebSocketChannel.connect(
+      Uri.parse('wss://ws.binaryws.com/websockets/v3?app_id=1089'));
+
+  void forceLoad() {
+    Timer(Duration(milliseconds: 1250), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
+  Widget loadpage = Center(child: CircularProgressIndicator());
 
   @override
   void initState() {
     getBAL();
-    getTransHistory();
+    _getuser();
+    _getasset();
+    forceLoad();
     super.initState();
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // final balancedata = Provider.of<Auth>(context);
+    final data = Provider.of<Auth>(context);
     return Stack(
       children: <Widget>[
         Positioned(
@@ -43,13 +69,19 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 'Welcome back,',
                 style: TextStyle(color: Colors.white),
               ),
-              Text(
-                ' Tom!',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              /* (_isLoading == true)
+                  ? Container(width: 15, height: 15, child: loadpage)
+                  :  */
+              Consumer<Auth>(
+                  builder: (_, datauser, __) => (datauser.user.isEmpty)
+                      ? Container(width: 15, height: 15, child: loadpage)
+                      : Text(
+                          ' ${datauser.user[0].first_name} ${datauser.user[0].last_name}!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ))
             ],
           ),
         ),
@@ -78,13 +110,15 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     SizedBox(height: 10),
                     Container(
                       child: Consumer<Auth>(
-                        builder: (_, balancedata, __) => Text(
-                          '\$${(balancedata.balance).toStringAsFixed(2)}',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 28),
-                        ),
+                        builder: (_, balancedata, __) => (_isLoading == true)
+                            ? Container(width: 15, height: 15, child: loadpage)
+                            : Text(
+                                '\$${(balancedata.balance).toStringAsFixed(2)}',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 28),
+                              ),
                       ),
                     ),
                   ],
@@ -162,7 +196,6 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                 Column(
                                   children: <Widget>[
                                     Container(
-                                      // alignment: Alignment.center,
                                       decoration: BoxDecoration(
                                         color: Colors.black12,
                                         shape: BoxShape.circle,
@@ -194,7 +227,6 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                 Column(
                                   children: <Widget>[
                                     Container(
-                                      // alignment: Alignment.center,
                                       decoration: BoxDecoration(
                                         color: Colors.black12,
                                         shape: BoxShape.circle,
@@ -230,57 +262,6 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     ),
                   ),
                 ],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 12,
-          left: 22.5,
-          child: Container(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: Container(
-                alignment: Alignment.center,
-                // color: Colors.black,
-                height: MediaQuery.of(context).size.height * 0.105,
-                width: MediaQuery.of(context).size.width * 0.88,
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Center(
-                        child: ListView(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          children: <Widget>[
-                            Column(
-                              children: [
-                                Container(
-                                    child: Image.asset(
-                                        'assets/navbar/gold asset.png'))
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Container(
-                                    child: Image.asset(
-                                        'assets/navbar/Rectangle 6331.png'))
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Container(
-                                    child: Image.asset(
-                                        'assets/navbar/Rectangle 6331.png'))
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ),

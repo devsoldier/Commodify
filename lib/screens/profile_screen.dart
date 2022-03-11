@@ -1,3 +1,4 @@
+import 'package:drc/widget/profile_widget.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -23,6 +24,7 @@ class ProfileScreen extends StatelessWidget {
                 height: double.infinity, width: double.infinity),
           ),
         ),
+        ProfileWidget(),
       ],
     );
   }

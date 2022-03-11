@@ -1,9 +1,11 @@
+import 'package:drc/widget/activity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
+import './transaction_widget.dart';
 
 class WalletWidget extends StatefulWidget {
   // const WalletWidget({ Key? key }) : super(key: key);
@@ -211,6 +213,8 @@ class _WalletWidgetState extends State<WalletWidget> {
   @override
   Widget build(BuildContext context) {
     // final balancedata = Provider.of<Auth>(context);
+    // Widget Activity = ;
+
     Widget Payment = Positioned(
       bottom: 10,
       left: 17,
@@ -257,7 +261,8 @@ class _WalletWidgetState extends State<WalletWidget> {
                             ],
                           ),
                         ),
-                        SizedBox(width: 65),
+                        SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.05),
                       ],
                     ),
                     Row(
@@ -608,8 +613,8 @@ class _WalletWidgetState extends State<WalletWidget> {
           ),
         ),
         Positioned(
-          bottom: 300,
-          left: 15,
+          bottom: MediaQuery.of(context).size.height * 0.44,
+          left: MediaQuery.of(context).size.width * 0.038,
           child: Container(
             // color: Colors.black,
             // height: MediaQuery.of(context).size.height * 0.1,
@@ -644,7 +649,18 @@ class _WalletWidgetState extends State<WalletWidget> {
             ),
           ),
         ),
-        (initialPage == 0) ? Payment : Center(child: Text('nothing')),
+        (initialPage == 0)
+            ? Payment
+            : Positioned(
+                bottom: MediaQuery.of(context).size.height * 0.00,
+                left: MediaQuery.of(context).size.width * 0.041,
+                child: Center(
+                  child: Container(
+                    // color: Colors.black,
+                    child: Activity(),
+                  ),
+                ),
+              ),
         // WIP
         // Positioned(
         //   bottom: 10,
