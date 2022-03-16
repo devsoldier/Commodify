@@ -25,31 +25,6 @@ class DashboardScreen extends StatelessWidget {
                 height: double.infinity, width: double.infinity),
           ),
         ),
-        Positioned(
-          top: 24,
-          left: 7,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
-            child: Container(
-              color: Color.fromRGBO(0, 178, 255, 0.6),
-              width: MediaQuery.of(context).size.width * 0.96,
-              height: MediaQuery.of(context).size.height * 0.115,
-            ),
-          ),
-        ),
-        Positioned(
-          left: 7,
-          bottom: -10,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
-            child: Container(
-              color: Colors.white,
-              width: MediaQuery.of(context).size.width * 0.96,
-              height: MediaQuery.of(context).size.height * 0.645,
-            ),
-          ),
-        ),
-        Graph(),
         DashboardWidget(),
       ],
     );

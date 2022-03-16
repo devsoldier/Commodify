@@ -64,7 +64,7 @@ class _NavBarState extends State<NavBar> {
                 label: 'Profile'),
           ],
           selectedItemColor: Color.fromRGBO(0, 178, 255, 1),
-          unselectedItemColor: Colors.black,
+          unselectedItemColor: Colors.white12,
           currentIndex: _selectedPageIndex,
           backgroundColor: Color.fromRGBO(9, 51, 116, 1.0),
           onTap: _selectPage,

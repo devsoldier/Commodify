@@ -1,9 +1,10 @@
+import 'package:drc/screens/signup_screen.dart';
+import 'package:drc/widget/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 import '../model/http_exception.dart';
-// import 'dart:convert';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import '../screens/login_screen.dart';
 
 class SignUpWidget extends StatefulWidget {
   @override
@@ -13,8 +14,10 @@ class SignUpWidget extends StatefulWidget {
 class _SignUpWidgetState extends State<SignUpWidget> {
   bool? _tnc = false;
   bool _isLoading = false;
-  bool _keyboardVisible = false;
+  // bool _keyboardVisible = false;
   // bool isOpen;
+  RegExp regex =
+      RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   FocusNode _fname = FocusNode();
@@ -54,15 +57,37 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     );
   }
 
+  void _showsuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Successful Signup!'),
+        content:
+            Consumer<Auth>(builder: (_, data, __) => Text(data.message[0])),
+        actions: <Widget>[
+          ElevatedButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       // Invalid!
       return;
     }
+
     _formKey.currentState!.save();
+
     setState(() {
       _isLoading = true;
     });
+
     try {
       await Provider.of<Auth>(context, listen: false).signup(
         _authData["first_name"]!,
@@ -71,22 +96,19 @@ class _SignUpWidgetState extends State<SignUpWidget> {
         _authData["password"]!,
       );
     } on HttpException catch (error) {
-      var errorMessage = 'Authentication failed';
-      if (error.toString().contains('EMAIL_EXISTS')) {
-        errorMessage = 'This email address is already in use.';
-      } else if (error.toString().contains('INVALID_EMAIL')) {
-        errorMessage = 'This is not a valid email address';
-      } else if (error.toString().contains('WEAK_PASSWORD')) {
-        errorMessage = 'This password is too weak.';
-      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
-        errorMessage = 'Could not find a user with that email.';
-      } else if (error.toString().contains('INVALID_PASSWORD')) {
-        errorMessage = 'Invalid password.';
+      var errorMessage = 'Signup failed';
+      if (error.toString().contains('name')) {
+        errorMessage = 'Please provide valid name.';
+      } else if (error.toString().contains('email address')) {
+        errorMessage = 'Please provide valid email address.';
+      } else if (error.toString().contains('password')) {
+        errorMessage = 'Please provide valid password.';
+      } else if (error.toString().contains('already exist')) {
+        errorMessage = 'User already exist.';
       }
       _showErrorDialog(errorMessage);
     } catch (error) {
-      const errorMessage =
-          'Could not authenticate you. Please try again later.';
+      const errorMessage = 'Failed to Signup';
       _showErrorDialog(errorMessage);
     }
     setState(() {
@@ -95,25 +117,38 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     // print(_authData);
   }
 
-  // String? validatePassword(String value) {
-  //   RegExp regex =
-  //       RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-  //   if (value.isEmpty) {
-  //     return 'Please enter password';
-  //   } else {
-  //     if (!regex.hasMatch(value)) {
-  //       return 'Enter valid password';
-  //     } else {
-  //       return null;
-  //     }
-  //   }
-  // }
+  Future<void> _verify() {
+    return Provider.of<Auth>(context, listen: false).isAuth();
+  }
 
-  detectKeyboard() {
-    if (MediaQuery.of(context).viewInsets.bottom != 0) {
-      setState(() {
-        _keyboardVisible = true;
-      });
+  Future<void> runBoth() async {
+    _submit().then((_) => _verify());
+  }
+
+  String? validatePassword(String value) {
+    RegExp regex =
+        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
+    if (value.isEmpty) {
+      return 'Please enter password';
+    }
+    if (!regex.hasMatch(value)) {
+      return 'Enter valid password';
+    } else {
+      return null;
+    }
+  }
+
+  String? get _errorText {
+    final text = _confirmpasswordController.value.text;
+    RegExp regex =
+        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
+    /*  if (!regex.hasMatch(text)) {
+      return 'Enter valid password';
+    } */
+    if (text.isEmpty || text.length < 8) {
+      return 'idk';
+    } else {
+      return null;
     }
   }
 
@@ -131,287 +166,367 @@ class _SignUpWidgetState extends State<SignUpWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final data = Provider.of<Auth>(context);
     return Stack(
       children: <Widget>[
         Positioned(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                  height: (_emailfield.hasPrimaryFocus ||
-                          _passwordfield.hasPrimaryFocus ||
-                          _fname.hasPrimaryFocus ||
-                          _lname.hasPrimaryFocus ||
-                          _confirmpasswordfield
-                              .hasPrimaryFocus /* _keyboardVisible */)
-                      ? (MediaQuery.of(context).size.height * 0.00)
-                      : (MediaQuery.of(context).size.height * 0.37)),
-              Expanded(
-                child: Container(
-                  height: 20,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-        Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.55,
-          right: MediaQuery.of(context).size.width * 0.31,
-          child: Container(
-            child: Text(
-              'Sign Up',
-              style: TextStyle(
-                fontSize: 35,
-                fontWeight: FontWeight.bold,
-              ),
+          bottom: 0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30.0),
             ),
-          ),
-        ),
-        Positioned(
-          bottom: MediaQuery.of(context).size.width * 0.07,
-          left: MediaQuery.of(context).size.width * 0.14,
-          child: Form(
-            key: _formKey,
             child: Container(
-              margin: EdgeInsets.only(right: 60),
-              // padding: EdgeInsets.only(right: 100),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  //FULL NAME
-                  Row(
-                    children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            child: Text(
-                              'First Name',
+              color: Colors.white,
+              width: MediaQuery.of(context).size.width * 1,
+              height: MediaQuery.of(context).size.height * 0.63,
+              child: Form(
+                key: _formKey,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        SizedBox(height: 10),
+                        Container(
+                          child: Text('Sign Up',
                               style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: (MediaQuery.of(context).size.width * 0.350),
-                            height: 35,
-                            child: TextFormField(
-                              focusNode: _fname,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
+                                  fontSize: 35, fontWeight: FontWeight.bold)),
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  child: Text(
+                                    'First Name',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              onSaved: (value) {
-                                _authData["first_name"] = value.toString();
-                                FocusScope.of(context).requestFocus(_lname);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            child: Text(
-                              'Last Name',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: (MediaQuery.of(context).size.width * 0.35),
-                            height: 35,
-                            child: TextFormField(
-                              focusNode: _lname,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
+                                Container(
+                                  width: (MediaQuery.of(context).size.width *
+                                      0.350),
+                                  height: 35,
+                                  child: TextFormField(
+                                    focusNode: _fname,
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Please enter first name!';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: InputDecoration(
+                                      // errorStyle:,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                      ),
+                                    ),
+                                    onSaved: (value) {
+                                      _authData["first_name"] =
+                                          value.toString();
+                                      FocusScope.of(context)
+                                          .requestFocus(_lname);
+                                    },
                                   ),
                                 ),
-                              ),
-                              onSaved: (value) {
-                                _authData["last_name"] = value.toString();
-                                FocusScope.of(context)
-                                    .requestFocus(_emailfield);
-                              },
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  //EMAIL
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                  Text(
-                    'Email',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Container(
-                    width: (MediaQuery.of(context).size.width * 0.75),
-                    height: 35,
-                    child: TextFormField(
-                      keyboardType: TextInputType.emailAddress,
-                      focusNode: _emailfield,
-                      validator: (value) {
-                        if (value!.isEmpty || !value.contains('@')) {
-                          return 'Invalid email!';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5.0),
-                          ),
-                        ),
-                      ),
-                      onSaved: (value) {
-                        _authData["email"] = value.toString();
-                        FocusScope.of(context).requestFocus(_passwordfield);
-                      },
-                    ),
-                  ),
-
-                  //PASSWORD
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                  Text(
-                    'Password',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Container(
-                    width: (MediaQuery.of(context).size.width * 0.75),
-                    height: 35,
-                    child: TextFormField(
-                      obscureText: true,
-                      controller: _passwordController,
-                      focusNode: _passwordfield,
-                      validator: /* ((value) =>
-                              validatePassword(value.toString())), */
-                          (value) {
-                        if (value!.isEmpty || value.length < 5) {
-                          return 'Password is too short!';
-                        }
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5.0),
-                          ),
-                        ),
-                      ),
-                      onFieldSubmitted: (_) {
-                        FocusScope.of(context)
-                            .requestFocus(_confirmpasswordfield);
-                      },
-                    ),
-                  ),
-
-                  //CONFIRM PASSWORD
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                  Text(
-                    'Confirm Password',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Container(
-                    width: (MediaQuery.of(context).size.width * 0.75),
-                    height: 35,
-                    child: TextFormField(
-                      obscureText: true,
-                      controller: _confirmpasswordController,
-                      focusNode: _confirmpasswordfield,
-                      validator: (value) {
-                        if (value!.isEmpty) return 'Empty';
-                        if (value != _passwordController.text)
-                          return 'Not Match';
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5.0),
-                          ),
-                        ),
-                      ),
-                      onSaved: (value) {
-                        _authData["password"] = value!;
-                      },
-                    ),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        child: Checkbox(
-                          value: _tnc,
-                          onChanged: (value) {
-                            setState(() {
-                              _tnc = value;
-                            });
-                          },
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          text: "I agree to the ",
-                          style: TextStyle(color: Colors.black87),
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: 'terms and conditions',
-                                style: TextStyle(color: Colors.red)),
+                            SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.width * 0.05),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  child: Text(
+                                    'Last Name',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: (MediaQuery.of(context).size.width *
+                                      0.35),
+                                  height: 35,
+                                  child: TextFormField(
+                                    focusNode: _lname,
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Please enter first name!';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                      ),
+                                    ),
+                                    onSaved: (value) {
+                                      _authData["last_name"] = value.toString();
+                                      FocusScope.of(context)
+                                          .requestFocus(_emailfield);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  // SizedBox(height: MediaQuery.of(context).size.height * 0.047),
-                  Row(
-                    children: <Widget>[
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-                      if (_tnc == false)
-                        Image.asset(
-                          'assets/signup/signup btn grey.png',
-                        )
-                      else
-                        GestureDetector(
-                          onTap: _submit,
+
+                        Row(
+                          children: [
+                            //EMAIL
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Email',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Container(
+                                  width: (MediaQuery.of(context).size.width *
+                                      0.75),
+                                  height: 35,
+                                  child: TextFormField(
+                                    keyboardType: TextInputType.emailAddress,
+                                    focusNode: _emailfield,
+                                    validator: (value) {
+                                      if (value!.isEmpty ||
+                                          !value.contains('@')) {
+                                        return 'Invalid email!';
+                                      }
+                                      return null;
+                                    },
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                      ),
+                                    ),
+                                    onSaved: (value) {
+                                      _authData["email"] = value.toString();
+                                      FocusScope.of(context)
+                                          .requestFocus(_passwordfield);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            //PASSWORD
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Password',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Container(
+                                  width: (MediaQuery.of(context).size.width *
+                                      0.75),
+                                  height: 35,
+                                  child: TextFormField(
+                                    obscureText: true,
+                                    controller: _passwordController,
+                                    focusNode: _passwordfield,
+                                    validator: (value) {
+                                      if (value!.isEmpty || value.length < 5) {
+                                        return 'Password is too short!';
+                                      } else if (!regex.hasMatch(value)) {
+                                        return 'Invalid password';
+                                      }
+                                    },
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                      ),
+                                    ),
+                                    onSaved: (_) {
+                                      FocusScope.of(context)
+                                          .requestFocus(_confirmpasswordfield);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            //CONFIRM PASSWORD
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Confirm Password',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Container(
+                                  width: (MediaQuery.of(context).size.width *
+                                      0.75),
+                                  height: 35,
+                                  child: TextFormField(
+                                    obscureText: true,
+                                    controller: _confirmpasswordController,
+                                    focusNode: _confirmpasswordfield,
+                                    validator: (value) {
+                                      if (value!.isEmpty ||
+                                          value != _passwordController.text)
+                                        return 'does not match';
+                                      if (!regex.hasMatch(value))
+                                        return 'Invalid password';
+
+                                      return null;
+                                    },
+                                    decoration: InputDecoration(
+                                      errorText: (_confirmpasswordfield
+                                              .hasPrimaryFocus)
+                                          ? _errorText
+                                          : null,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _authData["password"] = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              child: Checkbox(
+                                value: _tnc,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _tnc = value;
+                                  });
+                                },
+                              ),
+                            ),
+                            RichText(
+                              text: TextSpan(
+                                text: "I agree to the ",
+                                style: TextStyle(color: Colors.black87),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: 'terms and conditions',
+                                      style: TextStyle(color: Colors.red)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        // SizedBox(height: MediaQuery.of(context).size.height * 0.047),
+                        Row(
+                          children: <Widget>[
+                            SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.width * 0.05),
+                            if (_tnc == false)
+                              Image.asset(
+                                'assets/signup/signup btn grey.png',
+                              )
+                            else if (_tnc == true)
+                              GestureDetector(
+                                onTap: () async {
+                                  await runBoth();
+                                  (data.isAuthenticated == true)
+                                      ? Navigator.of(context)
+                                          .pushReplacementNamed(
+                                              NavBar.routeName)
+                                      : null;
+                                },
+                                child: Container(
+                                  child: Image.asset(
+                                    'assets/signup/signup btn.png',
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        Center(
                           child: Container(
-                            child: Image.asset(
-                              'assets/signup/signup btn.png',
+                            alignment: Alignment.bottomCenter,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    // Image.asset(
+                                    //   'assets/signup/Already have an account_.png',
+                                    // ),
+                                    Text(
+                                      'Already have an account?',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black38),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context)
+                                            .pushReplacementNamed(
+                                                LoginScreen.routeName);
+                                      },
+                                      child: Text(
+                                        ' Login',
+                                        style: TextStyle(
+                                          color: Colors.blue[400],
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: 15),
+                              ],
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                  // SizedBox(height: MediaQuery.of(context).size.height * 0.036),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        )
       ],
     );
   }

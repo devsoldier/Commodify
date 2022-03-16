@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:convert';
 import 'dart:async';
-// import '../providers/models.dart';
+import '../screens/graph.dart';
+import './assets_chart.dart';
 
 class DashboardWidget extends StatefulWidget {
-  const DashboardWidget({Key? key}) : super(key: key);
-
   @override
   _DashboardWidgetState createState() => _DashboardWidgetState();
 }
@@ -43,6 +42,15 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
   @override
   void initState() {
+    // Future(() {
+    //   final snackBar = SnackBar(
+    //     content: Consumer<Auth>(
+    //         builder: (_, data, __) => (data.message[0].isEmpty)
+    //             ? CircularProgressIndicator()
+    //             : Text(data.message[0])),
+    //   );
+    //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    // });
     getBAL();
     _getuser();
     _getasset();
@@ -58,215 +66,140 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<Auth>(context);
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          top: 5,
-          left: 7,
-          child: Row(
-            children: <Widget>[
-              Text(
-                'Welcome back,',
-                style: TextStyle(color: Colors.white),
-              ),
-              /* (_isLoading == true)
-                  ? Container(width: 15, height: 15, child: loadpage)
-                  :  */
-              Consumer<Auth>(
-                  builder: (_, datauser, __) => (datauser.user.isEmpty)
-                      ? Container(width: 15, height: 15, child: loadpage)
-                      : Text(
-                          ' ${datauser.user[0].first_name} ${datauser.user[0].last_name}!',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ))
-            ],
-          ),
-        ),
-        Positioned(
-          top: 28,
-          left: 10,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.95,
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Stack(
+        children: [
+          Container(height: MediaQuery.of(context).size.height * 1.415),
+          Positioned(
+            top: 0,
+            left: 7,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Container(
-                  // color: Colors.black,
-                  height: 75,
-                  width: 75,
-                  child: Image.asset('assets/navbar/Vector.png'),
+                Text(
+                  'Welcome back,',
+                  style: TextStyle(color: Colors.white),
                 ),
-                Column(
-                  children: <Widget>[
+                /* (_isLoading == true)
+                    ? Container(width: 15, height: 15, child: loadpage)
+                    :  */
+
+                (data.user.isEmpty)
+                    ? Container(width: 15, height: 15, child: loadpage)
+                    : Text(
+                        ' ${data.user[0].first_name} ${data.user[0].last_name}!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+              ],
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.04,
+            left: MediaQuery.of(context).size.width * 0.02,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Container(
+                color: Color.fromRGBO(0, 178, 255, 0.6),
+                width: MediaQuery.of(context).size.width * 0.96,
+                height: MediaQuery.of(context).size.height * 0.1350,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
                     Container(
-                      child: Text(
-                        'Current Balance',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Container(
-                      child: Consumer<Auth>(
-                        builder: (_, balancedata, __) => (_isLoading == true)
-                            ? Container(width: 15, height: 15, child: loadpage)
-                            : Text(
-                                '\$${(balancedata.balance).toStringAsFixed(2)}',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 28),
-                              ),
-                      ),
+                        height: 75,
+                        width: 75,
+                        child: Image.asset('assets/navbar/Vector.png')),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: Text(
+                            'Current Balance',
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        ),
+                        Container(
+                          child: Consumer<Auth>(
+                            builder: (_, balancedata, __) =>
+                                (_isLoading == true)
+                                    ? Container(
+                                        width: 15, height: 15, child: loadpage)
+                                    : Text(
+                                        '\$${(balancedata.balance).toStringAsFixed(2)}',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 28),
+                                      ),
+                          ),
+                        ),
+                        //   Container(
+                        //     child: Text(
+                        //       '\$960.00',
+                        //       style: TextStyle(
+                        //           color: Colors.white,
+                        //           fontWeight: FontWeight.bold,
+                        //           fontSize: 28),
+                        //     ),
+                        //   ),
+                        // ],
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          top: MediaQuery.of(context).size.height * 0.18,
-          left: MediaQuery.of(context).size.width * 0.034,
-          child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 5,
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(top: 5),
-                    height: MediaQuery.of(context).size.height * 0.11,
-                    width: MediaQuery.of(context).size.width * 0.93,
-                    color: Color.fromRGBO(249, 247, 247, 1),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Center(
-                            child: ListView(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              scrollDirection: Axis.horizontal,
-                              children: <Widget>[
-                                // Divider(indent: 20),
-                                Column(
-                                  children: <Widget>[
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black12,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(2),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color.fromRGBO(
-                                                  0, 50, 117, 1.0)),
-                                          child: Container(
-                                            child: IconButton(
-                                              icon: Icon(
-                                                  Icons
-                                                      .favorite_border_outlined,
-                                                  color: Color.fromRGBO(
-                                                      0, 178, 255, 1.0)),
-                                              onPressed: () {},
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Text('Favorite'),
-                                  ],
-                                ),
-                                Divider(
-                                    indent: MediaQuery.of(context).size.width *
-                                        0.18),
-                                Column(
-                                  children: <Widget>[
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black12,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(2),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color.fromRGBO(
-                                                  0, 50, 117, 1.0)),
-                                          child: Container(
-                                            child: IconButton(
-                                              icon: Icon(Icons.search,
-                                                  color: Color.fromRGBO(
-                                                      0, 178, 255, 1.0)),
-                                              onPressed: () {},
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Text('Search')
-                                  ],
-                                ),
-                                Divider(
-                                    indent: MediaQuery.of(context).size.width *
-                                        0.18),
-                                Column(
-                                  children: <Widget>[
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black12,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(2),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color.fromRGBO(
-                                                  0, 50, 117, 1.0)),
-                                          child: Container(
-                                            child: IconButton(
-                                              icon: Icon(
-                                                  Icons
-                                                      .notifications_active_outlined,
-                                                  color: Color.fromRGBO(
-                                                      0, 178, 255, 1.0)),
-                                              onPressed: () {},
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Text('Notification'),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ),
             ),
           ),
-        ),
-      ],
+          Positioned(
+            left: MediaQuery.of(context).size.width * 0.025,
+            top: MediaQuery.of(context).size.height * 0.18,
+            child: ClipRRect(
+              // borderRadius: BorderRadius.only(
+              //     topLeft: Radius.circular(22.0),
+              //     topRight: Radius.circular(22.0)),
+              borderRadius: BorderRadius.circular(10.0),
+              child: Container(
+                alignment: Alignment.centerLeft,
+                color: Colors.white,
+                width: MediaQuery.of(context).size.width * 0.95,
+                height: MediaQuery.of(context).size.height * 1.23,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width * 0.88,
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            // color: Colors.grey,
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(249, 247, 247, 1),
+                              // color: Colors.black,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: AssetsChart()),
+                      ],
+                    ),
+                    Graph(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

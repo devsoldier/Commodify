@@ -109,85 +109,97 @@ class _TransactionWidgetState extends State<TransactionWidget> {
                   children: <Widget>[
                     //ALL and OLD
 
-                    ListTile(
-                      leading:
-                          (historydata.historyfiltered[i].tx_asset == "gold")
-                              ? Image.asset('assets/navbar/gold 1.png')
-                              : Image.asset('assets/navbar/silver.png'),
-                      title: (historydata.historyfiltered[i].tx_type == 'buy')
-                          ? Center(
-                              child: Text(
-                                  '-${historydata.historyfiltered[i].tx_amount}',
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
-                            )
-                          : (historydata.historyfiltered[i].tx_type == 'buy')
-                              ? Center(
-                                  child: Text(
-                                      '+${historydata.historyfiltered[i].tx_amount}',
-                                      style: TextStyle(color: Colors.green)),
-                                )
-                              : null,
-                      subtitle: Center(child: Text('USD')),
-                      trailing: (historydata.historyfiltered[i].tx_type ==
-                              'buy')
-                          ? Column(
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.15,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.05,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
-                                      color: Color.fromRGBO(168, 255, 187, 1)),
-                                  child: Text(
-                                    'Buy',
-                                    style: TextStyle(
-                                        color: Colors.green,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
+                    Container(
+                      color: Color.fromRGBO(249, 247, 247, 1),
+                      child: ListTile(
+                        leading:
+                            (historydata.historyfiltered[i].tx_asset == "gold")
+                                ? Image.asset('assets/navbar/gold 1.png')
+                                : Image.asset(
+                                    'assets/navbar/silver.png',
+                                    width: 50,
+                                    height: 50,
                                   ),
-                                ),
-                                Text(
-                                  '${DateFormat('dd MMM hh:mm ').format(historydata.history[i].epoch)}',
-                                  style: TextStyle(color: Colors.black54),
-                                ),
-                              ],
-                            )
-                          : (historydata.historyfiltered[i].tx_type == 'sell')
-                              ? Column(
-                                  children: [
-                                    Container(
-                                      alignment: Alignment.center,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.15,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.05,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          color:
-                                              Color.fromRGBO(240, 186, 182, 1)),
-                                      child: Text(
-                                        'Sell',
+                        title: (historydata.historyfiltered[i].tx_type == 'buy')
+                            ? Center(
+                                child: Text(
+                                    '-${historydata.historyfiltered[i].tx_amount}',
+                                    style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                              )
+                            : (historydata.historyfiltered[i].tx_type == 'sell')
+                                ? Center(
+                                    child: Text(
+                                        '+${historydata.historyfiltered[i].tx_amount.toStringAsFixed(2)}',
                                         style: TextStyle(
-                                            color: Colors.red,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green)),
+                                  )
+                                : null,
+                        subtitle: Center(child: Text('USD')),
+                        trailing: (historydata.historyfiltered[i].tx_type ==
+                                'buy')
+                            ? Column(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.15,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.05,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        color:
+                                            Color.fromRGBO(168, 255, 187, 1)),
+                                    child: Text(
+                                      'Buy',
+                                      style: TextStyle(
+                                          color: Colors.green,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${DateFormat('dd MMM hh:mm ').format(historydata.historyfiltered[i].epoch)}',
+                                    style: TextStyle(color: Colors.black54),
+                                  ),
+                                ],
+                              )
+                            : (historydata.historyfiltered[i].tx_type == 'sell')
+                                ? Column(
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.center,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.15,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.05,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            color: Color.fromRGBO(
+                                                240, 186, 182, 1)),
+                                        child: Text(
+                                          'Sell',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      '${DateFormat('dd/MMM hh:mm ').format(historydata.history[i].epoch)}',
-                                      style: TextStyle(color: Colors.black54),
-                                    ),
-                                  ],
-                                )
-                              : null,
+                                      Text(
+                                        '${DateFormat('dd/MMM hh:mm ').format(historydata.historyfiltered[i].epoch)}',
+                                        style: TextStyle(color: Colors.black54),
+                                      ),
+                                    ],
+                                  )
+                                : null,
+                      ),
                     )
                   ],
                 ),

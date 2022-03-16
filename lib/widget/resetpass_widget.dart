@@ -1,124 +1,50 @@
-import 'package:drc/screens/resetpass_screen.dart';
 import 'package:flutter/material.dart';
+import '../screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
-import '../model/http_exception.dart';
-import '../widget/navbar.dart';
-import 'dart:async';
-import '../screens/signup_screen.dart';
 
-class LoginWidget extends StatefulWidget {
+class ResetPassWidget extends StatefulWidget {
   @override
-  _LoginWidgetState createState() => _LoginWidgetState();
+  _ResetPassWidgetState createState() => _ResetPassWidgetState();
 }
 
-class _LoginWidgetState extends State<LoginWidget> {
-  bool? _rememberMe = false;
-  bool _isLoading = false;
-  final GlobalKey<FormState> _loginKey = GlobalKey();
+class _ResetPassWidgetState extends State<ResetPassWidget> {
+  final GlobalKey<FormState> _formKey = GlobalKey();
 
   FocusNode _emailfield = FocusNode();
   FocusNode _passwordfield = FocusNode();
+  FocusNode _confirmpasswordfield = FocusNode();
 
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmpasswordController =
+      TextEditingController();
 
   Map<String, String> _authData = {
     "email": "",
     "password": "",
   };
 
-  void setStateIfMounted(f) {
-    if (mounted) setState(f);
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('An Error Occurred!'),
-        content: Text(message),
-        actions: <Widget>[
-          ElevatedButton(
-            child: Text('Okay'),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-          )
-        ],
-      ),
-    );
-  }
-
   Future<void> _submit() async {
-    if (!_loginKey.currentState!.validate()) {
-      // Invalid!
+    if (!_formKey.currentState!.validate()) {
       return;
     }
-    _loginKey.currentState!.save();
-
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      // await Provider.of<Auth>(context, listen: false).isAuth();
-      await Provider.of<Auth>(context, listen: false).login(
-        _authData["email"]!,
-        _authData["password"]!,
-      );
-    } on HttpException catch (error) {
-      var errorMessage = 'Login Failed';
-      if (error.toString().contains('Credentials Invalid')) {
-        errorMessage = 'Credentials invalid.';
-      } else if (error.toString().contains('Credentials Incorrect')) {
-        errorMessage = 'Credentials incorrect.';
-      }
-      _showErrorDialog(errorMessage);
-    } catch (error) {
-      const errorMessage = 'Failed to login.';
-      _showErrorDialog(errorMessage);
-    }
-    setStateIfMounted(() {
-      _isLoading = false;
-    });
-    // print(_authData);
-  }
-
-  Future<void> _verify() {
-    return Provider.of<Auth>(context, listen: false).isAuth();
-  }
-
-  Future<void> runBoth() {
-    return _submit().then((_) => _verify());
-  }
-
-  // Future<void> _getbal() async {
-  //   await Provider.of<Auth>(context, listen: false).getbalance();
-  // }
-
-  // Future<void> _getuser() async {
-  //   await Provider.of<Auth>(context, listen: false).getuser();
-  // }
-
-  // Future<void> runbalanduser() async {
-  //   _getbal().then((_) => _getuser());
-  // }
-
-  @override
-  void initState() {
-    super.initState();
+    _formKey.currentState!.save();
+    Provider.of<Auth>(context, listen: false).reset(
+      _authData["email"]!,
+      _authData["password"]!,
+    );
   }
 
   @override
   void dispose() {
     _emailfield.dispose();
     _passwordfield.dispose();
+    _confirmpasswordfield.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<Auth>(context);
     return Stack(
       children: [
         Positioned(
@@ -132,20 +58,19 @@ class _LoginWidgetState extends State<LoginWidget> {
               width: MediaQuery.of(context).size.width * 1,
               height: MediaQuery.of(context).size.height * 0.63,
               child: Form(
-                key: _loginKey,
+                key: _formKey,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Column(
-                      // mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         SizedBox(height: 10),
                         Container(
-                          child: Text('Login',
+                          child: Text('Reset Password',
                               style: TextStyle(
                                   fontSize: 35, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(height: 30),
+                        SizedBox(height: 10),
                         Row(
                           children: [
                             Column(
@@ -160,7 +85,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 10),
+                                SizedBox(height: 5),
                                 Container(
                                   width: (MediaQuery.of(context).size.width *
                                       0.75),
@@ -191,24 +116,23 @@ class _LoginWidgetState extends State<LoginWidget> {
                                 ),
                                 SizedBox(height: 10),
                               ],
-                            ),
+                            )
                           ],
                         ),
                         Row(
                           children: [
+                            //PASSWORD
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  child: Text(
-                                    'Password',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                Text(
+                                  'Password',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 10),
+                                SizedBox(height: 5),
                                 Container(
                                   width: (MediaQuery.of(context).size.width *
                                       0.75),
@@ -217,10 +141,58 @@ class _LoginWidgetState extends State<LoginWidget> {
                                     obscureText: true,
                                     controller: _passwordController,
                                     focusNode: _passwordfield,
-                                    validator: (value) {
+                                    validator: /* ((value) =>
+                                    validatePassword(value.toString())), */
+                                        (value) {
                                       if (value!.isEmpty || value.length < 5) {
                                         return 'Password is too short!';
                                       }
+                                    },
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                      ),
+                                    ),
+                                    onFieldSubmitted: (_) {
+                                      FocusScope.of(context)
+                                          .requestFocus(_confirmpasswordfield);
+                                    },
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            //CONFIRM PASSWORD
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Confirm Password',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+                                Container(
+                                  width: (MediaQuery.of(context).size.width *
+                                      0.75),
+                                  height: 40,
+                                  child: TextFormField(
+                                    obscureText: true,
+                                    controller: _confirmpasswordController,
+                                    focusNode: _confirmpasswordfield,
+                                    validator: (value) {
+                                      if (value!.isEmpty) return 'Empty';
+                                      if (value != _passwordController.text)
+                                        return 'Does Not Match';
+                                      return null;
                                     },
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
@@ -238,56 +210,41 @@ class _LoginWidgetState extends State<LoginWidget> {
                             ),
                           ],
                         ),
+                        SizedBox(height: 30),
+                        GestureDetector(
+                            onTap: _submit,
+                            child:
+                                Image.asset('assets/navbar/reset button.png')),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Container(
-                              child: Checkbox(
-                                value: _rememberMe,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _rememberMe = value;
-                                  });
-                                },
-                              ),
-                            ),
-                            Text('Remember Me'),
-                            SizedBox(
-                                width:
-                                    MediaQuery.of(context).size.width * 0.08),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pushReplacementNamed(
-                                    ResetPassScreen.routeName);
-                              },
-                              child: Text(
-                                'Forget Password?',
-                                style: TextStyle(
-                                  color: Color.fromRGBO(42, 123, 217, 1.0),
-                                  fontWeight: FontWeight.bold,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pushReplacementNamed(
+                                        LoginScreen.routeName);
+                                  },
+                                  child: Text(
+                                    'Back to Login form',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Color.fromRGBO(
+                                        0,
+                                        178,
+                                        255,
+                                        1,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ],
                         ),
-                        GestureDetector(
-                          onTap: () async {
-                            await runBoth();
-                            (auth.isAuthenticated == true)
-                                ? Navigator.of(context)
-                                    .pushReplacementNamed(NavBar.routeName)
-                                : _showErrorDialog('not authenticated');
-                          },
-                          // runBoth,
-                          child: Container(
-                            child: Image.asset(
-                              'assets/signup/login button.png',
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),

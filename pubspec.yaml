@@ -107,6 +107,10 @@ flutter:
     - assets/navbar/savebtn.png
     - assets/navbar/cancelbtn.png
     - assets/navbar/logout.png
+    - assets/navbar/logout.svg
+    - assets/navbar/message.png
+    - assets/navbar/Lock.png
+    - assets/navbar/reset button.png
   # - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

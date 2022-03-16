@@ -7,7 +7,7 @@ import 'dart:convert';
 import '../providers/models.dart';
 // import '../providers/interval.dart';
 import 'dart:async';
-import 'dart:math';
+import '../model/http_exception.dart';
 import '../providers/auth.dart';
 // import '../widget/dashboard_widget.dart';
 
@@ -19,7 +19,11 @@ class TradingWidget extends StatefulWidget {
 class _TradingWidgetState extends State<TradingWidget> {
   final List<Commodity> _chartData = [];
   List<dynamic> timeConverted = [];
-  List<dynamic> loadedData = [];
+
+  List<dynamic> loadedPLAT = [];
+  List<dynamic> loadedPALLA = [];
+  List<dynamic> loadedGOLD = [];
+  List<dynamic> loadedSILVER = [];
   late TrackballBehavior _trackballBehavior;
   late ZoomPanBehavior _zoomPanBehavior;
   String _selectedCommodity = 'Gold/USD';
@@ -45,6 +49,9 @@ class _TradingWidgetState extends State<TradingWidget> {
   final channel2 = IOWebSocketChannel.connect(
       Uri.parse('wss://ws.binaryws.com/websockets/v3?app_id=1089'));
 
+  final channel3 = IOWebSocketChannel.connect(
+      Uri.parse('wss://ws.binaryws.com/websockets/v3?app_id=1089'));
+
   void setStateIfMounted(f) {
     if (mounted) setState(f);
   }
@@ -55,7 +62,30 @@ class _TradingWidgetState extends State<TradingWidget> {
   }
 
   void getTickStream() {
-    channel2.sink.add('{  "ticks": "${commodity}",  "subscribe": 1}');
+    channel2.sink.add(
+        '{  "ticks_history": "${commodity}",  "adjust_start_time": 1,  "count": 1,"end": "latest","start": 1,"style": "candles"}');
+  }
+
+  void repeatAction() {
+    Timer.periodic(Duration(minutes: 1), (timer) {
+      getTickStream();
+    });
+  }
+
+  void tickStreamPLAT() {
+    channel3.sink.add('{  "ticks": "frxXPTUSD",  "subscribe": 1}');
+  }
+
+  void tickStreamPALLA() {
+    channel3.sink.add('{  "ticks": "frxXPDUSD",  "subscribe": 1}');
+  }
+
+  void tickStreamGOLD() {
+    channel3.sink.add('{  "ticks": "frxXAUUSD",  "subscribe": 1}');
+  }
+
+  void tickStreamSILVER() {
+    channel3.sink.add('{  "ticks": "frxXAGUSD",  "subscribe": 1}');
   }
 
   void initialValue() {
@@ -80,10 +110,6 @@ class _TradingWidgetState extends State<TradingWidget> {
         // print(_chartData);
       });
     });
-  }
-
-  void _getasset() {
-    Provider.of<Auth>(context, listen: false).getasset();
   }
 
   void handShake() {
@@ -113,13 +139,201 @@ class _TradingWidgetState extends State<TradingWidget> {
     });
   }
 
+  getprice() {
+    channel3.stream.listen(
+      (data) {
+        final extractedData = jsonDecode(data);
+        if (extractedData["echo_req"]["ticks"] == "frxXPTUSD") {
+          setState(() {
+            for (int i = 0; i < extractedData.length - 3; i++) {
+              loadedPLAT.insert(
+                0,
+                extractedData['tick']['quote'],
+              );
+              if (loadedPLAT.length > 3) {
+                loadedPLAT.removeAt(2);
+              }
+              // print(loadedData[i].Quote);
+            }
+          });
+        }
+        if (extractedData["echo_req"]["ticks"] == "frxXPDUSD") {
+          setState(() {
+            for (int i = 0; i < extractedData.length - 3; i++) {
+              loadedPALLA.insert(
+                0,
+                extractedData['tick']['quote'],
+              );
+              if (loadedPALLA.length > 3) {
+                loadedPALLA.removeAt(2);
+              }
+              // print(loadedData[i].Quote);
+            }
+          });
+        }
+        if (extractedData["echo_req"]["ticks"] == "frxXAUUSD") {
+          setState(() {
+            for (int i = 0; i < extractedData.length - 3; i++) {
+              loadedGOLD.insert(
+                0,
+                extractedData['tick']['quote'],
+              );
+              if (loadedGOLD.length > 3) {
+                loadedGOLD.removeAt(2);
+              }
+              // print(loadedData[i].Quote);
+            }
+          });
+        }
+        if (extractedData["echo_req"]["ticks"] == "frxXAGUSD") {
+          setState(() {
+            for (int i = 0; i < extractedData.length - 3; i++) {
+              loadedSILVER.insert(
+                0,
+                extractedData['tick']['quote'],
+              );
+              if (loadedSILVER.length > 3) {
+                loadedSILVER.removeAt(2);
+              }
+              // print(loadedData[i].Quote);
+            }
+          });
+        }
+
+        // print(loadedGOLD.length);
+        // print(loadedPLAT.length);
+        // print(loadedPALLA.length);
+        // print(extractedData.length);
+      },
+    );
+  }
+
+  void _showbuysuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Purchase Successful'),
+        content: Consumer<Auth>(
+            builder: (_, data, __) =>
+                (data.message.isEmpty) ? SizedBox() : Text(data.message[0])),
+        actions: <Widget>[
+          ElevatedButton(
+            child: Text('Okay'),
+            onPressed: () {
+              // _getasset().then((_) => setState(() {}));
+
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showsellsuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Trade Successful'),
+        content: Consumer<Auth>(
+            builder: (_, data, __) =>
+                (data.message.isEmpty) ? SizedBox() : Text(data.message[0])),
+        actions: <Widget>[
+          ElevatedButton(
+            child: Text('Okay'),
+            onPressed: () {
+              // _getasset().then((_) => setState(() {}));
+
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occurred!'),
+        content: Text(message),
+        actions: <Widget>[
+          ElevatedButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> _getasset() async {
+    await Provider.of<Auth>(context, listen: false).getasset();
+  }
+
+  Future<void> purchase() async {
+    _buysellkey.currentState!.save();
+    try {
+      await Provider.of<Auth>(context, listen: false)
+          .buy(_buysellData, _selectedproduct);
+    } on HttpException catch (error) {
+      var errorMessage = 'Purchase Failed';
+      if (error.toString().contains('Invalid Amount to Purchase')) {
+        errorMessage = 'Invalid Amount to Purchase.';
+      } else
+        _showErrorDialog(errorMessage);
+    } catch (error) {
+      const errorMessage = 'Failed to purchase.';
+      _showErrorDialog(errorMessage);
+    }
+    setState(() {});
+  }
+
+  Future<void> sell() async {
+    _buysellkey.currentState!.save();
+    try {
+      await Provider.of<Auth>(context, listen: false)
+          .sell(_buysellData, _selectedproduct);
+    } on HttpException catch (error) {
+      var errorMessage = 'Trade Failed';
+      if (error.toString().contains('Not Enough')) {
+        errorMessage = 'failed';
+      } else
+        _showErrorDialog(errorMessage);
+    } catch (error) {
+      const errorMessage = 'Failed to trade.';
+      _showErrorDialog(errorMessage);
+    }
+    setState(() {});
+  }
+
+  Future<void> getBal() async {
+    await Provider.of<Auth>(context, listen: false).getbalance();
+  }
+
+  Future<void> runbothpurchase() async {
+    purchase().then((_) => getBal());
+  }
+
+  Future<void> runbothsell() async {
+    sell().then((_) => getBal());
+  }
+
   @override
   void initState() {
     // secTimer();
     // getbalance();
     _getasset();
+    getprice();
     getTickOnce();
     getTickStream();
+    tickStreamPLAT();
+    tickStreamPALLA();
+    tickStreamGOLD();
+    tickStreamSILVER();
     handShake();
     initialValue();
     _zoomPanBehavior = ZoomPanBehavior(
@@ -131,32 +345,6 @@ class _TradingWidgetState extends State<TradingWidget> {
     super.initState();
   }
 
-  Future<void> purchase() async {
-    _buysellkey.currentState!.save();
-    await Provider.of<Auth>(context, listen: false)
-        .buy(_buysellData, _selectedproduct);
-  }
-
-  Future<void> sell() async {
-    _buysellkey.currentState!.save();
-    await Provider.of<Auth>(context, listen: false)
-        .sell(_buysellData, _selectedproduct);
-  }
-
-  Future<void> getBal() async {
-    await Provider.of<Auth>(context, listen: false).getbalance();
-  }
-
-  Future<void> runbothpurchase() async {
-    purchase().then((_) => getBal());
-    _getasset();
-  }
-
-  Future<void> runbothsell() async {
-    sell().then((_) => getBal());
-    _getasset();
-  }
-
   @override
   void dispose() {
     super.dispose();
@@ -165,6 +353,8 @@ class _TradingWidgetState extends State<TradingWidget> {
   @override
   Widget build(BuildContext context) {
     final balancedata = Provider.of<Auth>(context);
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     Widget gold = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,7 +368,9 @@ class _TradingWidgetState extends State<TradingWidget> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text('Balance ${balancedata.asset[0].gold_amount}')
+            Consumer<Auth>(
+                builder: (_, data, __) =>
+                    Text('Balance ${data.asset[0].gold_amount}'))
           ],
         ),
         SizedBox(width: 40)
@@ -200,7 +392,9 @@ class _TradingWidgetState extends State<TradingWidget> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text('Balance ${balancedata.asset[0].platinum_amount}')
+            Consumer<Auth>(
+                builder: (_, data, __) =>
+                    Text('Balance ${data.asset[0].platinum_amount}'))
           ],
         ),
         SizedBox(width: 40)
@@ -222,7 +416,9 @@ class _TradingWidgetState extends State<TradingWidget> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text('Balance ${balancedata.asset[0].silver_amount}')
+            Consumer<Auth>(
+                builder: (_, data, __) =>
+                    Text('Balance ${data.asset[0].silver_amount}'))
           ],
         ),
         SizedBox(width: 40)
@@ -239,7 +435,9 @@ class _TradingWidgetState extends State<TradingWidget> {
         Column(
           children: [
             Text('Palladium/USD'),
-            Text('Balance ${balancedata.asset[0].palladium_amount}')
+            Consumer<Auth>(
+                builder: (_, data, __) =>
+                    Text('Balance ${data.asset[0].palladium_amount}'))
           ],
         ),
         SizedBox(width: 40)
@@ -254,7 +452,7 @@ class _TradingWidgetState extends State<TradingWidget> {
           width: MediaQuery.of(context).size.width * 1.0,
           height: (maximize == true)
               ? MediaQuery.of(context).size.height * 0.4
-              : MediaQuery.of(context).size.height * 0.7,
+              : MediaQuery.of(context).size.height * 0.73,
           color: Color.fromRGBO(15, 34, 66, 1),
           child: Column(
             children: <Widget>[
@@ -295,343 +493,634 @@ class _TradingWidgetState extends State<TradingWidget> {
       children: <Widget>[
         Positioned(
           left: 7,
-          bottom: -20,
+          bottom: 0,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(25.0),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(22.0),
+              topRight: Radius.circular(22.0),
+            ),
             child: Container(
               color: Colors.white,
               width: MediaQuery.of(context).size.width * 0.96,
-              height: MediaQuery.of(context).size.height * 0.11,
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 15,
-          left: 190,
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                maximize = true;
-              });
-            },
-            child: Container(
-              // color: Colors.orange,
-              child: Icon(
-                Icons.arrow_drop_up,
-                color: Colors.black,
+              height: MediaQuery.of(context).size.height * 0.05,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        maximize = true;
+                      });
+                    },
+                    child: Container(
+                      // color: Colors.orange,
+                      child: Icon(
+                        Icons.arrow_drop_up,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
+        // Positioned(
+        //   bottom: 15,
+        //   left: 190,
+        //   child:
+        // ),
         graph,
       ],
     );
+
     return (maximize == false)
         ? minimized
         : Stack(
-            children: <Widget>[
+            children: [
               graph,
               Positioned(
-                left: 7,
-                bottom: -20,
+                left: MediaQuery.of(context).size.width * 0.02,
+                bottom: 0,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25.0),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(22.0),
+                    topRight: Radius.circular(22.0),
+                  ),
                   child: Container(
                     color: Colors.white,
                     width: MediaQuery.of(context).size.width * 0.96,
-                    height: MediaQuery.of(context).size.height * 0.41,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 230,
-                left: 190,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      maximize = false;
-                    });
-                  },
-                  child: Icon(
-                    Icons.arrow_drop_down,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 200,
-                left: 30,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      height: 25,
-                      child: Row(
-                        children: <Widget>[
-                          Text('BALANCE',
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 51, 116, 1),
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              )),
-                          SizedBox(width: 25),
-                          Container(
-                            color: Color.fromRGBO(220, 243, 255, 1),
-                            child: Row(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.monetization_on_outlined,
-                                  color: Color.fromRGBO(0, 51, 116, 1),
-                                ),
-                                Text(
-                                  '\$${(balancedata.balance).toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                    color: Color.fromRGBO(0, 51, 116, 1),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                    height: MediaQuery.of(context).size.height * 0.38,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              maximize = false;
+                            });
+                          },
+                          child: Icon(
+                            Icons.arrow_drop_down,
+                            color: Colors.black,
                           ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                bottom: 150,
-                left: 18,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.only(bottomLeft: Radius.circular(30)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        offset: Offset(0.0, 4.0), //(x,y)
-                        blurRadius: 5.0,
-                      ),
-                    ],
-                  ),
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 45,
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(27, 84, 169, 1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                        dropdownColor: Color.fromRGBO(27, 84, 169, 1),
-                        style: TextStyle(color: Colors.white),
-                        isExpanded: true,
-                        value: _selectedCommodity,
-                        onChanged: (newval) {
-                          setState(() {
-                            _selectedCommodity = newval as String;
-                            if (newval == 'Gold/USD') {
-                              setState(() {
-                                commodity = 'frxXAUUSD';
-                                getTickOnce();
-                                getTickStream();
-                                _chartData.clear();
-                              });
-                            }
-                            if (newval == 'Palladium/USD') {
-                              setState(() {
-                                commodity = 'frxXPDUSD';
-                                getTickOnce();
-                                getTickStream();
-                                _chartData.clear();
-                              });
-                            }
-                            if (newval == 'Platinum/USD') {
-                              setState(() {
-                                commodity = 'frxXPTUSD';
-                                getTickOnce();
-                                getTickStream();
-                                _chartData.clear();
-                              });
-                            }
-                            if (newval == 'Silver/USD') {
-                              setState(() {
-                                commodity = 'frxXAGUSD';
-                                getTickOnce();
-                                getTickStream();
-                                _chartData.clear();
-                              });
-                            }
-                            // secTimer();
-                          });
-                        },
-                        // elevation: 16,
-                        items: commodities.map((newval) {
-                          return DropdownMenuItem(
-                              value: newval,
-                              child: (newval == 'Gold/USD')
-                                  ? gold
-                                  : (newval == 'Palladium/USD')
-                                      ? palladium
-                                      : (newval == 'Platinum/USD')
-                                          ? platinum
-                                          : (newval == 'Silver/USD')
-                                              ? silver
-                                              : Text('T_T'));
-                        }).toList(),
-                        icon: Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.white,
                         ),
-                        iconSize: 30,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 100,
-                left: 18,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.only(bottomLeft: Radius.circular(30)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        offset: Offset(0.0, 4.0), //(x,y)
-                        blurRadius: 5.0,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10.0),
-                        child: Container(
-                          height: 45,
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          decoration: BoxDecoration(
-                            color: Color.fromRGBO(249, 247, 247, 1),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                'Price Index',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(9, 51, 116, 1),
-                                ),
-                              ),
-                              SizedBox(width: 50),
-                              (loadedData.length < 3)
-                                  ? Container(
-                                      width: 15,
-                                      height: 15,
-                                      child: CircularProgressIndicator())
-                                  : (loadedData[0] > loadedData[1])
-                                      ? Text(
-                                          '\$${loadedData[0]}',
-                                          style: TextStyle(color: Colors.green),
-                                        )
-                                      : /* (loadedData[0] < loadedData[1]) */
-                                      /* ? */ Text(
-                                          '\$${loadedData[0]}',
-                                          style: TextStyle(color: Colors.red),
+                        Row(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.width * 0.05),
+                            Container(
+                              height: 25,
+                              child: Row(
+                                children: <Widget>[
+                                  Text('BALANCE',
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(0, 51, 116, 1),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                  SizedBox(width: 25),
+                                  Container(
+                                    color: Color.fromRGBO(220, 243, 255, 1),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.monetization_on_outlined,
+                                          color: Color.fromRGBO(0, 51, 116, 1),
                                         ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 53,
-                bottom: 50,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.73,
-                  child: FittedBox(
-                    child: Image.asset('assets/navbar/Rectangle 6332.png'),
-                    fit: BoxFit.fill,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: -1,
-                left: 40,
-                child: Form(
-                  key: _buysellkey,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 40,
-                        width: MediaQuery.of(context).size.width * 0.73,
-                        child: TextFormField(
-                            keyboardType: TextInputType.number,
-                            focusNode: _buysellfield,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                            ),
-                            onSaved: (value) {
-                              _buysellData = double.parse(value!);
-                            }),
-                      ),
-                      SizedBox(height: 5),
-                      Container(
-                        padding: EdgeInsets.only(left: 6.5),
-                        child: Row(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (_selectedCommodity == 'Gold/USD') {
-                                    _selectedproduct = 'Xau';
-                                    runbothpurchase();
-                                  }
-                                  if (_selectedCommodity == 'Palladium/USD') {
-                                    _selectedproduct = 'Xpd';
-                                    runbothpurchase();
-                                  }
-                                  if (_selectedCommodity == 'Platinum/USD') {
-                                    _selectedproduct = 'Xpt';
-                                    runbothpurchase();
-                                  }
-                                  if (_selectedCommodity == 'Silver/USD') {
-                                    _selectedproduct = 'Xag';
-                                    runbothpurchase();
-                                  }
-                                  _getasset();
-                                });
-                              },
-                              child: Image.asset(
-                                'assets/navbar/buybtn.png',
-                              ),
-                            ),
-                            SizedBox(width: 25),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  runbothsell();
-                                });
-                              },
-                              child: Image.asset(
-                                'assets/navbar/sellbtn.png',
+                                        Text(
+                                          '\$${(balancedata.balance).toStringAsFixed(2)}',
+                                          style: TextStyle(
+                                            color:
+                                                Color.fromRGBO(0, 51, 116, 1),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(30)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(0.0, 4.0), //(x,y)
+                                blurRadius: 5.0,
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 45,
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(27, 84, 169, 1),
+                              // color: Colors.black,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                dropdownColor: Color.fromRGBO(27, 84, 169, 1),
+                                style: TextStyle(color: Colors.white),
+                                isExpanded: true,
+                                value: _selectedCommodity,
+                                onChanged: (newval) {
+                                  setState(() {
+                                    _selectedCommodity = newval as String;
+                                    if (newval == 'Gold/USD') {
+                                      commodity = 'frxXAUUSD';
+                                      tickStreamGOLD();
+                                      getTickOnce();
+                                      getTickStream();
+                                      _getasset();
+                                      _chartData.clear();
+                                    }
+                                    if (newval == 'Palladium/USD') {
+                                      commodity = 'frxXAUUSD';
+                                      tickStreamGOLD();
+                                      getTickOnce();
+                                      getTickStream();
+                                      _getasset();
+                                      _chartData.clear();
+                                    }
+                                    if (newval == 'Platinum/USD') {
+                                      commodity = 'frxXAUUSD';
+                                      tickStreamGOLD();
+                                      getTickOnce();
+                                      getTickStream();
+                                      _getasset();
+                                      _chartData.clear();
+                                    }
+                                    if (newval == 'Silver/USD') {
+                                      commodity = 'frxXAUUSD';
+                                      tickStreamGOLD();
+                                      getTickOnce();
+                                      getTickStream();
+                                      _getasset();
+                                      _chartData.clear();
+                                    }
+                                    // secTimer();
+                                  });
+                                },
+                                // elevation: 16,
+                                items: commodities.map((newval) {
+                                  return DropdownMenuItem(
+                                      value: newval,
+                                      child: (newval == 'Gold/USD')
+                                          ? gold
+                                          : (newval == 'Palladium/USD')
+                                              ? palladium
+                                              : (newval == 'Platinum/USD')
+                                                  ? platinum
+                                                  : (newval == 'Silver/USD')
+                                                      ? silver
+                                                      : Text('T_T'));
+                                }).toList(),
+                                icon: Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.white,
+                                ),
+                                iconSize: 30,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                height: 45,
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(249, 247, 247, 1),
+                                  // color: Colors.black,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      'Price Index',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color.fromRGBO(9, 51, 116, 1),
+                                      ),
+                                    ),
+                                    SizedBox(width: 50),
+                                    //GOLD
+                                    (_selectedCommodity == 'Gold/USD')
+                                        ? (loadedGOLD.length < 3)
+                                            ? Container(
+                                                width: 15,
+                                                height: 15,
+                                                child:
+                                                    CircularProgressIndicator())
+                                            : (loadedGOLD[0] > loadedGOLD[1])
+                                                ? Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      Container(
+                                                        child: Image.asset(
+                                                            'assets/navbar/arrow_right_alt.png',
+                                                            height: 35,
+                                                            width: 35),
+                                                      ),
+                                                      Text(
+                                                        '\$${loadedGOLD[0]}',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Color.fromRGBO(
+                                                              0, 255, 56, 1),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Row(
+                                                    children: [
+                                                      Container(
+                                                        child: Image.asset(
+                                                            'assets/navbar/arrow_right_red.png',
+                                                            height: 35,
+                                                            width: 35),
+                                                      ),
+                                                      Text(
+                                                        '\$${loadedGOLD[0]}',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.red),
+                                                      ),
+                                                    ],
+                                                  )
+                                        :
+                                        //PALLADIUM
+                                        (_selectedCommodity == 'Palladium/USD')
+                                            ? (loadedPALLA.length < 3)
+                                                ? Container(
+                                                    width: 15,
+                                                    height: 15,
+                                                    child:
+                                                        CircularProgressIndicator())
+                                                : (loadedPALLA[0] >
+                                                        loadedPALLA[1])
+                                                    ? Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceAround,
+                                                        children: [
+                                                          Container(
+                                                            child: Image.asset(
+                                                                'assets/navbar/arrow_right_alt.png',
+                                                                height: 35,
+                                                                width: 35),
+                                                          ),
+                                                          Text(
+                                                            '\$${loadedPALLA[0]}',
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      0,
+                                                                      255,
+                                                                      56,
+                                                                      1),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    : Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceAround,
+                                                        children: [
+                                                          Container(
+                                                            child: Image.asset(
+                                                                'assets/navbar/arrow_right_red.png',
+                                                                height: 35,
+                                                                width: 35),
+                                                          ),
+                                                          Text(
+                                                            '\$${loadedPALLA[0]}',
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Colors.red,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                            :
+                                            //PLATINUM
+                                            (_selectedCommodity ==
+                                                    'Platinum/USD')
+                                                ? (loadedPLAT.length < 3)
+                                                    ? Container(
+                                                        width: 15,
+                                                        height: 15,
+                                                        child:
+                                                            CircularProgressIndicator())
+                                                    : (loadedPLAT[0] >
+                                                            loadedPLAT[1])
+                                                        ? Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceAround,
+                                                            children: [
+                                                              Container(
+                                                                child: Image.asset(
+                                                                    'assets/navbar/arrow_right_alt.png',
+                                                                    height: 35,
+                                                                    width: 35),
+                                                              ),
+                                                              Text(
+                                                                '\$${loadedPLAT[0]}',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          0,
+                                                                          255,
+                                                                          56,
+                                                                          1),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceAround,
+                                                            children: [
+                                                              Container(
+                                                                child: Image.asset(
+                                                                    'assets/navbar/arrow_right_red.png',
+                                                                    height: 35,
+                                                                    width: 35),
+                                                              ),
+                                                              Text(
+                                                                '\$${loadedPLAT[0]}',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .red,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                :
+                                                //SILVER
+                                                (_selectedCommodity ==
+                                                        'Silver/USD')
+                                                    ? (loadedSILVER.length < 3)
+                                                        ? Container(
+                                                            width: 15,
+                                                            height: 15,
+                                                            child:
+                                                                CircularProgressIndicator())
+                                                        : (loadedSILVER[0] >
+                                                                loadedSILVER[1])
+                                                            ? Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceAround,
+                                                                children: [
+                                                                  Container(
+                                                                    child: Image.asset(
+                                                                        'assets/navbar/arrow_right_alt.png',
+                                                                        height:
+                                                                            35,
+                                                                        width:
+                                                                            35),
+                                                                  ),
+                                                                  Text(
+                                                                    '\$${loadedSILVER[0]}',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Color
+                                                                          .fromRGBO(
+                                                                              0,
+                                                                              255,
+                                                                              56,
+                                                                              1),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            : Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceAround,
+                                                                children: [
+                                                                  Container(
+                                                                    child: Image.asset(
+                                                                        'assets/navbar/arrow_right_red.png',
+                                                                        height:
+                                                                            35,
+                                                                        width:
+                                                                            35),
+                                                                  ),
+                                                                  Text(
+                                                                    '\$${loadedSILVER[0]}',
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        color: Colors
+                                                                            .red),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                    : Text('nothing'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Form(
+                          key: _buysellkey,
+                          child: Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    const BoxShadow(
+                                      color: Colors.black26,
+                                    ),
+                                    const BoxShadow(
+                                      color: Colors.white,
+                                      spreadRadius: -12.0,
+                                      blurRadius: 12.0,
+                                    ),
+                                  ],
+                                ),
+                                height: 40,
+                                width: MediaQuery.of(context).size.width * 0.73,
+                                child: TextFormField(
+                                    keyboardType: TextInputType.number,
+                                    focusNode: _buysellfield,
+                                    //  validator:,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
+                                    ),
+                                    onSaved: (value) {
+                                      _buysellData = double.parse(value!);
+                                    }),
+                              ),
+                              SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(left: 6.5),
+                                    child: Row(
+                                      children: <Widget>[
+                                        GestureDetector(
+                                          onTap: () {
+                                            /* (balancedata.message.isNotEmpty)
+                                                ? _showsuccessDialog()
+                                                :  */
+                                            setState(() {
+                                              if (_selectedCommodity ==
+                                                      'Gold/USD' ||
+                                                  balancedata
+                                                      .message.isNotEmpty) {
+                                                _selectedproduct = 'Xau';
+                                                runbothpurchase();
+                                                // _showbuysuccessDialog();
+                                                _getasset();
+                                              } else if (_selectedCommodity ==
+                                                      'Palladium/USD' ||
+                                                  balancedata
+                                                      .message.isNotEmpty) {
+                                                _selectedproduct = 'Xpd';
+                                                runbothpurchase();
+                                                // _showbuysuccessDialog();
+                                                _getasset();
+                                              } else if (_selectedCommodity ==
+                                                      'Platinum/USD' ||
+                                                  balancedata
+                                                      .message.isNotEmpty) {
+                                                _selectedproduct = 'Xpt';
+                                                runbothpurchase();
+                                                // _showbuysuccessDialog();
+                                                _getasset();
+                                              } else if (_selectedCommodity ==
+                                                      'Silver/USD' ||
+                                                  balancedata
+                                                      .message.isNotEmpty) {
+                                                _selectedproduct = 'Xag';
+                                                runbothpurchase();
+                                                // _showbuysuccessDialog();
+                                                _getasset();
+                                              }
+                                            });
+                                          },
+                                          child: Image.asset(
+                                            'assets/navbar/buybtn.png',
+                                          ),
+                                        ),
+                                        SizedBox(width: 25),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              if (_selectedCommodity ==
+                                                      'Gold/USD' ||
+                                                  balancedata
+                                                      .message.isNotEmpty) {
+                                                _selectedproduct = 'Xau';
+                                                runbothsell();
+                                                // _showsellsuccessDialog();
+                                                _getasset();
+                                              } else if (_selectedCommodity ==
+                                                      'Palladium/USD' ||
+                                                  balancedata
+                                                      .message.isNotEmpty) {
+                                                _selectedproduct = 'Xpd';
+                                                runbothsell();
+                                                // _showsellsuccessDialog();
+                                                _getasset();
+                                              } else if (_selectedCommodity ==
+                                                      'Platinum/USD' ||
+                                                  balancedata
+                                                      .message.isNotEmpty) {
+                                                _selectedproduct = 'Xpt';
+                                                runbothsell();
+                                                // _showsellsuccessDialog();
+                                                _getasset();
+                                              } else if (_selectedCommodity ==
+                                                      'Silver/USD' ||
+                                                  balancedata
+                                                      .message.isNotEmpty) {
+                                                _selectedproduct = 'Xag';
+                                                runbothsell();
+                                                // _showsellsuccessDialog();
+                                                _getasset();
+                                              }
+                                            });
+                                          },
+                                          child: Image.asset(
+                                            'assets/navbar/sellbtn.png',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

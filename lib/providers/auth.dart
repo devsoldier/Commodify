@@ -4,11 +4,15 @@ import 'package:jwt_decode/jwt_decode.dart';
 import 'dart:convert';
 import '../model/http_exception.dart';
 import './models.dart';
+import '../model/success.dart';
 
 class Auth with ChangeNotifier {
-  late String _token;
+  final List<String> token = [];
+
   bool? isAuthenticated;
+  List<String> message = [];
   late dynamic balance;
+  // late String errormessage;
   List<TransactionHistory> history = [];
   List<TransactionHistory> historybuy = [];
   List<TransactionHistory> historysell = [];
@@ -19,7 +23,12 @@ class Auth with ChangeNotifier {
   List<TransactionHistory> historyfiltered = [];
 
   List<UserDetail> user = [];
+  // List<String> emailuser = [];
+
+  List<dynamic> phonenumber = [];
   List<UserAsset> asset = [];
+
+  // Map<String,dynamic,Color> assetdata = {"gold":""};
 
   List<PaymentHistory> phistory = [];
   List<PaymentHistory> phistorytopup = [];
@@ -46,11 +55,17 @@ class Auth with ChangeNotifier {
         body: (body),
       );
       final responseData = json.decode(response.body);
-      if (responseData['error'] != null) {
-        throw HttpException(responseData['error']['message']);
+      if (responseData == "User already exist!!") {
+        throw HttpException(responseData);
       }
+      if (responseData['errors'] != null) {
+        for (int i = 0; i < responseData["errors"].length; i++) {
+          throw HttpException(responseData['errors'][i]['msg']);
+        }
+      }
+      message.insert(0, "Successful Signup");
       print(responseData);
-      _token = responseData['token'];
+      token.insert(0, responseData['token']);
       notifyListeners();
 
       // print(body);
@@ -60,6 +75,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> login(String email, String password) async {
+    // token.clear();
     final url = Uri.parse('http://157.245.57.54:5000/user/login');
     var resBody = {};
     resBody["email"] = email;
@@ -72,10 +88,40 @@ class Auth with ChangeNotifier {
         body: (body),
       );
       final responseData = json.decode(response.body);
-      if (responseData['error'] != null) {
-        throw HttpException(responseData['error']['message']);
+      if (responseData == 'Credentials Invalid') {
+        throw HttpException(responseData);
+      } else if (responseData == 'Credentials Incorrect') {
+        throw HttpException(responseData);
       }
-      _token = responseData['token'];
+
+      // print(responseData);
+      message.insert(0, 'Successful login');
+      token.insert(0, responseData['token']);
+      print(token[0]);
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<void> reset(String email, String password) async {
+    // message.clear();
+    // print("emailuser :${email}");
+    final url = Uri.parse('http://157.245.57.54:5000/resetPassword');
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({"email": email, "password": password}),
+      );
+      final responseData = json.decode(response.body);
+      if (responseData['errors'] != null) {
+        for (int i = 0; i < responseData["errors"].length; i++) {
+          throw HttpException(responseData['errors'][i]['msg']);
+        }
+      }
+      message.insert(0, responseData);
+      print(responseData);
       notifyListeners();
     } catch (error) {
       throw error;
@@ -87,12 +133,12 @@ class Auth with ChangeNotifier {
     final response = await http.get(
       url,
       headers: {
-        "token": _token,
+        "token": token[0],
       },
     );
     isAuthenticated = json.decode(response.body);
     print(isAuthenticated);
-    print(_token);
+    print(token);
     notifyListeners();
   }
 
@@ -101,48 +147,77 @@ class Auth with ChangeNotifier {
     final response = await http.put(
       url,
       headers: {
-        "token": _token,
+        "token": token[0],
       },
     );
-    print(json.decode(response.body));
-    // print(_token);
+    print('TOPUP:${json.decode(response.body)}');
+    // print(token);
     notifyListeners();
   }
 
   Future<void> buy(double amount, String product) async {
+    message.clear();
     final url = Uri.parse('http://157.245.57.54:5000/buy/${product}');
 
     var resBody = amount;
-    var Body = json.encode({"amount": resBody});
-    final response = await http.put(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "token": _token,
-      },
-      body: Body,
-    );
-    print(json.decode(response.body));
-    print(amount);
-    notifyListeners();
+    var Body = json.encode({"buy_amount": resBody});
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "token": token[0],
+        },
+        body: Body,
+      );
+      final responseData = json.decode(response.body);
+      if (responseData == 'Invalid Amount to Purchase') {
+        throw HttpException(responseData);
+      } else if (responseData == 'Insufficient Balance') {
+        throw HttpException(responseData);
+      }
+      message.insert(0, responseData);
+      print(message);
+      print('BUY:${json.decode(response.body)}');
+      // print(amount);
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
   Future<void> sell(double amount, String product) async {
+    message.clear();
     final url = Uri.parse('http://157.245.57.54:5000/sell/${product}');
     var resBody = amount;
-    var Body = json.encode({"amount": resBody});
-    final response = await http.put(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "token": _token,
-      },
-      body: Body,
-    );
-    print(json.decode(response.body));
-
-    print(amount);
-    notifyListeners();
+    var Body = json.encode({"sell_amount": resBody});
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "token": token[0],
+        },
+        body: Body,
+      );
+      final responseData = json.decode(response.body);
+      if (responseData == 'Not enough gold to sell') {
+        throw HttpException(responseData);
+      } else if (responseData == 'Not enough palladium to sell') {
+        throw HttpException(responseData);
+      } else if (responseData == 'Not enough platinum to sell') {
+        throw HttpException(responseData);
+      } else if (responseData == 'Not enough silver to sell') {
+        throw HttpException(responseData);
+      }
+      message.insert(0, responseData);
+      print(message);
+      print('SELL:${json.decode(response.body)}');
+      // print(amount);
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
   Future<void> iswithdraw(double amount) async {
@@ -153,11 +228,11 @@ class Auth with ChangeNotifier {
       url,
       headers: {
         "Content-Type": "application/json",
-        "token": _token,
+        "token": token[0],
       },
       body: Body,
     );
-    print(json.decode(response.body));
+    print('WITHDRAW:${json.decode(response.body)}');
 
     notifyListeners();
   }
@@ -169,12 +244,120 @@ class Auth with ChangeNotifier {
       url,
       headers: {
         "Content-Type": "application/json",
-        "token": _token,
+        "token": token[0],
       },
     );
     final responseData = json.decode(response.body);
     balance = responseData[0]['balance'];
+    print('BALANCE:${responseData}');
+    notifyListeners();
+  }
 
+  Future<void> getuser() async {
+    // user.clear();
+    // emailuser.clear();
+    // phonenumber.clear();
+    final url = Uri.parse('http://157.245.57.54:5000/display/user');
+    // var resBody = amount;
+    // var Body = json.encode({"withdraw_amount": resBody});
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "token": token[0],
+      },
+    );
+    final responseData = json.decode(response.body);
+    // emailuser.insert(0, responseData[0]["user_email"]);
+    for (int i = 0; i < responseData.length; i++) {
+      if (responseData[i]["phone_number"] != null) {
+        phonenumber.insert(0, responseData[i]["phone_number"]);
+      }
+      if (responseData[i]["phone_number"] == null) {
+        phonenumber.insert(0, 0);
+      }
+      user.insert(
+        0,
+        UserDetail(
+          user_id: responseData[i]["user_id"],
+          user_email: responseData[i]["user_email"],
+          first_name: responseData[i]["first_name"],
+          last_name: responseData[i]["last_name"],
+          phone_number: phonenumber[i],
+        ),
+      );
+      user.removeAt(1);
+    }
+
+    // print(responseData);
+    print(user[0]);
+    notifyListeners();
+  }
+
+  List assetdata = [];
+  List<dynamic> assettype = [];
+  List assetamount = [];
+  List<dynamic> assetcolor = [];
+  List<AssetData> pieasset = [];
+
+  Future<void> getasset() async {
+    // asset.clear();
+    assetamount.clear();
+    assetcolor.clear();
+    assetamount.clear();
+    pieasset.clear();
+
+    final url = Uri.parse('http://157.245.57.54:5000/display/asset');
+    // var resBody = amount;
+    // var Body = json.encode({"withdraw_amount": resBody});
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "token": token[0],
+      },
+    );
+    final responseData = json.decode(response.body);
+
+    // print('gold amount: ${responseData[0]["gold_amount"]}');
+    // print(responseData);
+    assettype.insertAll(0, ["Gold", "Platinum", "Silver", "Palladium"]);
+    assetcolor.insertAll(0, [
+      Color.fromRGBO(255, 197, 51, 1),
+      Color.fromRGBO(2, 211, 204, 1),
+      Color.fromRGBO(188, 149, 223, 1),
+      // Color.fromRGBO(100, 236, 255, 1),
+      Color.fromRGBO(242, 114, 111, 1)
+    ]);
+    assetdata.insertAll(0, [
+      responseData[0]["gold_amount"],
+      responseData[0]["platinum_amount"],
+      responseData[0]["silver_amount"],
+      responseData[0]["palladium_amount"],
+    ]);
+    for (int i = 0; i < responseData.length; i++) {
+      asset.insert(
+        0,
+        UserAsset(
+          user_id: responseData[i]["user_id"],
+          gold_amount: responseData[i]["gold_amount"],
+          platinum_amount: responseData[i]["platinum_amount"],
+          silver_amount: responseData[i]["silver_amount"],
+          palladium_amount: responseData[i]["palladium_amount"],
+        ),
+      );
+    }
+    // assetamount.insertAll(0, assetdata);
+    // pieasset.add(AssetData(x: assettype, y: assetdata, color: assetcolor[0]));
+    for (int i = 0; i < assettype.length; i++) {
+      pieasset.add(
+          AssetData(x: assettype[i], y: assetdata[i], color: assetcolor[i]));
+    }
+    // print('CHARTDATA :${pieasset}');
+    // print("ASSET TYPE:${assettype}");
+    // print(assetamount);
+    print(asset);
+    print('ASSET:${responseData}');
     notifyListeners();
   }
 
@@ -187,7 +370,7 @@ class Auth with ChangeNotifier {
       url,
       headers: {
         "Content-Type": "application/json",
-        "token": _token,
+        "token": token[0],
       },
     );
     final responseData = json.decode(response.body);
@@ -251,36 +434,6 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getuser() async {
-    final url = Uri.parse('http://157.245.57.54:5000/display/user');
-    // var resBody = amount;
-    // var Body = json.encode({"withdraw_amount": resBody});
-    final response = await http.get(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "token": _token,
-      },
-    );
-    final responseData = json.decode(response.body);
-
-    for (int i = 0; i < responseData.length; i++) {
-      user.add(
-        UserDetail(
-          user_id: responseData[i]["user_id"],
-          user_email: responseData[i]["user_email"],
-          first_name: responseData[i]["first_name"],
-          last_name: responseData[i]["last_name"],
-        ),
-      );
-    }
-
-    // print(responseData);
-
-    // print(user);
-    notifyListeners();
-  }
-
   Future<void> getpaymenthistory(String filteroption, String sortoption) async {
     phistory.clear();
     final url = Uri.parse('http://157.245.57.54:5000/display/payment');
@@ -289,7 +442,7 @@ class Auth with ChangeNotifier {
       url,
       headers: {
         "Content-Type": "application/json",
-        "token": _token,
+        "token": token[0],
       },
     );
     final responseData = json.decode(response.body);
@@ -358,33 +511,28 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getasset() async {
+  Future<void> updatephone(num phonenum) async {
     // asset.clear();
-    final url = Uri.parse('http://157.245.57.54:5000/display/asset');
+    final url = Uri.parse('http://157.245.57.54:5000/updateUser');
     // var resBody = amount;
     // var Body = json.encode({"withdraw_amount": resBody});
-    final response = await http.get(
+
+    final response = await http.put(
       url,
       headers: {
         "Content-Type": "application/json",
-        "token": _token,
+        "token": token[0],
       },
+      body: json.encode({"phone_number": phonenum}),
     );
+    // print(phonenum);
     final responseData = json.decode(response.body);
-
-    for (int i = 0; i < responseData.length; i++) {
-      asset.insert(
-        0,
-        UserAsset(
-          user_id: responseData[i]["user_id"],
-          gold_amount: responseData[i]["gold_amount"],
-          platinum_amount: responseData[i]["platinum_amount"],
-          silver_amount: responseData[i]["silver_amount"],
-          palladium_amount: responseData[i]["palladium_amount"],
-        ),
-      );
-    }
-    print(asset);
+    // print(responseData);
     notifyListeners();
+  }
+
+  void logout() {
+    token.clear();
+    isAuthenticated = false;
   }
 }

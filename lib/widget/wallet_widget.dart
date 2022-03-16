@@ -16,13 +16,14 @@ class WalletWidget extends StatefulWidget {
 
 class _WalletWidgetState extends State<WalletWidget> {
   bool currentTab = true;
-  bool? selectedpayment = false;
+  bool? online = false;
+  bool? card = false;
   int initialPage = 0;
   late double withdrawamount;
   // List paymentMethod = [];
   final GlobalKey<FormState> _carddetail = GlobalKey();
   // final GlobalKey<FormState> _withdrawamount = GlobalKey();
-  final GlobalKey<FormState> _topupamount = GlobalKey();
+  // final GlobalKey<FormState> _topupamount = GlobalKey();
 
   FocusNode _cardnumber = FocusNode();
   FocusNode _month = FocusNode();
@@ -215,70 +216,158 @@ class _WalletWidgetState extends State<WalletWidget> {
     // final balancedata = Provider.of<Auth>(context);
     // Widget Activity = ;
 
-    Widget Payment = Positioned(
-      bottom: 10,
-      left: 17,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        // color: Colors.black12,
-        child: Form(
-          key: _carddetail,
-          child: Column(
-            children: <Widget>[
-              Container(
-                child: Row(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Container(
-                          child: Checkbox(
-                            value: selectedpayment,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedpayment = value;
-                              });
-                            },
+    Widget Payment = Container(
+      width: MediaQuery.of(context).size.width * 0.9,
+      // color: Colors.black12,
+      child: Form(
+        key: _carddetail,
+        child: Column(
+          children: <Widget>[
+            Container(
+              child: Row(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        child: Checkbox(
+                          value: card,
+                          onChanged: (value) {
+                            setState(() {
+                              card = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Container(
+                        child: Image.asset(
+                          'assets/navbar/Visa.png',
+                        ),
+                      ),
+                      Container(
+                        child: Stack(
+                          children: <Widget>[
+                            Positioned(
+                              child:
+                                  Image.asset('assets/navbar/Rectangle 6.png'),
+                            ),
+                            Positioned(
+                              left: 7,
+                              top: 3,
+                              child: Image.asset(
+                                  'assets/navbar/Oval 5 + Oval 5 Copy + Oval 5 Copy 3.png'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.05),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        child: Checkbox(
+                          value: online,
+                          onChanged: (value) {
+                            setState(() {
+                              online = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Text(
+                        'Online Banking',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Color.fromRGBO(9, 51, 116, 1),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            Container(
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      SizedBox(width: 14),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        // color: Colors.black,
+                        child: Text(
+                          'Card Number',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Color.fromRGBO(9, 51, 116, 1),
                           ),
                         ),
-                        Container(
-                          child: Image.asset(
-                            'assets/navbar/Visa.png',
-                          ),
-                        ),
-                        Container(
-                          child: Stack(
-                            children: <Widget>[
-                              Positioned(
-                                child: Image.asset(
-                                    'assets/navbar/Rectangle 6.png'),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 7),
+                  Row(
+                    children: <Widget>[
+                      SizedBox(width: 14),
+                      //CARDNUMBER
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        width: (MediaQuery.of(context).size.width * 0.75),
+                        height: 40,
+                        child: TextFormField(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(16)
+                          ],
+                          keyboardType: TextInputType.number,
+                          focusNode: _cardnumber,
+                          validator: (value) {
+                            if (value!.isEmpty || value.length < 16) {
+                              return 'enter valid number!';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(5.0),
                               ),
-                              Positioned(
-                                left: 7,
-                                top: 3,
-                                child: Image.asset(
-                                    'assets/navbar/Oval 5 + Oval 5 Copy + Oval 5 Copy 3.png'),
-                              ),
-                            ],
+                            ),
                           ),
+                          onSaved: (value) {},
                         ),
-                        SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.05),
-                      ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(
+                      left: 15,
+                      right: 105,
                     ),
-                    Row(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Container(
-                          child: Checkbox(
-                            value: selectedpayment,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedpayment = value;
-                              });
-                            },
+                        Text(
+                          'Expiration Date',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Color.fromRGBO(9, 51, 116, 1),
                           ),
                         ),
                         Text(
-                          'Online Banking',
+                          'CCV',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
@@ -287,48 +376,81 @@ class _WalletWidgetState extends State<WalletWidget> {
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-              Container(
-                child: Column(
-                  // mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
+                  ),
+                  SizedBox(height: 7),
+                  Container(
+                    padding: EdgeInsets.only(left: 16, right: 50),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        SizedBox(width: 14),
+                        //MONTH
                         Container(
-                          alignment: Alignment.centerLeft,
-                          // color: Colors.black,
-                          child: Text(
-                            'Card Number',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: Color.fromRGBO(9, 51, 116, 1),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 7),
-                    Row(
-                      children: <Widget>[
-                        SizedBox(width: 14),
-                        //CARDNUMBER
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          width: (MediaQuery.of(context).size.width * 0.75),
+                          width: (MediaQuery.of(context).size.width * 0.11),
                           height: 40,
                           child: TextFormField(
                             inputFormatters: [
-                              LengthLimitingTextInputFormatter(16)
+                              LengthLimitingTextInputFormatter(2)
                             ],
                             keyboardType: TextInputType.number,
-                            focusNode: _cardnumber,
+                            controller: _monthController,
+                            focusNode: _month,
                             validator: (value) {
-                              if (value!.isEmpty || value.length < 16) {
+                              if (value!.isEmpty || int.parse(value) > 13) {
+                                return 'enter correct value';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5.0),
+                                ),
+                              ),
+                            ),
+                            onSaved: (value) {},
+                          ),
+                        ),
+                        //year
+                        Container(
+                          width: (MediaQuery.of(context).size.width * 0.20),
+                          height: 40,
+                          child: TextFormField(
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(4)
+                            ],
+                            keyboardType: TextInputType.number,
+                            controller: _yearController,
+                            focusNode: _year,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'enter valid year!';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5.0),
+                                ),
+                              ),
+                            ),
+                            onSaved: (value) {},
+                          ),
+                        ),
+                        SizedBox(width: 55),
+                        //CCV
+                        Container(
+                          width: (MediaQuery.of(context).size.width * 0.20),
+                          height: 40,
+                          child: TextFormField(
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(3)
+                            ],
+                            keyboardType: TextInputType.number,
+                            controller: _ccvController,
+                            focusNode: _ccv,
+                            validator: (value) {
+                              if (value!.isEmpty) {
                                 return 'enter valid number!';
                               }
                               return null;
@@ -345,160 +467,34 @@ class _WalletWidgetState extends State<WalletWidget> {
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-              Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 15,
-                        right: 105,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            'Expiration Date',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: Color.fromRGBO(9, 51, 116, 1),
-                            ),
-                          ),
-                          Text(
-                            'CCV',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: Color.fromRGBO(9, 51, 116, 1),
-                            ),
-                          ),
-                        ],
-                      ),
+            ),
+            Container(
+              // color: Colors.black,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(height: 19),
+                  GestureDetector(
+                    onTap: _submit,
+                    child: Image.asset(
+                      'assets/navbar/save button.png',
                     ),
-                    SizedBox(height: 7),
-                    Container(
-                      padding: EdgeInsets.only(left: 16, right: 50),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          //MONTH
-                          Container(
-                            width: (MediaQuery.of(context).size.width * 0.11),
-                            height: 40,
-                            child: TextFormField(
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(2)
-                              ],
-                              keyboardType: TextInputType.number,
-                              controller: _monthController,
-                              focusNode: _month,
-                              validator: (value) {
-                                if (value!.isEmpty || int.parse(value) > 13) {
-                                  return 'enter correct value';
-                                }
-                                return null;
-                              },
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
-                                  ),
-                                ),
-                              ),
-                              onSaved: (value) {},
-                            ),
-                          ),
-                          //year
-                          Container(
-                            width: (MediaQuery.of(context).size.width * 0.20),
-                            height: 40,
-                            child: TextFormField(
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(4)
-                              ],
-                              keyboardType: TextInputType.number,
-                              controller: _yearController,
-                              focusNode: _year,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'enter valid year!';
-                                }
-                                return null;
-                              },
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
-                                  ),
-                                ),
-                              ),
-                              onSaved: (value) {},
-                            ),
-                          ),
-                          SizedBox(width: 55),
-                          //CCV
-                          Container(
-                            width: (MediaQuery.of(context).size.width * 0.20),
-                            height: 40,
-                            child: TextFormField(
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(3)
-                              ],
-                              keyboardType: TextInputType.number,
-                              controller: _ccvController,
-                              focusNode: _ccv,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'enter valid number!';
-                                }
-                                return null;
-                              },
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
-                                  ),
-                                ),
-                              ),
-                              onSaved: (value) {},
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  // Text('Save'),
+                ],
               ),
-              Container(
-                // color: Colors.black,
-                child: Column(
-                  children: <Widget>[
-                    SizedBox(height: 19),
-                    GestureDetector(
-                      onTap: _submit,
-                      child: Image.asset(
-                        'assets/navbar/save button.png',
-                      ),
-                    ),
-                    // Text('Save'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
     return Stack(
       children: <Widget>[
         Positioned(
-          top: 24,
-          left: 7,
+          top: MediaQuery.of(context).size.height * 0.04,
+          left: MediaQuery.of(context).size.width * 0.02,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
             child: Container(
@@ -536,8 +532,8 @@ class _WalletWidgetState extends State<WalletWidget> {
           ),
         ),
         Positioned(
-          top: 100,
-          left: 7,
+          top: MediaQuery.of(context).size.height * 0.137,
+          left: MediaQuery.of(context).size.width * 0.02,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
             child: Container(
@@ -601,72 +597,61 @@ class _WalletWidgetState extends State<WalletWidget> {
           ),
         ),
         Positioned(
-          left: 14.5,
-          bottom: -20,
+          left: MediaQuery.of(context).size.width * 0.04,
+          bottom: 0,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(22.0),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(22.0),
+              topRight: Radius.circular(22.0),
+            ),
             child: Container(
               color: Colors.white,
-              width: MediaQuery.of(context).size.width * 0.915,
-              height: MediaQuery.of(context).size.height * 0.527,
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.44,
-          left: MediaQuery.of(context).size.width * 0.038,
-          child: Container(
-            // color: Colors.black,
-            // height: MediaQuery.of(context).size.height * 0.1,
-            height: 40,
-            // width: MediaQuery.of(context).size.width * 1.0,
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: ToggleSwitch(
-                    minWidth: double.infinity,
-                    cornerRadius: 20.0,
-                    activeBgColors: [
-                      [Colors.white],
-                      [Colors.white],
-                      // [Colors.red[800]!]
-                    ],
-                    activeFgColor: Color.fromRGBO(9, 51, 116, 1),
-                    inactiveBgColor: Color.fromRGBO(132, 199, 239, 0.57),
-                    inactiveFgColor: Color.fromRGBO(9, 51, 116, 1),
-                    initialLabelIndex: initialPage,
-                    totalSwitches: 2,
-                    labels: ['Payment', 'Activity'],
-                    // radiusStyle: true,
-                    onToggle: (index) {
-                      setState(() {
-                        initialPage = index!;
-                      });
-                    },
+              width: MediaQuery.of(context).size.width * 0.92,
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: Column(
+                children: [
+                  Container(
+                    height: 40,
+                    child: ToggleSwitch(
+                      minWidth: double.infinity,
+                      cornerRadius: 20.0,
+                      activeBgColors: [
+                        [Colors.white],
+                        [Colors.white],
+                        // [Colors.red[800]!]
+                      ],
+                      activeFgColor: Color.fromRGBO(9, 51, 116, 1),
+                      inactiveBgColor: Color.fromRGBO(132, 199, 239, 0.57),
+                      inactiveFgColor: Color.fromRGBO(9, 51, 116, 1),
+                      initialLabelIndex: initialPage,
+                      totalSwitches: 2,
+                      labels: ['Payment', 'Activity'],
+                      // radiusStyle: true,
+                      onToggle: (index) {
+                        setState(() {
+                          initialPage = index!;
+                        });
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        (initialPage == 0)
-            ? Payment
-            : Positioned(
-                bottom: MediaQuery.of(context).size.height * 0.00,
-                left: MediaQuery.of(context).size.width * 0.041,
-                child: Center(
-                  child: Container(
-                    // color: Colors.black,
-                    child: Activity(),
-                  ),
-                ),
+                  ((initialPage == 0)
+                      ? Payment
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child: Container(
+                                // color: Colors.black,
+                                child: Activity(),
+                              ),
+                            ),
+                          ],
+                        )),
+                ],
               ),
-        // WIP
-        // Positioned(
-        //   bottom: 10,
-        //   left: 10,
-        //   child: ListView.builder(itemBuilder: )
-        // ),
+            ),
+          ),
+        ),
       ],
     );
   }

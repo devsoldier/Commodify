@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 class Commodity {
   final num close;
   final DateTime epoch;
@@ -39,15 +41,18 @@ class UserDetail {
   final String user_email;
   final String first_name;
   final String last_name;
+  final dynamic phone_number;
 
   UserDetail(
       {required this.user_id,
       required this.user_email,
       required this.first_name,
-      required this.last_name});
+      required this.last_name,
+      required this.phone_number});
 
   @override
-  String toString() => '$user_id, $user_email,$first_name,$last_name';
+  String toString() =>
+      '$user_id, $user_email,$first_name,$last_name,$phone_number';
 }
 
 // class PriceOnly {
@@ -94,4 +99,32 @@ class UserAsset {
   @override
   String toString() =>
       '$user_id,$gold_amount,$platinum_amount,$silver_amount,$palladium_amount';
+}
+
+class AssetDummy {
+  // final String user_id;
+  final dynamic gold_amount;
+  final dynamic platinum_amount;
+  final dynamic silver_amount;
+  final dynamic palladium_amount;
+
+  AssetDummy(
+      {/* required this.user_id, */
+      required this.gold_amount,
+      required this.platinum_amount,
+      required this.silver_amount,
+      required this.palladium_amount});
+
+  @override
+  String toString() =>
+      '$gold_amount,$platinum_amount,$silver_amount,$palladium_amount';
+}
+
+class AssetData {
+  final String x;
+  final dynamic y;
+  final Color color;
+  AssetData({required this.x, required this.y, required this.color});
+  @override
+  String toString() => '$x,$y,$color';
 }

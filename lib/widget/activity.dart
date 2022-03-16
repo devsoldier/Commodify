@@ -46,7 +46,7 @@ class _ActivityState extends State<Activity> {
         Row(
           children: [
             Container(
-              width: 90,
+              width: 100,
               height: 50,
               child: DropdownButtonHideUnderline(
                 child: DropdownButton(
@@ -95,7 +95,7 @@ class _ActivityState extends State<Activity> {
         ),
         Container(
           width: MediaQuery.of(context).size.width * 0.9,
-          height: MediaQuery.of(context).size.height * 0.38,
+          height: MediaQuery.of(context).size.height * 0.35,
           child: ListView.builder(
             itemCount: paymentdata.phistoryfiltered.length,
             itemBuilder: (_, i) => Card(
@@ -108,7 +108,7 @@ class _ActivityState extends State<Activity> {
                               "Withdraw")
                           ? Container(
                               // color: Colors.black,
-                              width: 100,
+                              width: 101,
                               height: 50,
                               child: Row(
                                 children: [
@@ -119,7 +119,9 @@ class _ActivityState extends State<Activity> {
                                   Text(
                                     '${paymentdata.phistoryfiltered[i].payment_type}',
                                     style: TextStyle(
-                                        fontSize: 15, color: Colors.red),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color: Color.fromRGBO(9, 51, 116, 1)),
                                   ),
                                 ],
                               ),
@@ -139,7 +141,10 @@ class _ActivityState extends State<Activity> {
                                       Text(
                                         '${paymentdata.phistoryfiltered[i].payment_type}',
                                         style: TextStyle(
-                                            fontSize: 15, color: Colors.green),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color:
+                                                Color.fromRGBO(9, 51, 116, 1)),
                                       ),
                                     ],
                                   ),
@@ -147,11 +152,15 @@ class _ActivityState extends State<Activity> {
                               : null,
                       title: Center(
                         child: Container(
-                          width: 50,
-                          height: 15,
-                          child: Text(
-                              '${paymentdata.phistoryfiltered[i].payment_amount}'),
-                        ),
+                            width: 50,
+                            height: 18,
+                            child: (paymentdata
+                                        .phistoryfiltered[i].payment_type ==
+                                    "Withdraw")
+                                ? Text(
+                                    '-\$${paymentdata.phistoryfiltered[i].payment_amount}')
+                                : Text(
+                                    '+\$${paymentdata.phistoryfiltered[i].payment_amount}')),
                       ),
                       trailing: (paymentdata
                                   .phistoryfiltered[i].payment_status ==
@@ -159,13 +168,24 @@ class _ActivityState extends State<Activity> {
                           ? Container(
                               // color: Colors.black,
                               width: 90,
-                              height: 20,
+                              height: 30,
                               child: Column(
                                 children: [
                                   Text(
                                     '${paymentdata.phistoryfiltered[i].payment_status}',
                                     style: TextStyle(
-                                        fontSize: 15, color: Colors.green),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color: Colors.green),
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      '${DateFormat('dd MMM hh:mm ').format(paymentdata.phistoryfiltered[i].payment_timestamp)}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                          color: Colors.black54),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -174,13 +194,24 @@ class _ActivityState extends State<Activity> {
                                   "Cancelled")
                               ? Container(
                                   width: 50,
-                                  height: 15,
+                                  height: 30,
                                   child: Column(
                                     children: [
                                       Text(
                                         '${paymentdata.phistoryfiltered[i].payment_status}',
                                         style: TextStyle(
-                                            fontSize: 15, color: Colors.red),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: Colors.black54),
+                                      ),
+                                      Flexible(
+                                        child: Text(
+                                          '${DateFormat('dd MMM hh:mm ').format(paymentdata.phistoryfiltered[i].payment_timestamp)}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                              color: Colors.black54),
+                                        ),
                                       ),
                                     ],
                                   ),

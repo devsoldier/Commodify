@@ -24,6 +24,7 @@ class TradingScreen extends StatelessWidget {
                 height: double.infinity, width: double.infinity),
           ),
         ),
+        // TradingWidget(),
         TradingWidget(),
       ],
     );
