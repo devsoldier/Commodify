@@ -39,9 +39,10 @@ class _AssetsChartState extends State<AssetsChart> {
                   // Corner style of doughnut segment
                   cornerStyle: CornerStyle.bothFlat,
                   dataLabelSettings: DataLabelSettings(
-                      isVisible: true,
-                      // Positioning the data label
-                      labelPosition: ChartDataLabelPosition.outside))
+                    isVisible: true,
+                    // Positioning the data label
+                    /* labelPosition: ChartDataLabelPosition.outside */
+                  ))
             ],
           ),
         ),
@@ -55,8 +56,8 @@ class _AssetsChartState extends State<AssetsChart> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
-                        height: 10,
-                        width: 10,
+                        height: 15,
+                        width: 20,
                         color: Color.fromRGBO(255, 197, 51, 1)),
                     SizedBox(width: 10),
                     Container(
@@ -76,8 +77,8 @@ class _AssetsChartState extends State<AssetsChart> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
-                        height: 10,
-                        width: 10,
+                        height: 15,
+                        width: 20,
                         color: Color.fromRGBO(2, 211, 204, 1)),
                     SizedBox(width: 10),
                     Container(
@@ -103,8 +104,8 @@ class _AssetsChartState extends State<AssetsChart> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
-                        height: 10,
-                        width: 10,
+                        height: 15,
+                        width: 20,
                         color: Color.fromRGBO(188, 149, 223, 1)),
                     SizedBox(width: 10),
                     Container(
@@ -124,8 +125,8 @@ class _AssetsChartState extends State<AssetsChart> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
-                        height: 10,
-                        width: 10,
+                        height: 15,
+                        width: 20,
                         color: Color.fromRGBO(242, 114, 111, 1)),
                     SizedBox(width: 10),
                     Container(

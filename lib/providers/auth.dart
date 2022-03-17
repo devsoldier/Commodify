@@ -76,7 +76,8 @@ class Auth with ChangeNotifier {
 
   Future<void> login(String email, String password) async {
     // token.clear();
-    final url = Uri.parse('http://157.245.57.54:5000/user/login');
+    // final url = Uri.parse('http://157.245.57.54:5000/user/login');
+    final url = Uri.parse('https://api.comd5.xyz/user/login');
     var resBody = {};
     resBody["email"] = email;
     resBody["password"] = password;
@@ -121,6 +122,7 @@ class Auth with ChangeNotifier {
         }
       }
       message.insert(0, responseData);
+      print(message);
       print(responseData);
       notifyListeners();
     } catch (error) {

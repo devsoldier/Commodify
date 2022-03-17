@@ -19,7 +19,7 @@ class TradingWidget extends StatefulWidget {
 class _TradingWidgetState extends State<TradingWidget> {
   final List<Commodity> _chartData = [];
   List<dynamic> timeConverted = [];
-
+  RegExp regex = RegExp(r'^[a-zA-Z0-9&%=]+$');
   List<dynamic> loadedPLAT = [];
   List<dynamic> loadedPALLA = [];
   List<dynamic> loadedGOLD = [];
@@ -275,6 +275,9 @@ class _TradingWidgetState extends State<TradingWidget> {
   }
 
   Future<void> purchase() async {
+    if (!_buysellkey.currentState!.validate()) {
+      return;
+    }
     _buysellkey.currentState!.save();
     try {
       await Provider.of<Auth>(context, listen: false)
@@ -293,6 +296,9 @@ class _TradingWidgetState extends State<TradingWidget> {
   }
 
   Future<void> sell() async {
+    if (!_buysellkey.currentState!.validate()) {
+      return;
+    }
     _buysellkey.currentState!.save();
     try {
       await Provider.of<Auth>(context, listen: false)
@@ -1000,9 +1006,13 @@ class _TradingWidgetState extends State<TradingWidget> {
                                 height: 40,
                                 width: MediaQuery.of(context).size.width * 0.73,
                                 child: TextFormField(
+                                    textAlign: TextAlign.center,
                                     keyboardType: TextInputType.number,
                                     focusNode: _buysellfield,
-                                    //  validator:,
+                                    validator: (value) {
+                                      if (!regex.hasMatch(value!))
+                                        return 'numbers only';
+                                    },
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       focusedBorder: InputBorder.none,

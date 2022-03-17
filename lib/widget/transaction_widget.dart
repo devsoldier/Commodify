@@ -111,6 +111,9 @@ class _TransactionWidgetState extends State<TransactionWidget> {
 
                     Container(
                       color: Color.fromRGBO(249, 247, 247, 1),
+                      // color: (i % 2 == 0)
+                      //     ? Color.fromRGBO(18, 39, 70, 1)
+                      //     : Color.fromRGBO(5, 157, 230, 1),
                       child: ListTile(
                         leading:
                             (historydata.historyfiltered[i].tx_asset == "gold")

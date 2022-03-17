@@ -16,6 +16,11 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   bool _isLoading = false;
   // bool _keyboardVisible = false;
   // bool isOpen;
+  final oneuppercase = RegExp("(?=(?:.*[A-Z]){1,})");
+  final onelowercase = RegExp("(?=(?:.*[A-Z]){1,})");
+  final onedigit = RegExp("(?=(?:.*\\d){1,})");
+  final onespecialcharacter =
+      RegExp("(?=(?:.*[!@#\$%^&*()\\-_=+{};:,<.>]){1,})");
   RegExp regex =
       RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
   final GlobalKey<FormState> _formKey = GlobalKey();
@@ -26,9 +31,9 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   FocusNode _passwordfield = FocusNode();
   FocusNode _confirmpasswordfield = FocusNode();
 
-  // final TextEditingController _fnameController = TextEditingController();
-  // final TextEditingController _lnameController = TextEditingController();
-  // final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _fnameController = TextEditingController();
+  final TextEditingController _lnameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmpasswordController =
       TextEditingController();
@@ -138,15 +143,52 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     }
   }
 
-  String? get _errorText {
+  String? get _errorTextpassword {
+    final text = _passwordController.value.text;
+    final oneuppercase = RegExp("(?=(?:.*[A-Z]){1,})");
+    final onelowercase = RegExp("(?=(?:.*[A-Z]){1,})");
+    final onedigit = RegExp("(?=(?:.*\\d){1,})");
+    final onespecialcharacter =
+        RegExp("(?=(?:.*[!@#\$%^&*()\\-_=+{};:,<.>]){1,})");
+    if (!oneuppercase.hasMatch(text)) {
+      return 'must contain 1 uppercase';
+    } else if (!onelowercase.hasMatch(text)) {
+      return 'must contain 1 lowercase';
+    } else if (!onedigit.hasMatch(text)) {
+      return 'must contain 1 number';
+    } else if (!onespecialcharacter.hasMatch(text)) {
+      return 'must contain 1 special character';
+    } else if (text.isEmpty || text.length < 8) {
+      return 'add more characters';
+    } else if (text.isEmpty || text.length < 8) {
+      return 'add more characters';
+    } else {
+      return null;
+    }
+  }
+
+  String? get _errorTextConfirmpassword {
     final text = _confirmpasswordController.value.text;
-    RegExp regex =
-        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-    /*  if (!regex.hasMatch(text)) {
-      return 'Enter valid password';
-    } */
-    if (text.isEmpty || text.length < 8) {
-      return 'idk';
+
+    final oneuppercase = RegExp("(?=(?:.*[A-Z]){1,})");
+    final onelowercase = RegExp("(?=(?:.*[A-Z]){1,})");
+    final onedigit = RegExp("(?=(?:.*\\d){1,})");
+    final onespecialcharacter =
+        RegExp("(?=(?:.*[!@#\$%^&*()\\-_=+{};:,<.>]){1,})");
+    if (text != _passwordController.text) {
+      return 'password does not match';
+    } else if (!oneuppercase.hasMatch(text)) {
+      return 'must contain 1 uppercase';
+    } else if (!onelowercase.hasMatch(text)) {
+      return 'must contain 1 lowercase';
+    } else if (!onedigit.hasMatch(text)) {
+      return 'must contain 1 number';
+    } else if (!onespecialcharacter.hasMatch(text)) {
+      return 'must contain 1 special character';
+    } else if (text.isEmpty || text.length < 8) {
+      return 'add more characters';
+    } else if (text.isEmpty || text.length < 8) {
+      return 'add more characters';
     } else {
       return null;
     }
@@ -229,11 +271,11 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                         ),
                                       ),
                                     ),
-                                    onSaved: (value) {
-                                      _authData["first_name"] =
-                                          value.toString();
-                                      FocusScope.of(context)
-                                          .requestFocus(_lname);
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _authData["first_name"] =
+                                            value.toString();
+                                      });
                                     },
                                   ),
                                 ),
@@ -274,9 +316,10 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       ),
                                     ),
                                     onSaved: (value) {
-                                      _authData["last_name"] = value.toString();
-                                      FocusScope.of(context)
-                                          .requestFocus(_emailfield);
+                                      setState(() {
+                                        _authData["last_name"] =
+                                            value.toString();
+                                      });
                                     },
                                   ),
                                 ),
@@ -319,10 +362,10 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                         ),
                                       ),
                                     ),
-                                    onSaved: (value) {
-                                      _authData["email"] = value.toString();
-                                      FocusScope.of(context)
-                                          .requestFocus(_passwordfield);
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _authData["email"] = value.toString();
+                                      });
                                     },
                                   ),
                                 ),
@@ -352,13 +395,31 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                     controller: _passwordController,
                                     focusNode: _passwordfield,
                                     validator: (value) {
-                                      if (value!.isEmpty || value.length < 5) {
-                                        return 'Password is too short!';
-                                      } else if (!regex.hasMatch(value)) {
-                                        return 'Invalid password';
+                                      if (!oneuppercase.hasMatch(value!)) {
+                                        return 'must contain 1 uppercase';
+                                      } else if (!onelowercase
+                                          .hasMatch(value)) {
+                                        return 'must contain 1 lowercase';
+                                      } else if (!onedigit.hasMatch(value)) {
+                                        return 'must contain 1 number';
+                                      } else if (!onespecialcharacter
+                                          .hasMatch(value)) {
+                                        return 'must contain 1 special character';
+                                      } else if (value.isEmpty ||
+                                          value.length < 8) {
+                                        return 'add more characters';
+                                      } else if (value.isEmpty ||
+                                          value.length < 8) {
+                                        return 'add more characters';
+                                      } else {
+                                        return null;
                                       }
                                     },
                                     decoration: InputDecoration(
+                                      errorText:
+                                          (_passwordfield.hasPrimaryFocus)
+                                              ? _errorTextpassword
+                                              : null,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                           Radius.circular(5.0),
@@ -400,15 +461,30 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       if (value!.isEmpty ||
                                           value != _passwordController.text)
                                         return 'does not match';
-                                      if (!regex.hasMatch(value))
-                                        return 'Invalid password';
-
-                                      return null;
+                                      else if (!oneuppercase.hasMatch(value)) {
+                                        return 'must contain 1 uppercase';
+                                      } else if (!onelowercase
+                                          .hasMatch(value)) {
+                                        return 'must contain 1 lowercase';
+                                      } else if (!onedigit.hasMatch(value)) {
+                                        return 'must contain 1 number';
+                                      } else if (!onespecialcharacter
+                                          .hasMatch(value)) {
+                                        return 'must contain 1 special character';
+                                      } else if (value.isEmpty ||
+                                          value.length < 8) {
+                                        return 'add more characters';
+                                      } else if (value.isEmpty ||
+                                          value.length < 8) {
+                                        return 'add more characters';
+                                      } else {
+                                        return null;
+                                      }
                                     },
                                     decoration: InputDecoration(
                                       errorText: (_confirmpasswordfield
                                               .hasPrimaryFocus)
-                                          ? _errorText
+                                          ? _errorTextConfirmpassword
                                           : null,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
