@@ -67,6 +67,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
+  showsnackbar() {
+    final snackBar = SnackBar(
+      content: Consumer<Auth>(
+          builder: (_, data, __) => (data.message[0].isEmpty)
+              ? Text('')
+              : (data.message[0].isNotEmpty)
+                  ? Text(data.message[0])
+                  : Text('')),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> _updatepassword() async {
     if (_phonekey.currentState!.validate()) {
       // Invalid!
@@ -207,9 +219,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           child: Image.asset('assets/navbar/cancelbtn.png'),
                         ),
                         GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               _updatephone();
                               _getuser();
+                              await showsnackbar();
                             },
                             child: Image.asset('assets/navbar/savebtn.png')),
                       ],
@@ -449,6 +462,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                                     0.6),
                                                 height: 35,
                                                 child: TextFormField(
+                                                  obscureText: true,
                                                   enabled: isEdited,
                                                   controller:
                                                       _passwordController,
@@ -513,9 +527,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                                   'assets/navbar/cancelbtn.png'),
                                             ),
                                             GestureDetector(
-                                                onTap: () {
+                                                onTap: () async {
                                                   _updatepassword();
                                                   _getuser();
+                                                  await showsnackbar();
                                                 },
                                                 child: Image.asset(
                                                     'assets/navbar/savebtn.png')),

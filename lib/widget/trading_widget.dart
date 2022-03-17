@@ -19,7 +19,7 @@ class TradingWidget extends StatefulWidget {
 class _TradingWidgetState extends State<TradingWidget> {
   final List<Commodity> _chartData = [];
   List<dynamic> timeConverted = [];
-  RegExp regex = RegExp(r'^[a-zA-Z0-9&%=]+$');
+  RegExp regex = RegExp("(?=(?:.*[!@#\$%^&*()\\-_=+{};:,<>]))");
   List<dynamic> loadedPLAT = [];
   List<dynamic> loadedPALLA = [];
   List<dynamic> loadedGOLD = [];
@@ -34,6 +34,7 @@ class _TradingWidgetState extends State<TradingWidget> {
     'Silver/USD'
   ];
   String commodity = 'frxXAUUSD';
+  String placeholder = '';
   final GlobalKey<FormState> _buysellkey = GlobalKey();
   FocusNode _buysellfield = FocusNode();
   final TextEditingController _buysellController = TextEditingController();
@@ -328,6 +329,18 @@ class _TradingWidgetState extends State<TradingWidget> {
     sell().then((_) => getBal());
   }
 
+  showsnackbar() {
+    final snackBar = SnackBar(
+      content: Consumer<Auth>(
+          builder: (_, data, __) => (data.message[0].isEmpty)
+              ? Text('')
+              : (data.message[0].isNotEmpty)
+                  ? Text(data.message[0])
+                  : Text('')),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   void initState() {
     // secTimer();
@@ -359,6 +372,7 @@ class _TradingWidgetState extends State<TradingWidget> {
   @override
   Widget build(BuildContext context) {
     final balancedata = Provider.of<Auth>(context);
+
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -1010,7 +1024,7 @@ class _TradingWidgetState extends State<TradingWidget> {
                                     keyboardType: TextInputType.number,
                                     focusNode: _buysellfield,
                                     validator: (value) {
-                                      if (!regex.hasMatch(value!))
+                                      if (regex.hasMatch(value!))
                                         return 'numbers only';
                                     },
                                     decoration: InputDecoration(
@@ -1034,7 +1048,7 @@ class _TradingWidgetState extends State<TradingWidget> {
                                     child: Row(
                                       children: <Widget>[
                                         GestureDetector(
-                                          onTap: () {
+                                          onTap: () async {
                                             /* (balancedata.message.isNotEmpty)
                                                 ? _showsuccessDialog()
                                                 :  */
@@ -1045,6 +1059,7 @@ class _TradingWidgetState extends State<TradingWidget> {
                                                       .message.isNotEmpty) {
                                                 _selectedproduct = 'Xau';
                                                 runbothpurchase();
+
                                                 // _showbuysuccessDialog();
                                                 _getasset();
                                               } else if (_selectedCommodity ==
@@ -1053,6 +1068,7 @@ class _TradingWidgetState extends State<TradingWidget> {
                                                       .message.isNotEmpty) {
                                                 _selectedproduct = 'Xpd';
                                                 runbothpurchase();
+                                                // showsnackbar();
                                                 // _showbuysuccessDialog();
                                                 _getasset();
                                               } else if (_selectedCommodity ==
@@ -1061,6 +1077,7 @@ class _TradingWidgetState extends State<TradingWidget> {
                                                       .message.isNotEmpty) {
                                                 _selectedproduct = 'Xpt';
                                                 runbothpurchase();
+                                                // showsnackbar();
                                                 // _showbuysuccessDialog();
                                                 _getasset();
                                               } else if (_selectedCommodity ==
@@ -1069,10 +1086,13 @@ class _TradingWidgetState extends State<TradingWidget> {
                                                       .message.isNotEmpty) {
                                                 _selectedproduct = 'Xag';
                                                 runbothpurchase();
+                                                // showsnackbar();
                                                 // _showbuysuccessDialog();
                                                 _getasset();
                                               }
                                             });
+                                            await showsnackbar()
+                                                .then((_) => setState(() {}));
                                           },
                                           child: Image.asset(
                                             'assets/navbar/buybtn.png',
@@ -1080,7 +1100,7 @@ class _TradingWidgetState extends State<TradingWidget> {
                                         ),
                                         SizedBox(width: 25),
                                         GestureDetector(
-                                          onTap: () {
+                                          onTap: () async {
                                             setState(() {
                                               if (_selectedCommodity ==
                                                       'Gold/USD' ||
@@ -1116,6 +1136,8 @@ class _TradingWidgetState extends State<TradingWidget> {
                                                 _getasset();
                                               }
                                             });
+                                            await showsnackbar()
+                                                .then((_) => setState(() {}));
                                           },
                                           child: Image.asset(
                                             'assets/navbar/sellbtn.png',

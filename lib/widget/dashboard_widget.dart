@@ -42,15 +42,6 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
   @override
   void initState() {
-    // Future(() {
-    //   final snackBar = SnackBar(
-    //     content: Consumer<Auth>(
-    //         builder: (_, data, __) => (data.message[0].isEmpty)
-    //             ? CircularProgressIndicator()
-    //             : Text(data.message[0])),
-    //   );
-    //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    // });
     getBAL();
     _getuser();
     _getasset();

@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'dart:convert';
+import 'dart:io';
 import '../model/http_exception.dart';
 import './models.dart';
 import '../model/success.dart';
@@ -10,7 +11,7 @@ class Auth with ChangeNotifier {
   final List<String> token = [];
 
   bool? isAuthenticated;
-  List<String> message = [];
+  List<String> message = [''];
   late dynamic balance;
   // late String errormessage;
   List<TransactionHistory> history = [];
@@ -63,7 +64,7 @@ class Auth with ChangeNotifier {
           throw HttpException(responseData['errors'][i]['msg']);
         }
       }
-      message.insert(0, "Successful Signup");
+      // message.insert(0, "Successful Signup");
       print(responseData);
       token.insert(0, responseData['token']);
       notifyListeners();
@@ -96,7 +97,7 @@ class Auth with ChangeNotifier {
       }
 
       // print(responseData);
-      message.insert(0, 'Successful login');
+      // message.insert(0, 'Successful login');
       token.insert(0, responseData['token']);
       print(token[0]);
       notifyListeners();
@@ -106,8 +107,9 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> reset(String email, String password) async {
-    // message.clear();
-    // print("emailuser :${email}");
+    message.clear();
+    message.insert(0, '');
+
     final url = Uri.parse('http://157.245.57.54:5000/resetPassword');
     try {
       final response = await http.post(
@@ -121,7 +123,7 @@ class Auth with ChangeNotifier {
           throw HttpException(responseData['errors'][i]['msg']);
         }
       }
-      message.insert(0, responseData);
+      message.insert(0, 'Update Successful');
       print(message);
       print(responseData);
       notifyListeners();
@@ -159,6 +161,7 @@ class Auth with ChangeNotifier {
 
   Future<void> buy(double amount, String product) async {
     message.clear();
+    message.insert(0, '');
     final url = Uri.parse('http://157.245.57.54:5000/buy/${product}');
 
     var resBody = amount;
@@ -190,6 +193,7 @@ class Auth with ChangeNotifier {
 
   Future<void> sell(double amount, String product) async {
     message.clear();
+    message.insert(0, '');
     final url = Uri.parse('http://157.245.57.54:5000/sell/${product}');
     var resBody = amount;
     var Body = json.encode({"sell_amount": resBody});
@@ -514,6 +518,8 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> updatephone(num phonenum) async {
+    message.clear();
+    message.insert(0, '');
     // asset.clear();
     final url = Uri.parse('http://157.245.57.54:5000/updateUser');
     // var resBody = amount;
@@ -528,6 +534,7 @@ class Auth with ChangeNotifier {
       body: json.encode({"phone_number": phonenum}),
     );
     // print(phonenum);
+    message.insert(0, "Update Successful");
     final responseData = json.decode(response.body);
     // print(responseData);
     notifyListeners();
