@@ -166,6 +166,13 @@ class _LoginWidgetState extends State<LoginWidget> {
                                       0.75),
                                   height: 40,
                                   child: TextFormField(
+                                    toolbarOptions: ToolbarOptions(
+                                        copy: false,
+                                        paste: false,
+                                        cut: false,
+                                        selectAll: true
+                                        //by default all are disabled 'false'
+                                        ),
                                     keyboardType: TextInputType.emailAddress,
                                     focusNode: _emailfield,
                                     validator: (value) {
@@ -214,6 +221,13 @@ class _LoginWidgetState extends State<LoginWidget> {
                                       0.75),
                                   height: 40,
                                   child: TextFormField(
+                                    toolbarOptions: ToolbarOptions(
+                                        copy: false,
+                                        paste: false,
+                                        cut: false,
+                                        selectAll: true
+                                        //by default all are disabled 'false'
+                                        ),
                                     obscureText: true,
                                     controller: _passwordController,
                                     focusNode: _passwordfield,

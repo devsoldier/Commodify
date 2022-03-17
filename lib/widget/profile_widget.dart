@@ -157,6 +157,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             width: (MediaQuery.of(context).size.width * 0.6),
                             height: 35,
                             child: TextFormField(
+                              toolbarOptions: ToolbarOptions(
+                                  copy: false,
+                                  paste: false,
+                                  cut: false,
+                                  selectAll: true
+                                  //by default all are disabled 'false'
+                                  ),
                               enabled: isEdited,
                               focusNode: _phone,
                               validator: (value) {
@@ -171,7 +178,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               decoration: InputDecoration(
                                 fillColor: Color.fromRGBO(229, 229, 229, 1),
                                 filled: !isEdited,
-                                labelText: (data.user[0].phone_number != 0 &&
+                                labelText: (data.user[0].phone_number != "0" &&
                                         data.user.isEmpty)
                                     ? 'Press edit to add phone number'
                                     : '${data.user[0].phone_number}',
@@ -402,6 +409,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                                     0.6),
                                                 height: 35,
                                                 child: TextFormField(
+                                                  toolbarOptions: ToolbarOptions(
+                                                      copy: false,
+                                                      paste: false,
+                                                      cut: false,
+                                                      selectAll: true
+                                                      //by default all are disabled 'false'
+                                                      ),
                                                   enabled: !isEdited,
                                                   validator: (value) {
                                                     if (value!.isEmpty) {
@@ -462,6 +476,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                                     0.6),
                                                 height: 35,
                                                 child: TextFormField(
+                                                  toolbarOptions: ToolbarOptions(
+                                                      copy: false,
+                                                      paste: false,
+                                                      cut: false,
+                                                      selectAll: true
+                                                      //by default all are disabled 'false'
+                                                      ),
                                                   obscureText: true,
                                                   enabled: isEdited,
                                                   controller:

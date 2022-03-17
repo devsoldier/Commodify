@@ -39,10 +39,9 @@ class _AssetsChartState extends State<AssetsChart> {
                   // Corner style of doughnut segment
                   cornerStyle: CornerStyle.bothFlat,
                   dataLabelSettings: DataLabelSettings(
-                    isVisible: true,
-                    // Positioning the data label
-                    /* labelPosition: ChartDataLabelPosition.outside */
-                  ))
+                      isVisible: true,
+                      // Positioning the data label
+                      labelPosition: ChartDataLabelPosition.outside))
             ],
           ),
         ),

@@ -42,7 +42,7 @@ class Auth with ChangeNotifier {
 
   Future<void> signup(
       String fname, String lname, String email, String password) async {
-    final url = Uri.parse('http://157.245.57.54:5000/user/signup');
+    final url = Uri.parse('https://api.comd5.xyz/user/signup');
     var resBody = {};
     resBody["first_name"] = fname;
     resBody["last_name"] = lname;
@@ -58,8 +58,7 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (responseData == "User already exist!!") {
         throw HttpException(responseData);
-      }
-      if (responseData['errors'] != null) {
+      } else if (responseData['errors'] != null) {
         for (int i = 0; i < responseData["errors"].length; i++) {
           throw HttpException(responseData['errors'][i]['msg']);
         }
@@ -77,7 +76,7 @@ class Auth with ChangeNotifier {
 
   Future<void> login(String email, String password) async {
     // token.clear();
-    // final url = Uri.parse('http://157.245.57.54:5000/user/login');
+    // final url = Uri.parse('https://api.comd5.xyz/user/login');
     final url = Uri.parse('https://api.comd5.xyz/user/login');
     var resBody = {};
     resBody["email"] = email;
@@ -110,7 +109,7 @@ class Auth with ChangeNotifier {
     message.clear();
     message.insert(0, '');
 
-    final url = Uri.parse('http://157.245.57.54:5000/resetPassword');
+    final url = Uri.parse('https://api.comd5.xyz/resetPassword');
     try {
       final response = await http.post(
         url,
@@ -133,7 +132,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> isAuth() async {
-    final url = Uri.parse('http://157.245.57.54:5000/user/verify');
+    final url = Uri.parse('https://api.comd5.xyz/user/verify');
     final response = await http.get(
       url,
       headers: {
@@ -147,7 +146,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> istopup() async {
-    final url = Uri.parse('http://157.245.57.54:5000/topup');
+    final url = Uri.parse('https://api.comd5.xyz/topup');
     final response = await http.put(
       url,
       headers: {
@@ -162,7 +161,7 @@ class Auth with ChangeNotifier {
   Future<void> buy(double amount, String product) async {
     message.clear();
     message.insert(0, '');
-    final url = Uri.parse('http://157.245.57.54:5000/buy/${product}');
+    final url = Uri.parse('https://api.comd5.xyz/buy/${product}');
 
     var resBody = amount;
     var Body = json.encode({"buy_amount": resBody});
@@ -194,7 +193,7 @@ class Auth with ChangeNotifier {
   Future<void> sell(double amount, String product) async {
     message.clear();
     message.insert(0, '');
-    final url = Uri.parse('http://157.245.57.54:5000/sell/${product}');
+    final url = Uri.parse('https://api.comd5.xyz/sell/${product}');
     var resBody = amount;
     var Body = json.encode({"sell_amount": resBody});
     try {
@@ -227,7 +226,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> iswithdraw(double amount) async {
-    final url = Uri.parse('http://157.245.57.54:5000/withdraw');
+    final url = Uri.parse('https://api.comd5.xyz/withdraw');
     var resBody = amount;
     var Body = json.encode({"withdraw_amount": resBody});
     final response = await http.put(
@@ -244,7 +243,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> getbalance() async {
-    final url = Uri.parse('http://157.245.57.54:5000/display/balance');
+    final url = Uri.parse('https://api.comd5.xyz/display/balance');
 
     final response = await http.get(
       url,
@@ -263,7 +262,7 @@ class Auth with ChangeNotifier {
     // user.clear();
     // emailuser.clear();
     // phonenumber.clear();
-    final url = Uri.parse('http://157.245.57.54:5000/display/user');
+    final url = Uri.parse('https://api.comd5.xyz/display/user');
     // var resBody = amount;
     // var Body = json.encode({"withdraw_amount": resBody});
     final response = await http.get(
@@ -278,9 +277,8 @@ class Auth with ChangeNotifier {
     for (int i = 0; i < responseData.length; i++) {
       if (responseData[i]["phone_number"] != null) {
         phonenumber.insert(0, responseData[i]["phone_number"]);
-      }
-      if (responseData[i]["phone_number"] == null) {
-        phonenumber.insert(0, 0);
+      } else if (responseData[i]["phone_number"] == null) {
+        phonenumber.insert(0, "0");
       }
       user.insert(
         0,
@@ -313,7 +311,7 @@ class Auth with ChangeNotifier {
     assetamount.clear();
     pieasset.clear();
 
-    final url = Uri.parse('http://157.245.57.54:5000/display/asset');
+    final url = Uri.parse('https://api.comd5.xyz/display/asset');
     // var resBody = amount;
     // var Body = json.encode({"withdraw_amount": resBody});
     final response = await http.get(
@@ -370,7 +368,7 @@ class Auth with ChangeNotifier {
   Future<void> gethistory(String filteroption, String sortoption) async {
     history.clear();
     historyfiltered.clear();
-    final url = Uri.parse('http://157.245.57.54:5000/display/transaction');
+    final url = Uri.parse('https://api.comd5.xyz/display/transaction');
 
     final response = await http.get(
       url,
@@ -442,7 +440,7 @@ class Auth with ChangeNotifier {
 
   Future<void> getpaymenthistory(String filteroption, String sortoption) async {
     phistory.clear();
-    final url = Uri.parse('http://157.245.57.54:5000/display/payment');
+    final url = Uri.parse('https://api.comd5.xyz/display/payment');
 
     final response = await http.get(
       url,
@@ -521,7 +519,7 @@ class Auth with ChangeNotifier {
     message.clear();
     message.insert(0, '');
     // asset.clear();
-    final url = Uri.parse('http://157.245.57.54:5000/updateUser');
+    final url = Uri.parse('https://api.comd5.xyz/updateUser');
     // var resBody = amount;
     // var Body = json.encode({"withdraw_amount": resBody});
 

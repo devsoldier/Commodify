@@ -126,8 +126,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     return Provider.of<Auth>(context, listen: false).isAuth();
   }
 
-  Future<void> runBoth() async {
-    _submit().then((_) => _verify());
+  Future<void> runBoth() {
+    return _submit().then((_) => _verify());
   }
 
   // String? validatePassword(String value) {
@@ -256,6 +256,13 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       0.350),
                                   height: 35,
                                   child: TextFormField(
+                                    toolbarOptions: ToolbarOptions(
+                                        copy: false,
+                                        paste: false,
+                                        cut: false,
+                                        selectAll: true
+                                        //by default all are disabled 'false'
+                                        ),
                                     focusNode: _fname,
                                     validator: (value) {
                                       if (value!.isEmpty) {
@@ -301,6 +308,13 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       0.35),
                                   height: 35,
                                   child: TextFormField(
+                                    toolbarOptions: ToolbarOptions(
+                                        copy: false,
+                                        paste: false,
+                                        cut: false,
+                                        selectAll: true
+                                        //by default all are disabled 'false'
+                                        ),
                                     focusNode: _lname,
                                     validator: (value) {
                                       if (value!.isEmpty) {
@@ -346,6 +360,13 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       0.75),
                                   height: 35,
                                   child: TextFormField(
+                                    toolbarOptions: ToolbarOptions(
+                                        copy: false,
+                                        paste: false,
+                                        cut: false,
+                                        selectAll: true
+                                        //by default all are disabled 'false'
+                                        ),
                                     keyboardType: TextInputType.emailAddress,
                                     focusNode: _emailfield,
                                     validator: (value) {
@@ -391,6 +412,13 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       0.75),
                                   height: 35,
                                   child: TextFormField(
+                                    toolbarOptions: ToolbarOptions(
+                                        copy: false,
+                                        paste: false,
+                                        cut: false,
+                                        selectAll: true
+                                        //by default all are disabled 'false'
+                                        ),
                                     obscureText: true,
                                     controller: _passwordController,
                                     focusNode: _passwordfield,
@@ -453,6 +481,13 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       0.75),
                                   height: 35,
                                   child: TextFormField(
+                                    toolbarOptions: ToolbarOptions(
+                                        copy: false,
+                                        paste: false,
+                                        cut: false,
+                                        selectAll: true
+                                        //by default all are disabled 'false'
+                                        ),
                                     obscureText: true,
                                     controller: _confirmpasswordController,
                                     focusNode: _confirmpasswordfield,
@@ -545,7 +580,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       ? Navigator.of(context)
                                           .pushReplacementNamed(
                                               NavBar.routeName)
-                                      : null;
+                                      : _showErrorDialog('not authenticated');
                                 },
                                 child: Container(
                                   child: Image.asset(
