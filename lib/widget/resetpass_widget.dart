@@ -91,6 +91,7 @@ class _ResetPassWidgetState extends State<ResetPassWidget> {
                                       0.75),
                                   height: 40,
                                   child: TextFormField(
+                                    enabled: false,
                                     keyboardType: TextInputType.emailAddress,
                                     focusNode: _emailfield,
                                     validator: (value) {
@@ -139,6 +140,7 @@ class _ResetPassWidgetState extends State<ResetPassWidget> {
                                   height: 40,
                                   child: TextFormField(
                                     obscureText: true,
+                                    enabled: false,
                                     controller: _passwordController,
                                     focusNode: _passwordfield,
                                     validator: /* ((value) =>
@@ -185,6 +187,7 @@ class _ResetPassWidgetState extends State<ResetPassWidget> {
                                       0.75),
                                   height: 40,
                                   child: TextFormField(
+                                    enabled: false,
                                     obscureText: true,
                                     controller: _confirmpasswordController,
                                     focusNode: _confirmpasswordfield,
