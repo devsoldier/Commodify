@@ -130,18 +130,18 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     _submit().then((_) => _verify());
   }
 
-  String? validatePassword(String value) {
-    RegExp regex =
-        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-    if (value.isEmpty) {
-      return 'Please enter password';
-    }
-    if (!regex.hasMatch(value)) {
-      return 'Enter valid password';
-    } else {
-      return null;
-    }
-  }
+  // String? validatePassword(String value) {
+  //   RegExp regex =
+  //       RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
+  //   if (value.isEmpty) {
+  //     return 'Please enter password';
+  //   }
+  //   if (!regex.hasMatch(value)) {
+  //     return 'Enter valid password';
+  //   } else {
+  //     return null;
+  //   }
+  // }
 
   String? get _errorTextpassword {
     final text = _passwordController.value.text;
@@ -426,9 +426,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                         ),
                                       ),
                                     ),
-                                    onSaved: (_) {
-                                      FocusScope.of(context)
-                                          .requestFocus(_confirmpasswordfield);
+                                    onChanged: (value) {
+                                      setState(() {});
                                     },
                                   ),
                                 ),
