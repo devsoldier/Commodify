@@ -234,6 +234,7 @@ class _WalletWidgetState extends State<WalletWidget> {
                           onChanged: (value) {
                             setState(() {
                               card = value;
+                              online = false;
                             });
                           },
                         ),
@@ -270,6 +271,7 @@ class _WalletWidgetState extends State<WalletWidget> {
                           onChanged: (value) {
                             setState(() {
                               online = value;
+                              card = false;
                             });
                           },
                         ),
@@ -318,26 +320,15 @@ class _WalletWidgetState extends State<WalletWidget> {
                         alignment: Alignment.centerLeft,
                         width: (MediaQuery.of(context).size.width * 0.75),
                         height: 40,
-                        child: TextFormField(
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(16)
-                          ],
-                          keyboardType: TextInputType.number,
-                          focusNode: _cardnumber,
-                          validator: (value) {
-                            if (value!.isEmpty || value.length < 16) {
-                              return 'enter valid number!';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5.0),
-                              ),
-                            ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: Text('XXXXXX-XXXXXX-XXXXXX'),
+                            color: Color.fromRGBO(229, 229, 229, 1),
+                            width: MediaQuery.of(context).size.width * 0.6,
+                            height: 35,
                           ),
-                          onSaved: (value) {},
                         ),
                       ),
                     ],
@@ -387,54 +378,30 @@ class _WalletWidgetState extends State<WalletWidget> {
                         Container(
                           width: (MediaQuery.of(context).size.width * 0.11),
                           height: 40,
-                          child: TextFormField(
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(2)
-                            ],
-                            keyboardType: TextInputType.number,
-                            controller: _monthController,
-                            focusNode: _month,
-                            validator: (value) {
-                              if (value!.isEmpty || int.parse(value) > 13) {
-                                return 'enter correct value';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(5.0),
-                                ),
-                              ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Text('4'),
+                              color: Color.fromRGBO(229, 229, 229, 1),
+                              width: MediaQuery.of(context).size.width * 0.6,
+                              height: 35,
                             ),
-                            onSaved: (value) {},
                           ),
                         ),
                         //year
                         Container(
                           width: (MediaQuery.of(context).size.width * 0.20),
                           height: 40,
-                          child: TextFormField(
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(4)
-                            ],
-                            keyboardType: TextInputType.number,
-                            controller: _yearController,
-                            focusNode: _year,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'enter valid year!';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(5.0),
-                                ),
-                              ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Text('2022'),
+                              color: Color.fromRGBO(229, 229, 229, 1),
+                              width: MediaQuery.of(context).size.width * 0.6,
+                              height: 35,
                             ),
-                            onSaved: (value) {},
                           ),
                         ),
                         SizedBox(width: 55),
@@ -442,27 +409,15 @@ class _WalletWidgetState extends State<WalletWidget> {
                         Container(
                           width: (MediaQuery.of(context).size.width * 0.20),
                           height: 40,
-                          child: TextFormField(
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(3)
-                            ],
-                            keyboardType: TextInputType.number,
-                            controller: _ccvController,
-                            focusNode: _ccv,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'enter valid number!';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(5.0),
-                                ),
-                              ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Text('XXX'),
+                              color: Color.fromRGBO(229, 229, 229, 1),
+                              width: MediaQuery.of(context).size.width * 0.6,
+                              height: 35,
                             ),
-                            onSaved: (value) {},
                           ),
                         ),
                       ],
@@ -476,11 +431,8 @@ class _WalletWidgetState extends State<WalletWidget> {
               child: Column(
                 children: <Widget>[
                   SizedBox(height: 19),
-                  GestureDetector(
-                    onTap: _submit,
-                    child: Image.asset(
-                      'assets/navbar/save button.png',
-                    ),
+                  Image.asset(
+                    'assets/navbar/save button.png',
                   ),
                   // Text('Save'),
                 ],

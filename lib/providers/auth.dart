@@ -1,11 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
-import 'package:jwt_decode/jwt_decode.dart';
+// import 'package:jwt_decode/jwt_decode.dart';
 import 'dart:convert';
-import 'dart:io';
 import '../model/http_exception.dart';
 import './models.dart';
-import '../model/success.dart';
 
 class Auth with ChangeNotifier {
   final List<String> token = [];
@@ -298,7 +296,7 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  List assetdata = [];
+  // List assetdata = [];
   List<dynamic> assettype = [];
   List assetamount = [];
   List<dynamic> assetcolor = [];
@@ -306,14 +304,24 @@ class Auth with ChangeNotifier {
 
   Future<void> getasset() async {
     // asset.clear();
-    assetamount.clear();
+    // assetdata.clear();
     assetcolor.clear();
     assetamount.clear();
+
     pieasset.clear();
+    // assetamount.insert(0, [0, 0, 0, 0]);
 
     final url = Uri.parse('https://api.comd5.xyz/display/asset');
     // var resBody = amount;
     // var Body = json.encode({"withdraw_amount": resBody});
+    assettype.insertAll(0, ["Gold", "Platinum", "Silver", "Palladium"]);
+    assetcolor.insertAll(0, [
+      Color.fromRGBO(255, 197, 51, 1),
+      Color.fromRGBO(2, 211, 204, 1),
+      Color.fromRGBO(188, 149, 223, 1),
+      Color.fromRGBO(242, 114, 111, 1)
+    ]);
+
     final response = await http.get(
       url,
       headers: {
@@ -325,20 +333,7 @@ class Auth with ChangeNotifier {
 
     // print('gold amount: ${responseData[0]["gold_amount"]}');
     // print(responseData);
-    assettype.insertAll(0, ["Gold", "Platinum", "Silver", "Palladium"]);
-    assetcolor.insertAll(0, [
-      Color.fromRGBO(255, 197, 51, 1),
-      Color.fromRGBO(2, 211, 204, 1),
-      Color.fromRGBO(188, 149, 223, 1),
-      // Color.fromRGBO(100, 236, 255, 1),
-      Color.fromRGBO(242, 114, 111, 1)
-    ]);
-    assetdata.insertAll(0, [
-      responseData[0]["gold_amount"],
-      responseData[0]["platinum_amount"],
-      responseData[0]["silver_amount"],
-      responseData[0]["palladium_amount"],
-    ]);
+
     for (int i = 0; i < responseData.length; i++) {
       asset.insert(
         0,
@@ -351,17 +346,24 @@ class Auth with ChangeNotifier {
         ),
       );
     }
-    // assetamount.insertAll(0, assetdata);
-    // pieasset.add(AssetData(x: assettype, y: assetdata, color: assetcolor[0]));
+    assetamount.insertAll(0, [
+      responseData[0]["gold_amount"],
+      responseData[0]["platinum_amount"],
+      responseData[0]["silver_amount"],
+      responseData[0]["palladium_amount"],
+    ]);
+
     for (int i = 0; i < assettype.length; i++) {
-      pieasset.add(
-          AssetData(x: assettype[i], y: assetdata[i], color: assetcolor[i]));
+      pieasset.insert(0,
+          AssetData(x: assettype[i], y: assetamount[i], color: assetcolor[i]));
     }
-    // print('CHARTDATA :${pieasset}');
-    // print("ASSET TYPE:${assettype}");
-    // print(assetamount);
-    print(asset);
-    print('ASSET:${responseData}');
+
+    print('PIE ASSET: ${pieasset.length}');
+    print('ASSET AMOUNT: ${assetamount.length}');
+    // print('PIE ASSET: ${pieasset[0].y}');
+    // print('PIE ASSET: ${pieasset[1].y}');
+    print('ASSET:${asset}');
+
     notifyListeners();
   }
 
@@ -369,7 +371,6 @@ class Auth with ChangeNotifier {
     history.clear();
     historyfiltered.clear();
     final url = Uri.parse('https://api.comd5.xyz/display/transaction');
-
     final response = await http.get(
       url,
       headers: {

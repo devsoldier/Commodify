@@ -61,7 +61,18 @@ class _DashboardWidgetState extends State<DashboardWidget> {
       scrollDirection: Axis.vertical,
       child: Stack(
         children: [
-          Container(height: MediaQuery.of(context).size.height * 1.415),
+          Container(
+              height: /* (data.pieasset.isEmpty)
+                  ? MediaQuery.of(context).size.height * 1.02
+                  : */
+                  (data.assetamount.isEmpty)
+                      ? MediaQuery.of(context).size.height * 1.02
+                      : (data.pieasset[0].y == 0 &&
+                              data.pieasset[1].y == 0 &&
+                              data.pieasset[2].y == 0 &&
+                              data.pieasset[3].y == 0)
+                          ? MediaQuery.of(context).size.height * 1.02
+                          : MediaQuery.of(context).size.height * 1.415),
           Positioned(
             top: 0,
             left: 7,
@@ -156,31 +167,24 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 alignment: Alignment.centerLeft,
                 color: Colors.white,
                 width: MediaQuery.of(context).size.width * 0.95,
-                height: MediaQuery.of(context).size.height * 1.23,
+                height: /*  (data.pieasset.isEmpty)
+                    ? MediaQuery.of(context).size.height * 0.83
+                    :  */
+                    (data.assetamount.isEmpty)
+                        ? MediaQuery.of(context).size.height * 0.83
+                        : (data.pieasset[0].y == 0 &&
+                                data.pieasset[1].y == 0 &&
+                                data.pieasset[2].y == 0 &&
+                                data.pieasset[3].y == 0)
+                            ? MediaQuery.of(context).size.height * 0.83
+                            : MediaQuery.of(context).size.height * 1.23,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                            alignment: Alignment.center,
-                            width: MediaQuery.of(context).size.width * 0.88,
-                            height: MediaQuery.of(context).size.height * 0.6,
-                            // color: Colors.grey,
-                            decoration: BoxDecoration(
-                              color: Color.fromRGBO(249, 247, 247, 1),
-                              // color: Colors.black,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: AssetsChart()),
+                        AssetsChart(),
                       ],
                     ),
                     Graph(),

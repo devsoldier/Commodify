@@ -58,67 +58,6 @@ class _GraphState extends State<Graph> {
     if (mounted) setState(f);
   }
 
-  // secTimer() {
-  //   if (_selectedInterval == '1 minute') {
-  //     print(_selectedInterval);
-  //     setState(() {
-  //       Timer.periodic(Duration(minutes: 1), (timer) {
-  //         if (_selectedInterval != '1 minute') {
-  //           timer.cancel();
-  //         }
-  //         setStateIfMounted(() {
-  //           getTickStream();
-  //         });
-  //       });
-  //     });
-  //   } else if (_selectedInterval == '2 minutes') {
-  //     print(_selectedInterval);
-  //     setState(() {
-  //       Timer.periodic(Duration(minutes: 2), (timer) {
-  //         if (_selectedInterval != '2 minutes') {
-  //           timer.cancel();
-  //         }
-  //         setStateIfMounted(() {
-  //           getTickStream();
-  //         });
-  //       });
-  //     });
-  //   } else if (_selectedInterval == '3 minutes') {
-  //     setState(() {
-  //       Timer.periodic(Duration(minutes: 3), (timer) {
-  //         if (_selectedInterval != '3 minutes') {
-  //           timer.cancel();
-  //         }
-  //         setStateIfMounted(() {
-  //           getTickStream();
-  //         });
-  //       });
-  //     });
-  //   } else if (_selectedInterval == '4 minute') {
-  //     setState(() {
-  //       Timer.periodic(Duration(minutes: 4), (timer) {
-  //         if (_selectedInterval != '4 minute') {
-  //           timer.cancel();
-  //         }
-  //         setStateIfMounted(() {
-  //           getTickStream();
-  //         });
-  //       });
-  //     });
-  //   } else if (_selectedInterval == '5 minute') {
-  //     setState(() {
-  //       Timer.periodic(Duration(minutes: 5), (timer) {
-  //         if (_selectedInterval != '5 minute') {
-  //           timer.cancel();
-  //         }
-  //         setStateIfMounted(() {
-  //           getTickStream();
-  //         });
-  //       });
-  //     });
-  //   }
-  // }
-
   void getTickOnce() {
     channel.sink.add(
         '{  "ticks_history": "${commodity}",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
@@ -164,7 +103,6 @@ class _GraphState extends State<Graph> {
             ),
           );
         }
-        // print(_chartData);
       });
     });
   }
@@ -172,9 +110,6 @@ class _GraphState extends State<Graph> {
   void handShake() {
     channel2.stream.listen((data) {
       final extractedData = jsonDecode(data);
-      // print('SUBSCRIBE DATA :${extractedData}');
-      print('---------------------------------------');
-      // print(extractedData['ohlc']['open_time']);
       setState(() {
         timeConverted.insert(
             0,
@@ -191,22 +126,6 @@ class _GraphState extends State<Graph> {
           open: num.parse(extractedData['ohlc']['open']),
         ));
       });
-
-      // if(extractedData[extractedData['ohlc'].length-1])
-      // print('CLOSE ${extractedData['ohlc']['close']}');
-      // print(
-      //     'EPOCH ${DateTime.fromMillisecondsSinceEpoch(extractedData['ohlc']['open_time'] * 1000)}');
-      // print('HIGH ${extractedData['ohlc']['high']}');
-      // print('LOW ${extractedData['ohlc']['low']}');
-      // print('OPEN ${extractedData['ohlc']['open']}');
-      // print(_chartData.length);
-      // print(extractedData.length);
-      // print(extractedData['ohlc']['open_time'].length);
-      // print(timeConverted.length);
-      // print('CHARTDATA:${_chartData}');
-      // print(timeConverted);
-      // print('time 1: ${timeConverted[0]}');
-      // print('time 2: ${timeConverted[1]}');
     });
   }
 
@@ -281,7 +200,6 @@ class _GraphState extends State<Graph> {
 
   @override
   void initState() {
-    // secTimer();
     getTickOnce();
     getTickStream();
     tickStreamPLAT();
@@ -319,6 +237,7 @@ class _GraphState extends State<Graph> {
               // left: 13,
               children: [
                 Container(
+                  alignment: Alignment.center,
                   width: MediaQuery.of(context).size.width * 0.88,
                   height: MediaQuery.of(context).size.height * 0.42,
                   // color: Colors.grey,
@@ -335,7 +254,7 @@ class _GraphState extends State<Graph> {
                     ],
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -446,6 +365,7 @@ class _GraphState extends State<Graph> {
                                           majorGridLines:
                                               MajorGridLines(width: 0)),
                                       primaryYAxis: NumericAxis(
+                                          opposedPosition: true,
                                           // minimum: 150,
                                           // maximum: 300,
                                           // interval: 10,
@@ -520,6 +440,7 @@ class _GraphState extends State<Graph> {
                                   isactivePlat = false;
                                   isactiveSilver = false;
                                   _chartData.clear();
+                                  timeConverted.clear();
                                 });
                               },
                               child: Container(
@@ -624,13 +545,14 @@ class _GraphState extends State<Graph> {
                               onTap: () {
                                 setState(() {
                                   commodity = 'frxXPDUSD';
+                                  _chartData.clear();
+                                  timeConverted.clear();
                                   getTickOnce();
                                   getTickStream();
                                   isactiveGold = false;
                                   isactivePalla = true;
                                   isactivePlat = false;
                                   isactiveSilver = false;
-                                  _chartData.clear();
                                 });
                               },
                               child: Container(
@@ -742,13 +664,14 @@ class _GraphState extends State<Graph> {
                               onTap: () {
                                 setState(() {
                                   commodity = 'frxXPTUSD';
+                                  _chartData.clear();
+                                  timeConverted.clear();
                                   getTickOnce();
                                   getTickStream();
                                   isactiveGold = false;
                                   isactivePalla = false;
                                   isactivePlat = true;
                                   isactiveSilver = false;
-                                  _chartData.clear();
                                 });
                               },
                               child: Container(
@@ -860,13 +783,14 @@ class _GraphState extends State<Graph> {
                               onTap: () {
                                 setState(() {
                                   commodity = 'frxXAGUSD';
+                                  _chartData.clear();
+                                  timeConverted.clear();
                                   getTickOnce();
                                   getTickStream();
                                   isactiveGold = false;
                                   isactivePalla = false;
                                   isactivePlat = false;
                                   isactiveSilver = true;
-                                  _chartData.clear();
                                 });
                               },
                               child: Container(
@@ -988,12 +912,6 @@ class _GraphState extends State<Graph> {
             ),
           ],
         ),
-        // Center(
-        //   child: Align(
-        //     alignment: Alignment.bottomCenter,
-        //     child:
-        //   ),
-        // ),
       ],
     );
   }

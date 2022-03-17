@@ -88,6 +88,10 @@ class _LoginWidgetState extends State<LoginWidget> {
     return Provider.of<Auth>(context, listen: false).isAuth();
   }
 
+  Future<void> _getasset() {
+    return Provider.of<Auth>(context, listen: false).getasset();
+  }
+
   Future<void> runBoth() {
     return _submit().then((_) => _verify());
   }
@@ -287,6 +291,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                         GestureDetector(
                           onTap: () async {
                             await runBoth();
+                            // await _getasset();
                             (auth.isAuthenticated == true)
                                 ? Navigator.of(context)
                                     .pushReplacementNamed(NavBar.routeName)

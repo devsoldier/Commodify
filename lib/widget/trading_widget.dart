@@ -224,6 +224,7 @@ class _TradingWidgetState extends State<TradingWidget> {
               // _getasset().then((_) => setState(() {}));
 
               Navigator.of(ctx).pop();
+              setState(() {});
             },
           )
         ],
@@ -246,6 +247,7 @@ class _TradingWidgetState extends State<TradingWidget> {
               // _getasset().then((_) => setState(() {}));
 
               Navigator.of(ctx).pop();
+              setState(() {});
             },
           )
         ],
@@ -345,14 +347,15 @@ class _TradingWidgetState extends State<TradingWidget> {
   void initState() {
     // secTimer();
     // getbalance();
+    repeatAction();
     _getasset();
-    getprice();
-    getTickOnce();
-    getTickStream();
-    tickStreamPLAT();
-    tickStreamPALLA();
-    tickStreamGOLD();
-    tickStreamSILVER();
+    // getprice();
+    // getTickOnce();
+    // getTickStream();
+    // tickStreamPLAT();
+    // tickStreamPALLA();
+    // tickStreamGOLD();
+    // tickStreamSILVER();
     handShake();
     initialValue();
     _zoomPanBehavior = ZoomPanBehavior(
@@ -496,6 +499,7 @@ class _TradingWidgetState extends State<TradingWidget> {
                       dateFormat: DateFormat('hh:mm:ss'),
                       majorGridLines: MajorGridLines(width: 0)),
                   primaryYAxis: NumericAxis(
+                      opposedPosition: true,
                       // minimum: 150,
                       // maximum: 300,
                       // interval: 10,
@@ -664,42 +668,48 @@ class _TradingWidgetState extends State<TradingWidget> {
                                 isExpanded: true,
                                 value: _selectedCommodity,
                                 onChanged: (newval) {
-                                  setState(() {
-                                    _selectedCommodity = newval as String;
-                                    if (newval == 'Gold/USD') {
+                                  _selectedCommodity = newval as String;
+                                  if (newval == 'Gold/USD') {
+                                    setState(() {
                                       commodity = 'frxXAUUSD';
                                       tickStreamGOLD();
                                       getTickOnce();
                                       getTickStream();
                                       _getasset();
                                       _chartData.clear();
-                                    }
-                                    if (newval == 'Palladium/USD') {
+                                    });
+                                  }
+                                  if (newval == 'Palladium/USD') {
+                                    setState(() {
                                       commodity = 'frxXAUUSD';
                                       tickStreamGOLD();
                                       getTickOnce();
                                       getTickStream();
                                       _getasset();
                                       _chartData.clear();
-                                    }
-                                    if (newval == 'Platinum/USD') {
+                                    });
+                                  }
+                                  if (newval == 'Platinum/USD') {
+                                    setState(() {
                                       commodity = 'frxXAUUSD';
                                       tickStreamGOLD();
                                       getTickOnce();
                                       getTickStream();
                                       _getasset();
                                       _chartData.clear();
-                                    }
-                                    if (newval == 'Silver/USD') {
+                                    });
+                                  }
+                                  if (newval == 'Silver/USD') {
+                                    setState(() {
                                       commodity = 'frxXAUUSD';
                                       tickStreamGOLD();
                                       getTickOnce();
                                       getTickStream();
                                       _getasset();
                                       _chartData.clear();
-                                    }
-                                    // secTimer();
-                                  });
+                                    });
+                                  }
+                                  // secTimer();
                                 },
                                 // elevation: 16,
                                 items: commodities.map((newval) {
@@ -1049,46 +1059,38 @@ class _TradingWidgetState extends State<TradingWidget> {
                                       children: <Widget>[
                                         GestureDetector(
                                           onTap: () async {
-                                            /* (balancedata.message.isNotEmpty)
-                                                ? _showsuccessDialog()
-                                                :  */
                                             setState(() {
                                               if (_selectedCommodity ==
-                                                      'Gold/USD' ||
-                                                  balancedata
-                                                      .message.isNotEmpty) {
-                                                _selectedproduct = 'Xau';
-                                                runbothpurchase();
-
-                                                // _showbuysuccessDialog();
-                                                _getasset();
-                                              } else if (_selectedCommodity ==
-                                                      'Palladium/USD' ||
-                                                  balancedata
-                                                      .message.isNotEmpty) {
-                                                _selectedproduct = 'Xpd';
-                                                runbothpurchase();
-                                                // showsnackbar();
-                                                // _showbuysuccessDialog();
-                                                _getasset();
-                                              } else if (_selectedCommodity ==
-                                                      'Platinum/USD' ||
-                                                  balancedata
-                                                      .message.isNotEmpty) {
-                                                _selectedproduct = 'Xpt';
-                                                runbothpurchase();
-                                                // showsnackbar();
-                                                // _showbuysuccessDialog();
-                                                _getasset();
-                                              } else if (_selectedCommodity ==
-                                                      'Silver/USD' ||
-                                                  balancedata
-                                                      .message.isNotEmpty) {
-                                                _selectedproduct = 'Xag';
-                                                runbothpurchase();
-                                                // showsnackbar();
-                                                // _showbuysuccessDialog();
-                                                _getasset();
+                                                  'Gold/USD') {
+                                                setState(() {
+                                                  _selectedproduct = 'Xau';
+                                                  runbothpurchase();
+                                                  _getasset();
+                                                });
+                                              }
+                                              if (_selectedCommodity ==
+                                                  'Palladium/USD') {
+                                                setState(() {
+                                                  _selectedproduct = 'Xpd';
+                                                  runbothpurchase();
+                                                  _getasset();
+                                                });
+                                              }
+                                              if (_selectedCommodity ==
+                                                  'Platinum/USD') {
+                                                setState(() {
+                                                  _selectedproduct = 'Xpt';
+                                                  runbothpurchase();
+                                                  _getasset();
+                                                });
+                                              }
+                                              if (_selectedCommodity ==
+                                                  'Silver/USD') {
+                                                setState(() {
+                                                  _selectedproduct = 'Xag';
+                                                  runbothpurchase();
+                                                  _getasset();
+                                                });
                                               }
                                             });
                                             await showsnackbar()
@@ -1101,41 +1103,38 @@ class _TradingWidgetState extends State<TradingWidget> {
                                         SizedBox(width: 25),
                                         GestureDetector(
                                           onTap: () async {
-                                            setState(() {
-                                              if (_selectedCommodity ==
-                                                      'Gold/USD' ||
-                                                  balancedata
-                                                      .message.isNotEmpty) {
+                                            if (_selectedCommodity ==
+                                                'Gold/USD') {
+                                              setState(() {
                                                 _selectedproduct = 'Xau';
                                                 runbothsell();
-                                                // _showsellsuccessDialog();
                                                 _getasset();
-                                              } else if (_selectedCommodity ==
-                                                      'Palladium/USD' ||
-                                                  balancedata
-                                                      .message.isNotEmpty) {
+                                              });
+                                            }
+                                            if (_selectedCommodity ==
+                                                'Palladium/USD') {
+                                              setState(() {
                                                 _selectedproduct = 'Xpd';
                                                 runbothsell();
-                                                // _showsellsuccessDialog();
                                                 _getasset();
-                                              } else if (_selectedCommodity ==
-                                                      'Platinum/USD' ||
-                                                  balancedata
-                                                      .message.isNotEmpty) {
+                                              });
+                                            }
+                                            if (_selectedCommodity ==
+                                                'Platinum/USD') {
+                                              setState(() {
                                                 _selectedproduct = 'Xpt';
                                                 runbothsell();
-                                                // _showsellsuccessDialog();
                                                 _getasset();
-                                              } else if (_selectedCommodity ==
-                                                      'Silver/USD' ||
-                                                  balancedata
-                                                      .message.isNotEmpty) {
+                                              });
+                                            }
+                                            if (_selectedCommodity ==
+                                                'Silver/USD') {
+                                              setState(() {
                                                 _selectedproduct = 'Xag';
                                                 runbothsell();
-                                                // _showsellsuccessDialog();
                                                 _getasset();
-                                              }
-                                            });
+                                              });
+                                            }
                                             await showsnackbar()
                                                 .then((_) => setState(() {}));
                                           },

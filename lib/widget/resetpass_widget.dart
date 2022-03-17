@@ -102,6 +102,9 @@ class _ResetPassWidgetState extends State<ResetPassWidget> {
                                       return null;
                                     },
                                     decoration: InputDecoration(
+                                      fillColor:
+                                          Color.fromRGBO(229, 229, 229, 1),
+                                      filled: true,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                           Radius.circular(5.0),
@@ -151,6 +154,9 @@ class _ResetPassWidgetState extends State<ResetPassWidget> {
                                       }
                                     },
                                     decoration: InputDecoration(
+                                      fillColor:
+                                          Color.fromRGBO(229, 229, 229, 1),
+                                      filled: true,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                           Radius.circular(5.0),
@@ -198,6 +204,9 @@ class _ResetPassWidgetState extends State<ResetPassWidget> {
                                       return null;
                                     },
                                     decoration: InputDecoration(
+                                      fillColor:
+                                          Color.fromRGBO(229, 229, 229, 1),
+                                      filled: true,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                           Radius.circular(5.0),
