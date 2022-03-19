@@ -259,15 +259,42 @@ class _TradingWidgetState extends State<TradingWidget> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('An Error Occurred!'),
+        title: Text(
+          'An Error Occurred!',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: Text(message),
         actions: <Widget>[
-          ElevatedButton(
-            child: Text('Okay'),
-            onPressed: () {
-              Navigator.of(ctx).pop();
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                Navigator.pop(context);
+              });
             },
-          )
+            child: Container(
+              height: 30,
+              width: 90,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('Close',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment(0.8, 0.0),
+                      colors: <Color>[
+                        Color.fromRGBO(0, 178, 255, 1),
+                        Color.fromRGBO(25, 72, 134, 1),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -340,7 +367,9 @@ class _TradingWidgetState extends State<TradingWidget> {
                   ? Text(data.message[0])
                   : Text('')),
     );
+
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    setState(() {});
   }
 
   @override
@@ -349,13 +378,13 @@ class _TradingWidgetState extends State<TradingWidget> {
     // getbalance();
     repeatAction();
     _getasset();
-    // getprice();
-    // getTickOnce();
-    // getTickStream();
-    // tickStreamPLAT();
-    // tickStreamPALLA();
-    // tickStreamGOLD();
-    // tickStreamSILVER();
+    getprice();
+    getTickOnce();
+    getTickStream();
+    tickStreamPLAT();
+    tickStreamPALLA();
+    tickStreamGOLD();
+    tickStreamSILVER();
     handShake();
     initialValue();
     _zoomPanBehavior = ZoomPanBehavior(

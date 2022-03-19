@@ -20,8 +20,11 @@ class _GraphState extends State<Graph> {
   bool isactivePalla = false;
   bool isactivePlat = false;
   bool isactiveSilver = false;
-  final List<Commodity> _chartData = [];
-  final List<dynamic> timeConverted = [];
+  final List<Commodity> _chartDatagold = [];
+  final List<Commodity> _chartDatasilver = [];
+  final List<Commodity> _chartDatapalladium = [];
+  final List<Commodity> _chartDataplatinum = [];
+
   late TrackballBehavior _trackballBehavior;
   late ZoomPanBehavior _zoomPanBehavior;
   String _selectedInterval = '1 minute';
@@ -33,8 +36,8 @@ class _GraphState extends State<Graph> {
     '5 minutes'
   ];
 
+  ChartSeriesController? _chartSeriesController;
   String interval = '60';
-
   String commodity = 'frxXAUUSD';
 
   List<dynamic> loadedPLAT = [];
@@ -60,12 +63,26 @@ class _GraphState extends State<Graph> {
 
   void getTickOnce() {
     channel.sink.add(
-        '{  "ticks_history": "${commodity}",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+        '{  "ticks_history": "frxXAUUSD",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+    channel.sink.add(
+        '{  "ticks_history": "frxXAGUSD",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+    channel.sink.add(
+        '{  "ticks_history": "frxXPDUSD",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+    channel.sink.add(
+        '{  "ticks_history": "frxXPTUSD",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
   }
 
   void getTickStream() {
+    print('COMMODITY: ${commodity}');
+    print('COMMODITY: ${interval}');
     channel2.sink.add(
-        '{  "ticks_history": "${commodity}",  "adjust_start_time": 1,  "count": 1,"granularity":${interval},  "end": "latest",  "start": 1,  "style": "candles","subscribe":1}');
+        '{  "ticks_history": "frxXAUUSD",  "adjust_start_time": 1,  "count": 1,"granularity":${interval},  "end": "latest",  "start": 1,  "style": "candles","subscribe":1}');
+    channel2.sink.add(
+        '{  "ticks_history": "frxXAGUSD",  "adjust_start_time": 1,  "count": 1,"granularity":${interval},  "end": "latest",  "start": 1,  "style": "candles","subscribe":1}');
+    channel2.sink.add(
+        '{  "ticks_history": "frxXPDUSD",  "adjust_start_time": 1,  "count": 1,"granularity":${interval},  "end": "latest",  "start": 1,  "style": "candles","subscribe":1}');
+    channel2.sink.add(
+        '{  "ticks_history": "frxXPTUSD",  "adjust_start_time": 1,  "count": 1,"granularity":${interval},  "end": "latest",  "start": 1,  "style": "candles","subscribe":1}');
   }
 
   void tickStreamPLAT() {
@@ -92,16 +109,50 @@ class _GraphState extends State<Graph> {
         for (int i = 0; i < extractedData['candles'].length; i++) {
           timeConverted.add(DateTime.fromMillisecondsSinceEpoch(
               extractedData['candles'][i]['epoch'] * 1000));
-
-          _chartData.add(
-            Commodity(
-              close: extractedData['candles'][i]['close'],
-              epoch: timeConverted[i],
-              high: extractedData['candles'][i]['high'],
-              low: extractedData['candles'][i]['low'],
-              open: extractedData['candles'][i]['open'],
-            ),
-          );
+          if (extractedData['echo_req']['ticks_history'] == "frxXAUUSD") {
+            _chartDatagold.add(
+              Commodity(
+                close: extractedData['candles'][i]['close'],
+                epoch: timeConverted[i],
+                high: extractedData['candles'][i]['high'],
+                low: extractedData['candles'][i]['low'],
+                open: extractedData['candles'][i]['open'],
+              ),
+            );
+          }
+          if (extractedData['echo_req']['ticks_history'] == "frxXAGUSD") {
+            _chartDatasilver.add(
+              Commodity(
+                close: extractedData['candles'][i]['close'],
+                epoch: timeConverted[i],
+                high: extractedData['candles'][i]['high'],
+                low: extractedData['candles'][i]['low'],
+                open: extractedData['candles'][i]['open'],
+              ),
+            );
+          }
+          if (extractedData['echo_req']['ticks_history'] == "frxXPDUSD") {
+            _chartDatapalladium.add(
+              Commodity(
+                close: extractedData['candles'][i]['close'],
+                epoch: timeConverted[i],
+                high: extractedData['candles'][i]['high'],
+                low: extractedData['candles'][i]['low'],
+                open: extractedData['candles'][i]['open'],
+              ),
+            );
+          }
+          if (extractedData['echo_req']['ticks_history'] == "frxXPTUSD") {
+            _chartDataplatinum.add(
+              Commodity(
+                close: extractedData['candles'][i]['close'],
+                epoch: timeConverted[i],
+                high: extractedData['candles'][i]['high'],
+                low: extractedData['candles'][i]['low'],
+                open: extractedData['candles'][i]['open'],
+              ),
+            );
+          }
         }
       });
     });
@@ -110,14 +161,14 @@ class _GraphState extends State<Graph> {
   void handShake() {
     channel2.stream.listen((data) {
       final extractedData = jsonDecode(data);
-      setState(() {
-        timeConverted.insert(
-            0,
-            DateTime.fromMillisecondsSinceEpoch(
-                extractedData['ohlc']['open_time'] * 1000));
-        timeConverted.removeAt(3);
-
-        _chartData.add(Commodity(
+      final List<dynamic> timeConverted = [];
+      // timeConverted.insert(
+      //     0,
+      //     DateTime.fromMillisecondsSinceEpoch(
+      //         extractedData['ohlc']['open_time'] * 1000));
+      // timeConverted.removeAt(3);
+      if (extractedData['echo_req']['ticks_history'] == "frxXAUUSD") {
+        _chartDatagold.add(Commodity(
           close: num.parse(extractedData['ohlc']['close']),
           epoch: DateTime.fromMillisecondsSinceEpoch(
               extractedData['ohlc']['open_time'] * 1000),
@@ -125,7 +176,41 @@ class _GraphState extends State<Graph> {
           low: num.parse(extractedData['ohlc']['low']),
           open: num.parse(extractedData['ohlc']['open']),
         ));
-      });
+      }
+      if (extractedData['echo_req']['ticks_history'] == "frxXAGUSD") {
+        _chartDatasilver.add(Commodity(
+          close: num.parse(extractedData['ohlc']['close']),
+          epoch: DateTime.fromMillisecondsSinceEpoch(
+              extractedData['ohlc']['open_time'] * 1000),
+          high: num.parse(extractedData['ohlc']['high']),
+          low: num.parse(extractedData['ohlc']['low']),
+          open: num.parse(extractedData['ohlc']['open']),
+        ));
+      }
+      if (extractedData['echo_req']['ticks_history'] == "frxXPDUSD") {
+        _chartDatapalladium.add(Commodity(
+          close: num.parse(extractedData['ohlc']['close']),
+          epoch: DateTime.fromMillisecondsSinceEpoch(
+              extractedData['ohlc']['open_time'] * 1000),
+          high: num.parse(extractedData['ohlc']['high']),
+          low: num.parse(extractedData['ohlc']['low']),
+          open: num.parse(extractedData['ohlc']['open']),
+        ));
+      }
+      if (extractedData['echo_req']['ticks_history'] == "frxXPTUSD") {
+        _chartDataplatinum.add(Commodity(
+          close: num.parse(extractedData['ohlc']['close']),
+          epoch: DateTime.fromMillisecondsSinceEpoch(
+              extractedData['ohlc']['open_time'] * 1000),
+          high: num.parse(extractedData['ohlc']['high']),
+          low: num.parse(extractedData['ohlc']['low']),
+          open: num.parse(extractedData['ohlc']['open']),
+        ));
+      }
+
+      // print(_chartData);
+      print("--------------------------------------------------------");
+      // print(_chartData.length);
     });
   }
 
@@ -280,34 +365,37 @@ class _GraphState extends State<Graph> {
                                 // isExpanded: true,
                                 value: _selectedInterval,
                                 onChanged: (newval) {
-                                  setState(() {
-                                    _selectedInterval = newval as String;
-                                    if (newval == '1 minute') {
+                                  _selectedInterval = newval as String;
+                                  if (newval == '1 minute') {
+                                    setState(() {
                                       interval = '60';
                                       getTickStream();
-                                      timeConverted.clear();
-                                    }
-                                    if (newval == '2 minutes') {
+                                    });
+                                  }
+                                  if (newval == '2 minutes') {
+                                    setState(() {
                                       interval = '120';
                                       getTickStream();
-                                      timeConverted.clear();
-                                    }
-                                    if (newval == '3 minutes') {
+                                    });
+                                  }
+                                  if (newval == '3 minutes') {
+                                    setState(() {
                                       interval = '180';
                                       getTickStream();
-                                      timeConverted.clear();
-                                    }
-                                    if (newval == '4 minutes') {
+                                    });
+                                  }
+                                  if (newval == '4 minutes') {
+                                    setState(() {
                                       interval = '240';
                                       getTickStream();
-                                      timeConverted.clear();
-                                    }
-                                    if (newval == '5 minutes') {
+                                    });
+                                  }
+                                  if (newval == '5 minutes') {
+                                    setState(() {
                                       interval = '300';
                                       getTickStream();
-                                      timeConverted.clear();
-                                    }
-                                  });
+                                    });
+                                  }
                                 },
                                 elevation: 16,
                                 items: intervals.map((newval) {
@@ -342,7 +430,20 @@ class _GraphState extends State<Graph> {
                                       trackballBehavior: _trackballBehavior,
                                       series: <CandleSeries>[
                                         CandleSeries<Commodity, DateTime>(
-                                            dataSource: _chartData,
+                                            dataSource: (commodity ==
+                                                    'frxXAUUSD')
+                                                ? _chartDatagold
+                                                : (commodity == 'frxXAGUSD')
+                                                    ? _chartDatasilver
+                                                    : (commodity == 'frxXPDUSD')
+                                                        ? _chartDatapalladium
+                                                        : _chartDataplatinum,
+                                            onRendererCreated:
+                                                (ChartSeriesController
+                                                    controller) {
+                                              _chartSeriesController =
+                                                  controller;
+                                            },
                                             // name: 'GOLD',
                                             xValueMapper:
                                                 (Commodity sales, _) =>
@@ -432,25 +533,27 @@ class _GraphState extends State<Graph> {
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  commodity = 'frxXAUUSD';
                                   getTickOnce();
                                   getTickStream();
+                                  // _chartSeriesController?.updateDataSource(
+                                  //   addedDataIndexes: [_chartData.length - 1],
+                                  // );
+                                  // _chartDatagold.clear();
+
+                                  commodity = 'frxXAUUSD';
                                   isactiveGold = true;
                                   isactivePalla = false;
                                   isactivePlat = false;
                                   isactiveSilver = false;
-                                  _chartData.clear();
-                                  timeConverted.clear();
                                 });
                               },
                               child: Container(
-                                width: MediaQuery.of(context).size.width * 0.38,
+                                width: MediaQuery.of(context).size.width * 0.45,
                                 height:
                                     MediaQuery.of(context).size.height * 0.09,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10.0),
                                   child: Container(
-                                    //GOLD
                                     child: Row(
                                       children: [
                                         Container(
@@ -486,8 +589,11 @@ class _GraphState extends State<Graph> {
                                                               child: Text(
                                                                   '\$${loadedGOLD[0].toStringAsFixed(2)}',
                                                                   style: TextStyle(
-                                                                      color: Colors
-                                                                          .green)))
+                                                                      color: Color.fromRGBO(
+                                                                          0,
+                                                                          255,
+                                                                          56,
+                                                                          1))))
                                                         ],
                                                       )
                                                     : Row(
@@ -510,7 +616,6 @@ class _GraphState extends State<Graph> {
                                         ),
                                       ],
                                     ),
-
                                     decoration: (isactiveGold == false)
                                         ? BoxDecoration(
                                             gradient: LinearGradient(
@@ -544,11 +649,14 @@ class _GraphState extends State<Graph> {
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  commodity = 'frxXPDUSD';
-                                  _chartData.clear();
-                                  timeConverted.clear();
                                   getTickOnce();
                                   getTickStream();
+                                  // _chartSeriesController?.updateDataSource(
+                                  //   addedDataIndexes: [_chartData.length - 1],
+                                  // );
+                                  commodity = 'frxXPDUSD';
+                                  // _chartDatapalladium.clear();
+
                                   isactiveGold = false;
                                   isactivePalla = true;
                                   isactivePlat = false;
@@ -556,7 +664,7 @@ class _GraphState extends State<Graph> {
                                 });
                               },
                               child: Container(
-                                width: MediaQuery.of(context).size.width * 0.38,
+                                width: MediaQuery.of(context).size.width * 0.45,
                                 height:
                                     MediaQuery.of(context).size.height * 0.09,
                                 child: ClipRRect(
@@ -606,8 +714,11 @@ class _GraphState extends State<Graph> {
                                                               child: Text(
                                                                   '\$${loadedPALLA[0].toStringAsFixed(2)}',
                                                                   style: TextStyle(
-                                                                      color: Colors
-                                                                          .green)))
+                                                                      color: Color.fromRGBO(
+                                                                          0,
+                                                                          255,
+                                                                          56,
+                                                                          1))))
                                                         ],
                                                       )
                                                     : Row(
@@ -663,11 +774,13 @@ class _GraphState extends State<Graph> {
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  commodity = 'frxXPTUSD';
-                                  _chartData.clear();
-                                  timeConverted.clear();
                                   getTickOnce();
                                   getTickStream();
+                                  // _chartSeriesController?.updateDataSource(
+                                  //   addedDataIndexes: [_chartData.length - 1],
+                                  // );
+                                  commodity = 'frxXPTUSD';
+                                  // _chartDataplatinum.clear();
                                   isactiveGold = false;
                                   isactivePalla = false;
                                   isactivePlat = true;
@@ -675,7 +788,7 @@ class _GraphState extends State<Graph> {
                                 });
                               },
                               child: Container(
-                                width: MediaQuery.of(context).size.width * 0.38,
+                                width: MediaQuery.of(context).size.width * 0.45,
                                 height:
                                     MediaQuery.of(context).size.height * 0.09,
                                 child: ClipRRect(
@@ -725,8 +838,11 @@ class _GraphState extends State<Graph> {
                                                               child: Text(
                                                                   '\$${loadedPLAT[0].toStringAsFixed(2)}',
                                                                   style: TextStyle(
-                                                                      color: Colors
-                                                                          .green)))
+                                                                      color: Color.fromRGBO(
+                                                                          0,
+                                                                          255,
+                                                                          56,
+                                                                          1))))
                                                         ],
                                                       )
                                                     : Row(
@@ -782,11 +898,13 @@ class _GraphState extends State<Graph> {
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  commodity = 'frxXAGUSD';
-                                  _chartData.clear();
-                                  timeConverted.clear();
                                   getTickOnce();
                                   getTickStream();
+                                  // _chartSeriesController?.updateDataSource(
+                                  //   addedDataIndexes: [_chartData.length - 1],
+                                  // );
+                                  // _chartDatasilver.clear();
+                                  commodity = 'frxXAGUSD';
                                   isactiveGold = false;
                                   isactivePalla = false;
                                   isactivePlat = false;
@@ -794,7 +912,7 @@ class _GraphState extends State<Graph> {
                                 });
                               },
                               child: Container(
-                                width: MediaQuery.of(context).size.width * 0.38,
+                                width: MediaQuery.of(context).size.width * 0.45,
                                 height:
                                     MediaQuery.of(context).size.height * 0.09,
                                 child: ClipRRect(
@@ -845,8 +963,11 @@ class _GraphState extends State<Graph> {
                                                                 child: Text(
                                                                     '\$${loadedSILVER[0].toStringAsFixed(2)}',
                                                                     style: TextStyle(
-                                                                        color: Colors
-                                                                            .green)))
+                                                                        color: Color.fromRGBO(
+                                                                            0,
+                                                                            255,
+                                                                            56,
+                                                                            1))))
                                                           ],
                                                         )
                                                       : Row(

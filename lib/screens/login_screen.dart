@@ -39,20 +39,7 @@ class LoginScreen extends StatelessWidget {
           ),
           // LoginWidget(),
           LoginWidget(),
-          // Center(
-          //   child: Container(
-          //     alignment: Alignment.bottomCenter,
-          //     child: Column(
-          //       mainAxisAlignment: MainAxisAlignment.end,
-          //       children: [
-          //         Image.asset(
-          //           'assets/signup/login wtih.png',
-          //         ),
-          //         SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-          //       ],
-          //     ),
-          //   ),
-          // ),
+
           Center(
             child: Container(
               alignment: Alignment.bottomCenter,

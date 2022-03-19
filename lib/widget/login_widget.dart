@@ -36,15 +36,42 @@ class _LoginWidgetState extends State<LoginWidget> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('An Error Occurred!'),
+        title: Text(
+          'An Error Occurred!',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: Text(message),
         actions: <Widget>[
-          ElevatedButton(
-            child: Text('Okay'),
-            onPressed: () {
-              Navigator.of(ctx).pop();
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                Navigator.pop(context);
+              });
             },
-          )
+            child: Container(
+              height: 30,
+              width: 90,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('Close',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment(0.8, 0.0),
+                      colors: <Color>[
+                        Color.fromRGBO(0, 178, 255, 1),
+                        Color.fromRGBO(25, 72, 134, 1),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -256,23 +283,25 @@ class _LoginWidgetState extends State<LoginWidget> {
                             ),
                           ],
                         ),
+                        SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            Container(
-                              child: Checkbox(
-                                value: _rememberMe,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _rememberMe = value;
-                                  });
-                                },
-                              ),
-                            ),
-                            Text('Remember Me'),
-                            SizedBox(
-                                width:
-                                    MediaQuery.of(context).size.width * 0.08),
+                            // Container(
+                            //   child: Checkbox(
+                            //     value: _rememberMe,
+                            //     onChanged: (value) {
+                            //       setState(() {
+                            //         _rememberMe = value;
+                            //       });
+                            //     },
+                            //   ),
+                            // ),
+                            // Text('Remember Me'),
+                            // SizedBox(
+                            //     width:
+                            //         MediaQuery.of(context).size.width * 0.08),
+
                             GestureDetector(
                               onTap: () {
                                 Navigator.of(context).pushReplacementNamed(
@@ -288,6 +317,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                             ),
                           ],
                         ),
+                        SizedBox(height: 10),
                         GestureDetector(
                           onTap: () async {
                             await runBoth();

@@ -144,16 +144,24 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> istopup() async {
+    message.clear();
+    message.insert(0, '');
     final url = Uri.parse('https://api.comd5.xyz/topup');
-    final response = await http.put(
-      url,
-      headers: {
-        "token": token[0],
-      },
-    );
-    print('TOPUP:${json.decode(response.body)}');
-    // print(token);
-    notifyListeners();
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          "token": token[0],
+        },
+      );
+
+      message.insert(0, 'Topup Successful');
+      print('TOPUP:${json.decode(response.body)}');
+      // print(token);
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
   Future<void> buy(double amount, String product) async {
@@ -224,20 +232,32 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> iswithdraw(double amount) async {
+    message.clear();
+    message.insert(0, '');
     final url = Uri.parse('https://api.comd5.xyz/withdraw');
     var resBody = amount;
     var Body = json.encode({"withdraw_amount": resBody});
-    final response = await http.put(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "token": token[0],
-      },
-      body: Body,
-    );
-    print('WITHDRAW:${json.decode(response.body)}');
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "token": token[0],
+        },
+        body: Body,
+      );
+      final responseData = json.decode(response.body);
+      if (responseData == 'Insufficient balance') {
+        throw HttpException(responseData);
+      }
 
-    notifyListeners();
+      message.insert(0, 'Withdraw Successful');
+      print('WITHDRAW:${json.decode(response.body)}');
+
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
   Future<void> getbalance() async {

@@ -50,7 +50,7 @@ class _TransactionWidgetState extends State<TransactionWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              width: 50,
+              width: 60,
               height: 50,
               child: DropdownButtonHideUnderline(
                 child: DropdownButton(

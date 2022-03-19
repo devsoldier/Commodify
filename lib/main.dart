@@ -15,6 +15,8 @@ import './screens/signup_screen.dart';
 import './providers/auth.dart';
 // import '../screens/clone.dart';
 import 'package:flutter/services.dart';
+import './screens/splashscreen.dart';
+// import 'package:animated_splash_screen/animated_splash_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -48,13 +50,14 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             fontFamily: 'Roboto',
           ),
-          home: /* (auth.isAuthenticated != null && auth.isAuthenticated == true)
-              ? NavBar()
-              // : */
-              // NavBar(),
-              // Clone(),
-              SignUpScreen(),
-          // ResetPassScreen(),
+          home: /* AnimatedSplashScreen.withScreenFunction(
+            splash: 'assets/navbar/Vector.png',
+            screenFunction: () async {
+              return SignUpScreen();
+            },
+          ), */
+              SplashScreen(),
+          // SignUpScreen(),
           routes: {
             SignUpScreen.routeName: (ctx) => SignUpScreen(),
             LoginScreen.routeName: (ctx) => LoginScreen(),

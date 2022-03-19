@@ -2,8 +2,8 @@
     package="com.example.drc">
      <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="ComD5"
-        android:allowBackup="true"
+        android:label="COMD5"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher">        
         <activity
             android:name=".MainActivity"

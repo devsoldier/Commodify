@@ -6,6 +6,8 @@ import 'package:toggle_switch/toggle_switch.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 import './transaction_widget.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../model/http_exception.dart';
 
 class WalletWidget extends StatefulWidget {
   // const WalletWidget({ Key? key }) : super(key: key);
@@ -15,6 +17,7 @@ class WalletWidget extends StatefulWidget {
 }
 
 class _WalletWidgetState extends State<WalletWidget> {
+  RegExp regex = RegExp("(?=(?:.*[!@#\$%^&*()\\-_=+{};:,<>]))");
   bool currentTab = true;
   bool? online = false;
   bool? card = false;
@@ -22,7 +25,7 @@ class _WalletWidgetState extends State<WalletWidget> {
   late double withdrawamount;
   // List paymentMethod = [];
   final GlobalKey<FormState> _carddetail = GlobalKey();
-  // final GlobalKey<FormState> _withdrawamount = GlobalKey();
+  final GlobalKey<FormState> _withdrawamount = GlobalKey();
   // final GlobalKey<FormState> _topupamount = GlobalKey();
 
   FocusNode _cardnumber = FocusNode();
@@ -37,12 +40,81 @@ class _WalletWidgetState extends State<WalletWidget> {
   final TextEditingController _ccvController = TextEditingController();
   final TextEditingController _withdrawController = TextEditingController();
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          'An Error Occurred!',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(message),
+        actions: <Widget>[
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                Navigator.pop(context);
+              });
+            },
+            child: Container(
+              height: 30,
+              width: 90,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('Close',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment(0.8, 0.0),
+                      colors: <Color>[
+                        Color.fromRGBO(0, 178, 255, 1),
+                        Color.fromRGBO(25, 72, 134, 1),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _topup() async {
-    await Provider.of<Auth>(context, listen: false).istopup();
+    try {
+      await Provider.of<Auth>(context, listen: false).istopup();
+    } catch (error) {
+      const errorMessage = 'Top-up failed';
+      _showErrorDialog(errorMessage);
+    }
   }
 
   Future<void> _withdraw() async {
-    await Provider.of<Auth>(context, listen: false).iswithdraw(withdrawamount);
+    if (!_withdrawamount.currentState!.validate()) {
+      // Invalid!
+      return;
+    }
+    _withdrawamount.currentState!.save();
+
+    try {
+      // await Provider.of<Auth>(context, listen: false).isAuth();
+      await Provider.of<Auth>(context, listen: false)
+          .iswithdraw(withdrawamount);
+    } on HttpException catch (error) {
+      var errorMessage = 'Failed withdraw';
+      if (error.toString().contains('Insufficient balance')) {
+        errorMessage = 'Insufficient balance.';
+      }
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      const errorMessage = 'Withdraw failed.';
+      _showErrorDialog(errorMessage);
+    }
   }
 
   Future<void> updatebalance() async {
@@ -60,73 +132,128 @@ class _WalletWidgetState extends State<WalletWidget> {
   _showWithdrawDialog() {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('WITHDRAWAL'),
-        content: Container(
-          height: MediaQuery.of(context).size.height * 0.1,
-          width: MediaQuery.of(context).size.width * 0.1,
-          child: Column(
-            children: <Widget>[
-              Container(
-                alignment: Alignment.centerLeft,
-                child: Text('Amount'),
-              ),
-              Container(
-                color: Color.fromRGBO(229, 229, 229, 1),
-                height: 40,
-                width: 250,
-                child: TextField(
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hintText: 'Enter Amount',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(5.0),
+      builder: (ctx) => Form(
+        key: _withdrawamount,
+        child: AlertDialog(
+          title: Text('WITHDRAWAL',
+              style: TextStyle(
+                color: Color.fromRGBO(18, 39, 70, 1),
+                fontWeight: FontWeight.bold,
+              )),
+          content: Container(
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: MediaQuery.of(context).size.width * 0.1,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Amount',
+                      style: TextStyle(
+                        color: Color.fromRGBO(18, 39, 70, 1),
+                        fontWeight: FontWeight.bold,
+                      )),
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  color: Color.fromRGBO(229, 229, 229, 1),
+                  height: 40,
+                  width: 250,
+                  child: TextFormField(
+                    validator: (value) {
+                      if (regex.hasMatch(value!)) return 'numbers only';
+                      if (value.isEmpty || int.parse(value) < 0)
+                        return 'add value more than 0';
+                    },
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Amount',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5.0),
+                        ),
                       ),
                     ),
-                  ),
-                  onChanged: (value) {
-                    withdrawamount = double.parse(value);
-                  },
-                  controller: _withdrawController,
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          Container(
-            // color: Colors.black,
-            alignment: Alignment.centerRight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      withdrawbalance();
-                      Navigator.pop(context);
-                    });
-                  },
-                  child: Image.asset(
-                    'assets/navbar/withdraw btn.png',
-                  ),
-                ),
-                SizedBox(width: 20),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      Navigator.pop(context);
-                    });
-                  },
-                  child: Image.asset(
-                    'assets/navbar/cancel btn.png',
+                    onChanged: (value) {
+                      withdrawamount = double.parse(value);
+                    },
+                    controller: _withdrawController,
                   ),
                 ),
               ],
             ),
           ),
-        ],
+          actions: <Widget>[
+            Container(
+              // color: Colors.black,
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        Navigator.pop(context);
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22.0),
+                        border: Border.all(
+                          color: Color.fromRGBO(7, 148, 220, 1),
+                        ),
+                      ),
+                      height: 30,
+                      width: 90,
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Text('Cancel',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromRGBO(25, 72, 134, 1))),
+                      ),
+                    ),
+                  ),
+                  // SizedBox(width: 20),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        withdrawbalance();
+                        showsnackbar();
+                        // Navigator.pop(context);
+                      });
+                    },
+                    child: Container(
+                      height: 30,
+                      width: 90,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(22.0),
+                        child: Container(
+                          alignment: Alignment.center,
+                          child: Text('Withdraw',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment(0.8, 0.0),
+                              colors: <Color>[
+                                Color.fromRGBO(0, 178, 255, 1),
+                                Color.fromRGBO(25, 72, 134, 1),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -135,16 +262,29 @@ class _WalletWidgetState extends State<WalletWidget> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('TOP-UP'),
+        title: Text('TOP-UP',
+            style: TextStyle(
+              color: Color.fromRGBO(18, 39, 70, 1),
+              fontWeight: FontWeight.bold,
+            )),
         content: Container(
           height: MediaQuery.of(context).size.height * 0.1,
           width: MediaQuery.of(context).size.width * 0.1,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               Container(
                 alignment: Alignment.centerLeft,
-                child: Text('Amount'),
+                child: Text('Amount',
+                    style: TextStyle(
+                      color: Color.fromRGBO(18, 39, 70, 1),
+                      fontWeight: FontWeight.bold,
+                    )),
               ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [Container(child: Text('\$500'))],
+              )
             ],
           ),
         ),
@@ -158,23 +298,57 @@ class _WalletWidgetState extends State<WalletWidget> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      topupbalance();
                       Navigator.pop(context);
                     });
                   },
-                  child: Image.asset(
-                    'assets/navbar/topup btn.png',
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22.0),
+                        border:
+                            Border.all(color: Color.fromRGBO(7, 148, 220, 1))),
+                    height: 30,
+                    width: 90,
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Text('Cancel',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(25, 72, 134, 1))),
+                    ),
                   ),
                 ),
                 SizedBox(width: 20),
                 GestureDetector(
                   onTap: () {
                     setState(() {
+                      topupbalance();
+                      showsnackbar();
                       Navigator.pop(context);
                     });
                   },
-                  child: Image.asset(
-                    'assets/navbar/cancel btn.png',
+                  child: Container(
+                    height: 30,
+                    width: 90,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(22.0),
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Text('Top-up',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment(0.8, 0.0),
+                            colors: <Color>[
+                              Color.fromRGBO(0, 178, 255, 1),
+                              Color.fromRGBO(25, 72, 134, 1),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -198,6 +372,20 @@ class _WalletWidgetState extends State<WalletWidget> {
       return;
     }
     _carddetail.currentState!.save();
+  }
+
+  showsnackbar() {
+    final snackBar = SnackBar(
+      content: Consumer<Auth>(
+          builder: (_, data, __) => (data.message[0].isEmpty)
+              ? Text('')
+              : (data.message[0].isNotEmpty)
+                  ? Text(data.message[0])
+                  : Text('')),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    setState(() {});
   }
 
   @override

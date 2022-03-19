@@ -56,12 +56,121 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         title: Text('An Error Occurred!'),
         content: Text(message),
         actions: <Widget>[
-          ElevatedButton(
-            child: Text('Okay'),
-            onPressed: () {
-              Navigator.of(ctx).pop();
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                Navigator.pop(context);
+              });
             },
-          )
+            child: Container(
+              height: 30,
+              width: 90,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('Close',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment(0.8, 0.0),
+                      colors: <Color>[
+                        Color.fromRGBO(0, 178, 255, 1),
+                        Color.fromRGBO(25, 72, 134, 1),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showlogoutdialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Container(
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              Image.asset('assets/navbar/Exclamation Mark.png'),
+              Text(
+                'Logout?',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+        content: Text('Are you sure,you want to Logout?'),
+        actions: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22.0),
+                    border: Border.all(
+                      color: Color.fromRGBO(7, 148, 220, 1),
+                    ),
+                  ),
+                  height: 30,
+                  width: 90,
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Text('Cancel',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(25, 72, 134, 1))),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    logout();
+                    Navigator.of(context)
+                        .pushReplacementNamed(LoginScreen.routeName);
+                  });
+                },
+                child: Container(
+                  height: 30,
+                  width: 90,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(22.0),
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Text('Logout',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment(0.8, 0.0),
+                          colors: <Color>[
+                            Color.fromRGBO(0, 178, 255, 1),
+                            Color.fromRGBO(25, 72, 134, 1),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -575,9 +684,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             children: [
               GestureDetector(
                 onTap: () {
-                  logout();
-                  Navigator.of(context)
-                      .pushReplacementNamed(LoginScreen.routeName);
+                  _showlogoutdialog();
                 },
                 child: Container(
                   child: Image.asset('assets/navbar/logout.png'),
