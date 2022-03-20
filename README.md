@@ -3,6 +3,7 @@ https://drive.google.com/file/d/1X-Fv-nVkO4FxjA2k8j_KOUHdg319wPea/view?usp=shari
 
 ## Signing up!
 ![signing up](https://user-images.githubusercontent.com/88223527/159157511-21fcd18e-bfd1-4aca-ad11-0be1cecc3c62.gif)
+<img src="https://user-images.githubusercontent.com/88223527/159157511-21fcd18e-bfd1-4aca-ad11-0be1cecc3c62.gif" alt="commodify gif" width="25%" height="25%">
 
 ## Password validator
 ![password validator](https://user-images.githubusercontent.com/88223527/159157406-83bfb4c6-f26b-48a7-874f-2c892d6f668a.gif)
