@@ -473,18 +473,24 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                     controller: _passwordController,
                                     focusNode: _passwordfield,
                                     validator: (value) {
-                                      if (!oneuppercase.hasMatch(value!)) {
-                                        return 'must contain 1 uppercase';
-                                      } else if (!onelowercase
-                                          .hasMatch(value)) {
-                                        return 'must contain 1 lowercase';
-                                      } else if (!onedigit.hasMatch(value)) {
-                                        return 'must contain 1 number';
-                                      } else if (!onespecialcharacter
-                                          .hasMatch(value)) {
-                                        return 'must contain 1 special character';
-                                      } else if (value.isEmpty ||
-                                          value.length < 8) {
+                                      if (!oneuppercase.hasMatch(value!) ||
+                                          !onelowercase.hasMatch(value) ||
+                                          !onedigit.hasMatch(value) ||
+                                          !onespecialcharacter
+                                              .hasMatch(value)) {
+                                        return 'invalid password';
+                                      }
+                                      // if (!onelowercase.hasMatch(value)) {
+                                      //   return 'must contain 1 lowercase';
+                                      // }
+                                      // if (!onedigit.hasMatch(value)) {
+                                      //   return 'must contain 1 number';
+                                      // }
+                                      // if (!onespecialcharacter
+                                      //     .hasMatch(value)) {
+                                      //   return 'must contain 1 special character';
+                                      // }
+                                      if (value.isEmpty || value.length < 8) {
                                         return 'add more characters';
                                       } else {
                                         return null;
