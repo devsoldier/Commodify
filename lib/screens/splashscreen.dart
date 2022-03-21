@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedSplashScreen.withScreenFunction(
-      splashIconSize: 850,
+      splashIconSize: 950,
       duration: 5000,
       splash: Stack(
         children: [
