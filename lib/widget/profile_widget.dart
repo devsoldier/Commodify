@@ -277,10 +277,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return 'Invalid phone number';
-                                }
-                                if (value.length < 7) {
+                                } else if (value.length < 7) {
                                   return 'Invalid phone number';
-                                }
+                                } else
+                                  return null;
                               },
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
