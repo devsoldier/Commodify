@@ -108,7 +108,6 @@ class _LoginWidgetState extends State<LoginWidget> {
     setStateIfMounted(() {
       _isLoading = false;
     });
-    // print(_authData);
   }
 
   Future<void> _verify() {
@@ -122,18 +121,6 @@ class _LoginWidgetState extends State<LoginWidget> {
   Future<void> runBoth() {
     return _submit().then((_) => _verify());
   }
-
-  // Future<void> _getbal() async {
-  //   await Provider.of<Auth>(context, listen: false).getbalance();
-  // }
-
-  // Future<void> _getuser() async {
-  //   await Provider.of<Auth>(context, listen: false).getuser();
-  // }
-
-  // Future<void> runbalanduser() async {
-  //   _getbal().then((_) => _getuser());
-  // }
 
   @override
   void initState() {

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
-// import 'package:provider/provider.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth.dart';
 import 'dart:convert';
 import '../providers/models.dart';
-// import '../providers/interval.dart';
-import 'dart:async';
-// import 'dart:math';
-// import '../widget/dashboard_widget.dart';
 
 class Graph extends StatefulWidget {
   @override
@@ -162,11 +159,6 @@ class _GraphState extends State<Graph> {
     channel2.stream.listen((data) {
       final extractedData = jsonDecode(data);
       final List<dynamic> timeConverted = [];
-      // timeConverted.insert(
-      //     0,
-      //     DateTime.fromMillisecondsSinceEpoch(
-      //         extractedData['ohlc']['open_time'] * 1000));
-      // timeConverted.removeAt(3);
       if (extractedData['echo_req']['ticks_history'] == "frxXAUUSD") {
         _chartDatagold.add(Commodity(
           close: num.parse(extractedData['ohlc']['close']),
@@ -207,11 +199,11 @@ class _GraphState extends State<Graph> {
           open: num.parse(extractedData['ohlc']['open']),
         ));
       }
-
-      // print(_chartData);
-      print("--------------------------------------------------------");
-      // print(_chartData.length);
     });
+  }
+
+  void intervalpass() {
+    Provider.of<Auth>(context, listen: false).intervalpass(interval);
   }
 
   getprice() {
@@ -228,7 +220,6 @@ class _GraphState extends State<Graph> {
               if (loadedPLAT.length > 3) {
                 loadedPLAT.removeAt(2);
               }
-              // print(loadedData[i].Quote);
             }
           });
         }
@@ -242,7 +233,6 @@ class _GraphState extends State<Graph> {
               if (loadedPALLA.length > 3) {
                 loadedPALLA.removeAt(2);
               }
-              // print(loadedData[i].Quote);
             }
           });
         }
@@ -256,7 +246,6 @@ class _GraphState extends State<Graph> {
               if (loadedGOLD.length > 3) {
                 loadedGOLD.removeAt(2);
               }
-              // print(loadedData[i].Quote);
             }
           });
         }
@@ -270,15 +259,9 @@ class _GraphState extends State<Graph> {
               if (loadedSILVER.length > 3) {
                 loadedSILVER.removeAt(2);
               }
-              // print(loadedData[i].Quote);
             }
           });
         }
-
-        // print(loadedGOLD);
-        // print(loadedPLAT);
-        // print(loadedPALLA);
-        // print(extractedData);
       },
     );
   }
@@ -316,19 +299,13 @@ class _GraphState extends State<Graph> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
-              // crossAxisAlignment: CrossAxisAlignment.start,
-              // bottom: MediaQuery.of(context).size.height * 0.136,
-              // left: 13,
               children: [
                 Container(
                   alignment: Alignment.center,
                   width: MediaQuery.of(context).size.width * 0.88,
                   height: MediaQuery.of(context).size.height * 0.42,
-                  // color: Colors.grey,
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(249, 247, 247, 1),
-                    // color: Colors.black,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -345,54 +322,50 @@ class _GraphState extends State<Graph> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: <Widget>[
                           Container(
-                            // padding: EdgeInsets.only(top: 5, left: 15),
                             child: (Text('Market Overview',
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Color.fromRGBO(9, 51, 116, 1)))),
-                            // height: (MediaQuery.of(context).size.height * 0.35),
-                            // width: (MediaQuery.of(context).size.width * 0.93),
-                            // color: Color.fromRGBO(249, 247, 247, 1),
                           ),
                           Flexible(
-                            // padding: EdgeInsets.only(left: 20),
-                            // color: Colors.black,
-                            // width: MediaQuery.of(context).size.width * 0.2,
-                            // height: MediaQuery.of(context).size.height * 0.05,
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton(
-                                // isExpanded: true,
                                 value: _selectedInterval,
                                 onChanged: (newval) {
                                   _selectedInterval = newval as String;
                                   if (newval == '1 minute') {
                                     setState(() {
                                       interval = '60';
+                                      intervalpass();
                                       getTickStream();
                                     });
                                   }
                                   if (newval == '2 minutes') {
                                     setState(() {
                                       interval = '120';
+                                      intervalpass();
                                       getTickStream();
                                     });
                                   }
                                   if (newval == '3 minutes') {
                                     setState(() {
                                       interval = '180';
+                                      intervalpass();
                                       getTickStream();
                                     });
                                   }
                                   if (newval == '4 minutes') {
                                     setState(() {
                                       interval = '240';
+                                      intervalpass();
                                       getTickStream();
                                     });
                                   }
                                   if (newval == '5 minutes') {
                                     setState(() {
                                       interval = '300';
+                                      intervalpass();
                                       getTickStream();
                                     });
                                   }
@@ -409,7 +382,7 @@ class _GraphState extends State<Graph> {
                           ),
                         ],
                       ),
-                      // SizedBox(height: 10),
+                      //GRAPH DISPLAY
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -486,12 +459,12 @@ class _GraphState extends State<Graph> {
                   ),
                 ),
                 SizedBox(height: 15),
+                //LEFT and RIGHT SCROLLABLE TILE
                 Container(
                   width: MediaQuery.of(context).size.width * 0.88,
                   height: MediaQuery.of(context).size.height * 0.15,
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(249, 247, 247, 1),
-                    // color: Colors.black,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -508,15 +481,11 @@ class _GraphState extends State<Graph> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Container(
-                            // padding: EdgeInsets.only(top: 5, left: 15),
                             child: (Text('Assets',
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Color.fromRGBO(9, 51, 116, 1)))),
-                            // height: (MediaQuery.of(context).size.height * 0.35),
-                            // width: (MediaQuery.of(context).size.width * 0.93),
-                            // color: Color.fromRGBO(249, 247, 247, 1),
                           ),
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.25,
@@ -538,8 +507,7 @@ class _GraphState extends State<Graph> {
                                   // _chartSeriesController?.updateDataSource(
                                   //   addedDataIndexes: [_chartData.length - 1],
                                   // );
-                                  // _chartDatagold.clear();
-
+                                  _chartDatagold.clear();
                                   commodity = 'frxXAUUSD';
                                   isactiveGold = true;
                                   isactivePalla = false;
@@ -655,7 +623,7 @@ class _GraphState extends State<Graph> {
                                   //   addedDataIndexes: [_chartData.length - 1],
                                   // );
                                   commodity = 'frxXPDUSD';
-                                  // _chartDatapalladium.clear();
+                                  _chartDatapalladium.clear();
 
                                   isactiveGold = false;
                                   isactivePalla = true;
@@ -780,7 +748,7 @@ class _GraphState extends State<Graph> {
                                   //   addedDataIndexes: [_chartData.length - 1],
                                   // );
                                   commodity = 'frxXPTUSD';
-                                  // _chartDataplatinum.clear();
+                                  _chartDataplatinum.clear();
                                   isactiveGold = false;
                                   isactivePalla = false;
                                   isactivePlat = true;
@@ -869,8 +837,7 @@ class _GraphState extends State<Graph> {
                                         ? BoxDecoration(
                                             gradient: LinearGradient(
                                               begin: Alignment.topLeft,
-                                              end: Alignment(0.8,
-                                                  0.0), // 10% of the width, so there are ten blinds.
+                                              end: Alignment(0.8, 0.0),
                                               colors: <Color>[
                                                 Color.fromRGBO(67, 68, 70, 1),
                                                 Color.fromRGBO(9, 51, 116, 0.8),
@@ -881,13 +848,12 @@ class _GraphState extends State<Graph> {
                                         : BoxDecoration(
                                             gradient: LinearGradient(
                                               begin: Alignment.topLeft,
-                                              end: Alignment(0.8,
-                                                  0.0), // 10% of the width, so there are ten blinds.
+                                              end: Alignment(0.8, 0.0),
                                               colors: <Color>[
                                                 Color.fromRGBO(66, 142, 243, 1),
                                                 Color.fromRGBO(61, 190, 242, 1),
                                                 Color.fromRGBO(57, 136, 242, 1),
-                                              ], // red to yellow
+                                              ],
                                             ),
                                           ),
                                   ),
@@ -903,7 +869,7 @@ class _GraphState extends State<Graph> {
                                   // _chartSeriesController?.updateDataSource(
                                   //   addedDataIndexes: [_chartData.length - 1],
                                   // );
-                                  // _chartDatasilver.clear();
+                                  _chartDatasilver.clear();
                                   commodity = 'frxXAGUSD';
                                   isactiveGold = false;
                                   isactivePalla = false;

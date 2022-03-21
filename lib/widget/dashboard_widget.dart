@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'dart:developer' as developer;
+import 'package:flutter/services.dart';
 import '../screens/graph.dart';
 import './assets_chart.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class DashboardWidget extends StatefulWidget {
   @override
@@ -14,6 +17,9 @@ class DashboardWidget extends StatefulWidget {
 
 class _DashboardWidgetState extends State<DashboardWidget> {
   bool _isLoading = true;
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   void getBAL() {
     Provider.of<Auth>(context, listen: false).getbalance();
@@ -40,8 +46,20 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
   Widget loadpage = Center(child: CircularProgressIndicator());
 
+  showerrorsnackbar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    setState(() {});
+  }
+
   @override
   void initState() {
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     getBAL();
     _getuser();
     _getasset();
@@ -51,7 +69,39 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
   @override
   void dispose() {
+    _connectivitySubscription.cancel();
     super.dispose();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      developer.log('Couldn\'t check connectivity status', error: e);
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+      if (_connectionStatus == ConnectivityResult.none) {
+        showerrorsnackbar(
+            'Internet disconnected. Please check connection to resume.');
+      }
+    });
   }
 
   @override
@@ -159,25 +209,19 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             left: MediaQuery.of(context).size.width * 0.025,
             top: MediaQuery.of(context).size.height * 0.18,
             child: ClipRRect(
-              // borderRadius: BorderRadius.only(
-              //     topLeft: Radius.circular(22.0),
-              //     topRight: Radius.circular(22.0)),
               borderRadius: BorderRadius.circular(10.0),
               child: Container(
                 alignment: Alignment.centerLeft,
                 color: Colors.white,
                 width: MediaQuery.of(context).size.width * 0.95,
-                height: /*  (data.pieasset.isEmpty)
+                height: (data.assetamount.isEmpty)
                     ? MediaQuery.of(context).size.height * 0.83
-                    :  */
-                    (data.assetamount.isEmpty)
+                    : (data.pieasset[0].y == 0 &&
+                            data.pieasset[1].y == 0 &&
+                            data.pieasset[2].y == 0 &&
+                            data.pieasset[3].y == 0)
                         ? MediaQuery.of(context).size.height * 0.83
-                        : (data.pieasset[0].y == 0 &&
-                                data.pieasset[1].y == 0 &&
-                                data.pieasset[2].y == 0 &&
-                                data.pieasset[3].y == 0)
-                            ? MediaQuery.of(context).size.height * 0.83
-                            : MediaQuery.of(context).size.height * 1.23,
+                        : MediaQuery.of(context).size.height * 1.23,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [

@@ -48,15 +48,42 @@ class _SignUpWidgetState extends State<SignUpWidget> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('An Error Occurred!'),
+        title: Text(
+          'An Error Occurred!',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: Text(message),
         actions: <Widget>[
-          ElevatedButton(
-            child: Text('Okay'),
-            onPressed: () {
-              Navigator.of(ctx).pop();
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                Navigator.pop(context);
+              });
             },
-          )
+            child: Container(
+              height: 30,
+              width: 90,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text('Close',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment(0.8, 0.0),
+                      colors: <Color>[
+                        Color.fromRGBO(0, 178, 255, 1),
+                        Color.fromRGBO(25, 72, 134, 1),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -152,16 +179,39 @@ class _SignUpWidgetState extends State<SignUpWidget> {
         RegExp("(?=(?:.*[!@#\$%^&*()\\-_=+{};:,<.>]){1,})");
     if (!oneuppercase.hasMatch(text)) {
       return 'must contain 1 uppercase';
-    } else if (!onelowercase.hasMatch(text)) {
+    }
+    if (!onelowercase.hasMatch(text)) {
       return 'must contain 1 lowercase';
-    } else if (!onedigit.hasMatch(text)) {
+    }
+    if (!onedigit.hasMatch(text)) {
       return 'must contain 1 number';
-    } else if (!onespecialcharacter.hasMatch(text)) {
+    }
+    if (!onespecialcharacter.hasMatch(text)) {
       return 'must contain 1 special character';
-    } else if (text.isEmpty || text.length < 8) {
+    }
+    /*    if (text.isEmpty || text.length < 8) {
       return 'add more characters';
-    } else if (text.isEmpty || text.length < 8) {
-      return 'add more characters';
+    } */
+    if (text.length == 1 && text.length < 8) {
+      return 'add 7 more characters';
+    }
+    if (text.length == 2 && text.length < 8) {
+      return 'add 6 more characters';
+    }
+    if (text.length == 3 && text.length < 8) {
+      return 'add 5 more characters';
+    }
+    if (text.length == 4 && text.length < 8) {
+      return 'add 4 more characters';
+    }
+    if (text.length == 5 && text.length < 8) {
+      return 'add 3 more characters';
+    }
+    if (text.length == 6 && text.length < 8) {
+      return 'add 2 more characters';
+    }
+    if (text.length == 7 && text.length < 8) {
+      return 'add 1 more characters';
     } else {
       return null;
     }
@@ -433,9 +483,6 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       } else if (!onespecialcharacter
                                           .hasMatch(value)) {
                                         return 'must contain 1 special character';
-                                      } else if (value.isEmpty ||
-                                          value.length < 8) {
-                                        return 'add more characters';
                                       } else if (value.isEmpty ||
                                           value.length < 8) {
                                         return 'add more characters';

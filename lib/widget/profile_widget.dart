@@ -38,7 +38,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     _phonekey.currentState!.save();
     try {
       await Provider.of<Auth>(context, listen: false).updatephone(phonenum);
-    } on HttpException catch (error) {
     } catch (error) {
       const errorMessage = 'Failed to update.';
       _showErrorDialog(errorMessage);
@@ -287,9 +286,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               decoration: InputDecoration(
                                 fillColor: Color.fromRGBO(229, 229, 229, 1),
                                 filled: !isEdited,
-                                labelText: (data.user[0].phone_number != "0" &&
+                                labelText: (data.user[0].phone_number == "0" ||
                                         data.user.isEmpty)
-                                    ? 'Press edit to add phone number'
+                                    ? 'Add phone number'
                                     : '${data.user[0].phone_number}',
                                 labelStyle: TextStyle(color: Colors.black),
                                 border: OutlineInputBorder(

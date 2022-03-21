@@ -401,9 +401,6 @@ class _WalletWidgetState extends State<WalletWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // final balancedata = Provider.of<Auth>(context);
-    // Widget Activity = ;
-
     Widget Payment = Container(
       width: MediaQuery.of(context).size.width * 0.9,
       // color: Colors.black12,

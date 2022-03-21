@@ -4,7 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:convert';
+import 'dart:async';
+import 'dart:developer' as developer;
+import 'package:flutter/services.dart';
 import '../providers/models.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 // import '../providers/interval.dart';
 import 'dart:async';
 import '../model/http_exception.dart';
@@ -17,6 +21,9 @@ class TradingWidget extends StatefulWidget {
 }
 
 class _TradingWidgetState extends State<TradingWidget> {
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
   final List<Commodity> _chartData = [];
   List<dynamic> timeConverted = [];
   RegExp regex = RegExp("(?=(?:.*[!@#\$%^&*()\\-_=+{};:,<>]))");
@@ -24,6 +31,10 @@ class _TradingWidgetState extends State<TradingWidget> {
   List<dynamic> loadedPALLA = [];
   List<dynamic> loadedGOLD = [];
   List<dynamic> loadedSILVER = [];
+  final List<Commodity> _chartDatagold = [];
+  final List<Commodity> _chartDatasilver = [];
+  final List<Commodity> _chartDatapalladium = [];
+  final List<Commodity> _chartDataplatinum = [];
   late TrackballBehavior _trackballBehavior;
   late ZoomPanBehavior _zoomPanBehavior;
   String _selectedCommodity = 'Gold/USD';
@@ -33,6 +44,7 @@ class _TradingWidgetState extends State<TradingWidget> {
     'Platinum/USD',
     'Silver/USD'
   ];
+  String interval = '60';
   String commodity = 'frxXAUUSD';
   String placeholder = '';
   final GlobalKey<FormState> _buysellkey = GlobalKey();
@@ -43,6 +55,15 @@ class _TradingWidgetState extends State<TradingWidget> {
 
   bool maximize = true;
   bool stopLoop = true;
+
+  showerrorsnackbar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    setState(() {});
+  }
 
   final channel = IOWebSocketChannel.connect(
       Uri.parse('wss://ws.binaryws.com/websockets/v3?app_id=1089'));
@@ -59,18 +80,26 @@ class _TradingWidgetState extends State<TradingWidget> {
 
   void getTickOnce() {
     channel.sink.add(
-        '{  "ticks_history": "${commodity}",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+        '{  "ticks_history": "frxXAUUSD",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+    channel.sink.add(
+        '{  "ticks_history": "frxXAGUSD",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+    channel.sink.add(
+        '{  "ticks_history": "frxXPDUSD",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
+    channel.sink.add(
+        '{  "ticks_history": "frxXPTUSD",  "adjust_start_time": 1,  "count": 10,"end": "latest","start": 1,"style": "candles"}');
   }
 
   void getTickStream() {
+    // print('COMMODITY: ${commodity}');
+    // print('COMMODITY: ${interval}');
     channel2.sink.add(
-        '{  "ticks_history": "${commodity}",  "adjust_start_time": 1,  "count": 1,"end": "latest","start": 1,"style": "candles"}');
-  }
-
-  void repeatAction() {
-    Timer.periodic(Duration(minutes: 1), (timer) {
-      getTickStream();
-    });
+        '{  "ticks_history": "frxXAUUSD",  "adjust_start_time": 1,  "count": 1,"granularity":${interval},  "end": "latest",  "start": 1,  "style": "candles","subscribe":1}');
+    channel2.sink.add(
+        '{  "ticks_history": "frxXAGUSD",  "adjust_start_time": 1,  "count": 1,"granularity":${interval},  "end": "latest",  "start": 1,  "style": "candles","subscribe":1}');
+    channel2.sink.add(
+        '{  "ticks_history": "frxXPDUSD",  "adjust_start_time": 1,  "count": 1,"granularity":${interval},  "end": "latest",  "start": 1,  "style": "candles","subscribe":1}');
+    channel2.sink.add(
+        '{  "ticks_history": "frxXPTUSD",  "adjust_start_time": 1,  "count": 1,"granularity":${interval},  "end": "latest",  "start": 1,  "style": "candles","subscribe":1}');
   }
 
   void tickStreamPLAT() {
@@ -97,46 +126,108 @@ class _TradingWidgetState extends State<TradingWidget> {
         for (int i = 0; i < extractedData['candles'].length; i++) {
           timeConverted.add(DateTime.fromMillisecondsSinceEpoch(
               extractedData['candles'][i]['epoch'] * 1000));
-
-          _chartData.add(
-            Commodity(
-              close: extractedData['candles'][i]['close'],
-              epoch: timeConverted[i],
-              high: extractedData['candles'][i]['high'],
-              low: extractedData['candles'][i]['low'],
-              open: extractedData['candles'][i]['open'],
-            ),
-          );
+          if (extractedData['echo_req']['ticks_history'] == "frxXAUUSD") {
+            _chartDatagold.add(
+              Commodity(
+                close: extractedData['candles'][i]['close'],
+                epoch: timeConverted[i],
+                high: extractedData['candles'][i]['high'],
+                low: extractedData['candles'][i]['low'],
+                open: extractedData['candles'][i]['open'],
+              ),
+            );
+          }
+          if (extractedData['echo_req']['ticks_history'] == "frxXAGUSD") {
+            _chartDatasilver.add(
+              Commodity(
+                close: extractedData['candles'][i]['close'],
+                epoch: timeConverted[i],
+                high: extractedData['candles'][i]['high'],
+                low: extractedData['candles'][i]['low'],
+                open: extractedData['candles'][i]['open'],
+              ),
+            );
+          }
+          if (extractedData['echo_req']['ticks_history'] == "frxXPDUSD") {
+            _chartDatapalladium.add(
+              Commodity(
+                close: extractedData['candles'][i]['close'],
+                epoch: timeConverted[i],
+                high: extractedData['candles'][i]['high'],
+                low: extractedData['candles'][i]['low'],
+                open: extractedData['candles'][i]['open'],
+              ),
+            );
+          }
+          if (extractedData['echo_req']['ticks_history'] == "frxXPTUSD") {
+            _chartDataplatinum.add(
+              Commodity(
+                close: extractedData['candles'][i]['close'],
+                epoch: timeConverted[i],
+                high: extractedData['candles'][i]['high'],
+                low: extractedData['candles'][i]['low'],
+                open: extractedData['candles'][i]['open'],
+              ),
+            );
+          }
         }
-        // print(_chartData);
       });
     });
   }
 
   void handShake() {
     channel2.stream.listen((data) {
-      setState(() {
-        final extractedData = jsonDecode(data);
-        // print(extractedData);
+      final extractedData = jsonDecode(data);
+      final List<dynamic> timeConverted = [];
+      // timeConverted.insert(
+      //     0,
+      //     DateTime.fromMillisecondsSinceEpoch(
+      //         extractedData['ohlc']['open_time'] * 1000));
+      // timeConverted.removeAt(3);
+      if (extractedData['echo_req']['ticks_history'] == "frxXAUUSD") {
+        _chartDatagold.add(Commodity(
+          close: num.parse(extractedData['ohlc']['close']),
+          epoch: DateTime.fromMillisecondsSinceEpoch(
+              extractedData['ohlc']['open_time'] * 1000),
+          high: num.parse(extractedData['ohlc']['high']),
+          low: num.parse(extractedData['ohlc']['low']),
+          open: num.parse(extractedData['ohlc']['open']),
+        ));
+      }
+      if (extractedData['echo_req']['ticks_history'] == "frxXAGUSD") {
+        _chartDatasilver.add(Commodity(
+          close: num.parse(extractedData['ohlc']['close']),
+          epoch: DateTime.fromMillisecondsSinceEpoch(
+              extractedData['ohlc']['open_time'] * 1000),
+          high: num.parse(extractedData['ohlc']['high']),
+          low: num.parse(extractedData['ohlc']['low']),
+          open: num.parse(extractedData['ohlc']['open']),
+        ));
+      }
+      if (extractedData['echo_req']['ticks_history'] == "frxXPDUSD") {
+        _chartDatapalladium.add(Commodity(
+          close: num.parse(extractedData['ohlc']['close']),
+          epoch: DateTime.fromMillisecondsSinceEpoch(
+              extractedData['ohlc']['open_time'] * 1000),
+          high: num.parse(extractedData['ohlc']['high']),
+          low: num.parse(extractedData['ohlc']['low']),
+          open: num.parse(extractedData['ohlc']['open']),
+        ));
+      }
+      if (extractedData['echo_req']['ticks_history'] == "frxXPTUSD") {
+        _chartDataplatinum.add(Commodity(
+          close: num.parse(extractedData['ohlc']['close']),
+          epoch: DateTime.fromMillisecondsSinceEpoch(
+              extractedData['ohlc']['open_time'] * 1000),
+          high: num.parse(extractedData['ohlc']['high']),
+          low: num.parse(extractedData['ohlc']['low']),
+          open: num.parse(extractedData['ohlc']['open']),
+        ));
+      }
 
-        List<dynamic> timeConverted = [];
-        for (int i = 0; i < extractedData['candles'].length; i++) {
-          timeConverted.add(DateTime.fromMillisecondsSinceEpoch(
-              extractedData['candles'][i]['epoch'] * 1000));
-          // _chartData.removeAt(1);
-          _chartData.add(
-            Commodity(
-              close: extractedData['candles'][i]['close'],
-              epoch: timeConverted[i],
-              high: extractedData['candles'][i]['high'],
-              low: extractedData['candles'][i]['low'],
-              open: extractedData['candles'][i]['open'],
-            ),
-          );
-          // print(_chartData);
-          print(timeConverted);
-        }
-      });
+      // print(_chartData);
+      print("--------------------------------------------------------");
+      // print(_chartData.length);
     });
   }
 
@@ -374,9 +465,9 @@ class _TradingWidgetState extends State<TradingWidget> {
 
   @override
   void initState() {
-    // secTimer();
-    // getbalance();
-    repeatAction();
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _getasset();
     getprice();
     getTickOnce();
@@ -398,7 +489,39 @@ class _TradingWidgetState extends State<TradingWidget> {
 
   @override
   void dispose() {
+    _connectivitySubscription.cancel();
     super.dispose();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      developer.log('Couldn\'t check connectivity status', error: e);
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+      if (_connectionStatus == ConnectivityResult.none) {
+        showerrorsnackbar(
+            'Internet disconnected. Please check connection to resume.');
+      }
+    });
   }
 
   @override
@@ -516,8 +639,14 @@ class _TradingWidgetState extends State<TradingWidget> {
                   trackballBehavior: _trackballBehavior,
                   series: <CandleSeries>[
                     CandleSeries<Commodity, DateTime>(
-                        dataSource: _chartData,
-                        name: 'GOLD',
+                        dataSource: (commodity == 'frxXAUUSD')
+                            ? _chartDatagold
+                            : (commodity == 'frxXAGUSD')
+                                ? _chartDatasilver
+                                : (commodity == 'frxXPDUSD')
+                                    ? _chartDatapalladium
+                                    : _chartDataplatinum,
+                        // name: 'GOLD',
                         xValueMapper: (Commodity sales, _) => sales.epoch,
                         lowValueMapper: (Commodity sales, _) => sales.low,
                         highValueMapper: (Commodity sales, _) => sales.high,
@@ -705,37 +834,37 @@ class _TradingWidgetState extends State<TradingWidget> {
                                       getTickOnce();
                                       getTickStream();
                                       _getasset();
-                                      _chartData.clear();
+                                      _chartDatagold.clear();
                                     });
                                   }
                                   if (newval == 'Palladium/USD') {
                                     setState(() {
-                                      commodity = 'frxXAUUSD';
+                                      commodity = 'frxXPDUSD';
                                       tickStreamGOLD();
                                       getTickOnce();
                                       getTickStream();
                                       _getasset();
-                                      _chartData.clear();
+                                      _chartDatapalladium.clear();
                                     });
                                   }
                                   if (newval == 'Platinum/USD') {
                                     setState(() {
-                                      commodity = 'frxXAUUSD';
+                                      commodity = 'frxXPTUSD';
                                       tickStreamGOLD();
                                       getTickOnce();
                                       getTickStream();
                                       _getasset();
-                                      _chartData.clear();
+                                      _chartDataplatinum.clear();
                                     });
                                   }
                                   if (newval == 'Silver/USD') {
                                     setState(() {
-                                      commodity = 'frxXAUUSD';
+                                      commodity = 'frxXAGUSD';
                                       tickStreamGOLD();
                                       getTickOnce();
                                       getTickStream();
                                       _getasset();
-                                      _chartData.clear();
+                                      _chartDatasilver.clear();
                                     });
                                   }
                                   // secTimer();

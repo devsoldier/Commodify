@@ -107,10 +107,9 @@ class _TransactionWidgetState extends State<TransactionWidget> {
                 scrollDirection: Axis.vertical,
                 child: Column(
                   children: <Widget>[
-                    //ALL and OLD
-
                     Container(
                       color: Color.fromRGBO(249, 247, 247, 1),
+                      //switch colour every 2 tiles
                       // color: (i % 2 == 0)
                       //     ? Color.fromRGBO(18, 39, 70, 1)
                       //     : Color.fromRGBO(5, 157, 230, 1),

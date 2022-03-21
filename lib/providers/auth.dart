@@ -11,6 +11,7 @@ class Auth with ChangeNotifier {
   bool? isAuthenticated;
   List<String> message = [''];
   late dynamic balance;
+  late String intervaldata;
   // late String errormessage;
   List<TransactionHistory> history = [];
   List<TransactionHistory> historybuy = [];
@@ -70,6 +71,12 @@ class Auth with ChangeNotifier {
     } catch (error) {
       throw error;
     }
+  }
+
+  void intervalpass(String interval) {
+    intervaldata = interval;
+    print("interval data: ${intervaldata}");
+    notifyListeners();
   }
 
   Future<void> login(String email, String password) async {
