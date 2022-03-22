@@ -6,7 +6,7 @@ https://drive.google.com/file/d/1X-Fv-nVkO4FxjA2k8j_KOUHdg319wPea/view?usp=shari
 -keysigning(google appstore)</br>
 -email regex</br>
 -internet reconnection</br>
--page swipe as alternative for page navigation
+-page swipe as alternative for page navigation</br>
 -reduce boilerplate</br>
 
 ## Overview
