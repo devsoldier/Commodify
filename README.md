@@ -6,6 +6,7 @@ https://drive.google.com/file/d/1X-Fv-nVkO4FxjA2k8j_KOUHdg319wPea/view?usp=shari
 -keysigning(google appstore)</br>
 -email regex</br>
 -internet reconnection</br>
+-reduce boilerplate</br>
 
 ## Overview
 <img src="https://user-images.githubusercontent.com/88223527/159200797-ddd4ae03-159d-4033-977b-e3691f94e348.gif" alt="commodify gif" width="30%" height="30%">
