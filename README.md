@@ -3,11 +3,8 @@ https://drive.google.com/file/d/1X-Fv-nVkO4FxjA2k8j_KOUHdg319wPea/view?usp=shari
 
 ## Implementation on hold
 -using only one channel for websocket</br>
--keysigning(google appstore)</br>
--email regex</br>
 -internet reconnection</br>
 -page swipe as alternative for page navigation</br>
--reduce boilerplate</br>
 
 ## Mobile Design Concept
 https://www.figma.com/file/U93V7MLShrY4ZTzh8gzpxY/CommoditiesFINAL.V2?node-id=247%3A224
