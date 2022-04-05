@@ -1,6 +1,8 @@
 # APK:
 https://drive.google.com/file/d/1IwxayjwHca_5fnmT2gtNFeXdh8Y0zYgT/view?usp=sharing
 
+## Backend has been taken down temporarily, replaced with a backup backend(some features may not be available)
+
 ## Implementation on hold
 -using only one channel for websocket</br>
 -internet reconnection</br>
