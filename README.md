@@ -1,13 +1,13 @@
 # APK:
-https://drive.google.com/file/d/1X-Fv-nVkO4FxjA2k8j_KOUHdg319wPea/view?usp=sharing
+https://drive.google.com/file/d/1IwxayjwHca_5fnmT2gtNFeXdh8Y0zYgT/view?usp=sharing
 
 ## Implementation on hold
 -using only one channel for websocket</br>
--keysigning(google appstore)</br>
--email regex</br>
 -internet reconnection</br>
 -page swipe as alternative for page navigation</br>
--reduce boilerplate</br>
+
+## Mobile Design Concept
+https://www.figma.com/file/U93V7MLShrY4ZTzh8gzpxY/CommoditiesFINAL.V2?node-id=247%3A224
 
 ## Overview
 <img src="https://user-images.githubusercontent.com/88223527/159200797-ddd4ae03-159d-4033-977b-e3691f94e348.gif" alt="commodify gif" width="30%" height="30%">
