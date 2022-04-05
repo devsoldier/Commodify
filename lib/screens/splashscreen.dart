@@ -1,8 +1,8 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+// import 'package:syncfusion_flutter_charts/charts.dart';
 import 'signup_screen.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
+// import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:lottie/lottie.dart';
 
 class SplashScreen extends StatefulWidget {

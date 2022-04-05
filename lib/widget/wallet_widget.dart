@@ -162,8 +162,8 @@ class _WalletWidgetState extends State<WalletWidget> {
                   child: TextFormField(
                     validator: (value) {
                       if (regex.hasMatch(value!)) return 'numbers only';
-                      if (value.isEmpty || int.parse(value) < 0)
-                        return 'add value more than 0';
+                      // if (value.isEmpty || int.parse(value) < 0)
+                      //   return 'add value more than 0';
                     },
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.number,

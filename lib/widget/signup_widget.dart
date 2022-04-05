@@ -423,6 +423,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                       if (value!.isEmpty ||
                                           !value.contains('@')) {
                                         return 'Invalid email!';
+                                      } else if (!value.contains('.com')) {
+                                        return 'Invalid email!';
                                       }
                                       return null;
                                     },
