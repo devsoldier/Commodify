@@ -134,7 +134,7 @@ class _TransactionWidgetState extends State<TransactionWidget> {
                             : (historydata.historyfiltered[i].tx_type == 'sell')
                                 ? Center(
                                     child: Text(
-                                        '+${historydata.historyfiltered[i].tx_amount.toStringAsFixed(2)}',
+                                        '+${historydata.historyfiltered[i].tx_amount}',
                                         style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,

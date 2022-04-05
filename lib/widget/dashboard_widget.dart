@@ -176,11 +176,11 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         Container(
                           child: Consumer<Auth>(
                             builder: (_, balancedata, __) =>
-                                (_isLoading == true)
+                                (balancedata.balance.isEmpty)
                                     ? Container(
                                         width: 15, height: 15, child: loadpage)
                                     : Text(
-                                        '\$${(balancedata.balance).toStringAsFixed(2)}',
+                                        '\$${balancedata.balance}',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,

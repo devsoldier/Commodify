@@ -655,7 +655,7 @@ class _WalletWidgetState extends State<WalletWidget> {
                   Container(
                     child: Consumer<Auth>(
                       builder: (_, auth, __) => Text(
-                        '\$${(auth.balance).toStringAsFixed(2)}',
+                        '\$${auth.balance}',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 28,

@@ -544,8 +544,9 @@ class _TradingWidgetState extends State<TradingWidget> {
               ),
             ),
             Consumer<Auth>(
-                builder: (_, data, __) =>
-                    Text('Balance ${data.asset[0].gold_amount}'))
+                builder: (_, data, __) => (data.asset.isEmpty)
+                    ? Flexible(child: CircularProgressIndicator())
+                    : Text('Balance ${data.asset[0].gold_amount}'))
           ],
         ),
         SizedBox(width: 40)
@@ -568,8 +569,9 @@ class _TradingWidgetState extends State<TradingWidget> {
               ),
             ),
             Consumer<Auth>(
-                builder: (_, data, __) =>
-                    Text('Balance ${data.asset[0].platinum_amount}'))
+                builder: (_, data, __) => (data.asset.isEmpty)
+                    ? Flexible(child: CircularProgressIndicator())
+                    : Text('Balance ${data.asset[0].platinum_amount}'))
           ],
         ),
         SizedBox(width: 40)
@@ -592,8 +594,9 @@ class _TradingWidgetState extends State<TradingWidget> {
               ),
             ),
             Consumer<Auth>(
-                builder: (_, data, __) =>
-                    Text('Balance ${data.asset[0].silver_amount}'))
+                builder: (_, data, __) => (data.asset.isEmpty)
+                    ? Flexible(child: CircularProgressIndicator())
+                    : Text('Balance ${data.asset[0].silver_amount}'))
           ],
         ),
         SizedBox(width: 40)
@@ -611,8 +614,9 @@ class _TradingWidgetState extends State<TradingWidget> {
           children: [
             Text('Palladium/USD'),
             Consumer<Auth>(
-                builder: (_, data, __) =>
-                    Text('Balance ${data.asset[0].palladium_amount}'))
+                builder: (_, data, __) => (data.asset.isEmpty)
+                    ? Flexible(child: CircularProgressIndicator())
+                    : Text('Balance ${data.asset[0].palladium_amount}'))
           ],
         ),
         SizedBox(width: 40)
@@ -772,15 +776,20 @@ class _TradingWidgetState extends State<TradingWidget> {
                                           Icons.monetization_on_outlined,
                                           color: Color.fromRGBO(0, 51, 116, 1),
                                         ),
-                                        Text(
-                                          '\$${(balancedata.balance).toStringAsFixed(2)}',
-                                          style: TextStyle(
-                                            color:
-                                                Color.fromRGBO(0, 51, 116, 1),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                        (balancedata.balance.isEmpty)
+                                            ? Flexible(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              )
+                                            : Text(
+                                                '\$${balancedata.balance}',
+                                                style: TextStyle(
+                                                  color: Color.fromRGBO(
+                                                      0, 51, 116, 1),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                       ],
                                     ),
                                   ),

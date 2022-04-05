@@ -41,7 +41,7 @@ class Auth with ChangeNotifier {
 
   Future<void> signup(
       String fname, String lname, String email, String password) async {
-    final url = Uri.parse('https://api.comd5.xyz/user/signup');
+    final url = Uri.parse('https://be.tradehikers.xyz/user/signup');
     var resBody = {};
     resBody["first_name"] = fname;
     resBody["last_name"] = lname;
@@ -63,7 +63,7 @@ class Auth with ChangeNotifier {
         }
       }
       // message.insert(0, "Successful Signup");
-      print(responseData);
+      print("message:${responseData}");
       token.insert(0, responseData['token']);
       notifyListeners();
 
@@ -81,8 +81,8 @@ class Auth with ChangeNotifier {
 
   Future<void> login(String email, String password) async {
     // token.clear();
-    // final url = Uri.parse('https://api.comd5.xyz/user/login');
-    final url = Uri.parse('https://api.comd5.xyz/user/login');
+    // final url = Uri.parse('https://be.tradehikers.xyz/user/login');
+    final url = Uri.parse('https://be.tradehikers.xyz/user/login');
     var resBody = {};
     resBody["email"] = email;
     resBody["password"] = password;
@@ -114,7 +114,7 @@ class Auth with ChangeNotifier {
     message.clear();
     message.insert(0, '');
 
-    final url = Uri.parse('https://api.comd5.xyz/resetPassword');
+    final url = Uri.parse('https://be.tradehikers.xyz/resetPassword');
     try {
       final response = await http.post(
         url,
@@ -137,7 +137,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> isAuth() async {
-    final url = Uri.parse('https://api.comd5.xyz/user/verify');
+    final url = Uri.parse('https://be.tradehikers.xyz/user/verify');
     final response = await http.get(
       url,
       headers: {
@@ -153,7 +153,7 @@ class Auth with ChangeNotifier {
   Future<void> istopup() async {
     message.clear();
     message.insert(0, '');
-    final url = Uri.parse('https://api.comd5.xyz/topup');
+    final url = Uri.parse('https://be.tradehikers.xyz/topup');
     try {
       final response = await http.put(
         url,
@@ -174,7 +174,7 @@ class Auth with ChangeNotifier {
   Future<void> buy(double amount, String product) async {
     message.clear();
     message.insert(0, '');
-    final url = Uri.parse('https://api.comd5.xyz/buy/${product}');
+    final url = Uri.parse('https://be.tradehikers.xyz/buy/${product}');
 
     var resBody = amount;
     var Body = json.encode({"buy_amount": resBody});
@@ -206,7 +206,7 @@ class Auth with ChangeNotifier {
   Future<void> sell(double amount, String product) async {
     message.clear();
     message.insert(0, '');
-    final url = Uri.parse('https://api.comd5.xyz/sell/${product}');
+    final url = Uri.parse('https://be.tradehikers.xyz/sell/${product}');
     var resBody = amount;
     var Body = json.encode({"sell_amount": resBody});
     try {
@@ -241,7 +241,7 @@ class Auth with ChangeNotifier {
   Future<void> iswithdraw(double amount) async {
     message.clear();
     message.insert(0, '');
-    final url = Uri.parse('https://api.comd5.xyz/withdraw');
+    final url = Uri.parse('https://be.tradehikers.xyz/withdraw');
     var resBody = amount;
     var Body = json.encode({"withdraw_amount": resBody});
     try {
@@ -268,7 +268,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> getbalance() async {
-    final url = Uri.parse('https://api.comd5.xyz/display/balance');
+    final url = Uri.parse('https://be.tradehikers.xyz/display/balance');
 
     final response = await http.get(
       url,
@@ -287,7 +287,7 @@ class Auth with ChangeNotifier {
     // user.clear();
     // emailuser.clear();
     // phonenumber.clear();
-    final url = Uri.parse('https://api.comd5.xyz/display/user');
+    final url = Uri.parse('https://be.tradehikers.xyz/display/user');
     // var resBody = amount;
     // var Body = json.encode({"withdraw_amount": resBody});
     final response = await http.get(
@@ -338,7 +338,7 @@ class Auth with ChangeNotifier {
     pieasset.clear();
     // assetamount.insert(0, [0, 0, 0, 0]);
 
-    final url = Uri.parse('https://api.comd5.xyz/display/asset');
+    final url = Uri.parse('https://be.tradehikers.xyz/display/asset');
     // var resBody = amount;
     // var Body = json.encode({"withdraw_amount": resBody});
     assettype.insertAll(0, ["Gold", "Platinum", "Silver", "Palladium"]);
@@ -397,7 +397,7 @@ class Auth with ChangeNotifier {
   Future<void> gethistory(String filteroption, String sortoption) async {
     history.clear();
     historyfiltered.clear();
-    final url = Uri.parse('https://api.comd5.xyz/display/transaction');
+    final url = Uri.parse('https://be.tradehikers.xyz/display/transaction');
     final response = await http.get(
       url,
       headers: {
@@ -468,7 +468,7 @@ class Auth with ChangeNotifier {
 
   Future<void> getpaymenthistory(String filteroption, String sortoption) async {
     phistory.clear();
-    final url = Uri.parse('https://api.comd5.xyz/display/payment');
+    final url = Uri.parse('https://be.tradehikers.xyz/display/payment');
 
     final response = await http.get(
       url,
@@ -547,7 +547,7 @@ class Auth with ChangeNotifier {
     message.clear();
     message.insert(0, '');
     // asset.clear();
-    final url = Uri.parse('https://api.comd5.xyz/updateUser');
+    final url = Uri.parse('https://be.tradehikers.xyz/updateUser');
     // var resBody = amount;
     // var Body = json.encode({"withdraw_amount": resBody});
 
