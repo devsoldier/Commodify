@@ -462,7 +462,7 @@ class Auth with ChangeNotifier {
         historyfiltered = historysell.reversed.toList();
       }
     }
-
+    print(responseData[0]['timestamp'].runtimeType);
     notifyListeners();
   }
 
@@ -482,7 +482,7 @@ class Auth with ChangeNotifier {
 
     for (int i = 0; i < responseData.length; i++) {
       timeConverted.add(DateTime.fromMillisecondsSinceEpoch(
-          responseData[i]['payment_timestamp'] * 1000));
+          int.parse(responseData[i]['payment_timestamp']) * 1000));
 
       phistory.add(
         PaymentHistory(
@@ -491,7 +491,7 @@ class Auth with ChangeNotifier {
             payment_amount: responseData[i]["payment_amount"],
             payment_status: responseData[i]["payment_status"],
             payment_timestamp: timeConverted[i],
-            payment_id: responseData[i]["payment_id"]),
+            payment_id: responseData[i]["payment_id"].toString()),
       );
       phistoryoldestdate = phistory;
       phistoryoldestdate
@@ -539,7 +539,7 @@ class Auth with ChangeNotifier {
       }
     }
     // print(phistoryfiltered);
-    // print(phistory);
+    // print(responseData[0]['payment_timestamp'].runtimeType);
     notifyListeners();
   }
 
@@ -559,10 +559,10 @@ class Auth with ChangeNotifier {
       },
       body: json.encode({"phone_number": phonenum}),
     );
-    // print(phonenum);
+    print(phonenum);
     message.insert(0, "Update Successful");
     final responseData = json.decode(response.body);
-    // print(responseData);
+    print(responseData);
     notifyListeners();
   }
 

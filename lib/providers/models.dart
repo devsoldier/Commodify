@@ -18,7 +18,7 @@ class Commodity {
 }
 
 class TransactionHistory {
-  final String user_id;
+  final dynamic user_id;
   final DateTime epoch;
   final dynamic tx_amount;
   final String tx_type;
@@ -37,7 +37,7 @@ class TransactionHistory {
 }
 
 class UserDetail {
-  final String user_id;
+  final dynamic user_id;
   final String user_email;
   final String first_name;
   final String last_name;
@@ -63,7 +63,7 @@ class UserDetail {
 // }
 
 class PaymentHistory {
-  final String user_id;
+  final dynamic user_id;
   final String payment_type;
   final dynamic payment_amount;
   final String payment_status;
@@ -83,7 +83,7 @@ class PaymentHistory {
 }
 
 class UserAsset {
-  final String user_id;
+  final dynamic user_id;
   final dynamic gold_amount;
   final dynamic platinum_amount;
   final dynamic silver_amount;

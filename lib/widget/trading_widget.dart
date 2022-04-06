@@ -476,8 +476,8 @@ class _TradingWidgetState extends State<TradingWidget> {
     tickStreamPALLA();
     tickStreamGOLD();
     tickStreamSILVER();
-    handShake();
-    initialValue();
+    // handShake();
+    // initialValue();
     _zoomPanBehavior = ZoomPanBehavior(
         enablePinching: true,
         enableDoubleTapZooming: true,
@@ -716,7 +716,7 @@ class _TradingWidgetState extends State<TradingWidget> {
         //   left: 190,
         //   child:
         // ),
-        graph,
+        // graph,
       ],
     );
 
@@ -724,7 +724,7 @@ class _TradingWidgetState extends State<TradingWidget> {
         ? minimized
         : Stack(
             children: [
-              graph,
+              // graph,
               Positioned(
                 left: MediaQuery.of(context).size.width * 0.02,
                 bottom: 0,

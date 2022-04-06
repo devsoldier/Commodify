@@ -231,7 +231,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         AssetsChart(),
                       ],
                     ),
-                    Graph(),
+                    // Graph(),
                   ],
                 ),
               ),

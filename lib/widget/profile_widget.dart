@@ -247,7 +247,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                   children: [
                                     Flexible(
                                       child: Text(
-                                        datauser.user[0].user_id,
+                                        '${datauser.user[0].user_id}',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
